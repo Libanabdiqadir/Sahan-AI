@@ -1,0 +1,14 @@
+# Django Local Environment & DB
+Sahan_backend/.venv/
+Sahan_backend/venv/
+Sahan_backend/__pycache__/
+*.pyc
+Sahan_backend/db.sqlite3
+Sahan_backend/.env
+Sahan_backend/profile_pics/
+
+
+# React Local Environment & Dependencies
+Sahan_frontend/node_modules/
+Sahan_frontend/dist/
+Sahan_frontend/.env.local
