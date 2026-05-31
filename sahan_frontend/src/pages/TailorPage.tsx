@@ -1,23 +1,25 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Sparkles,
-  Download,
-  Plus,
-  Loader2,
-  AlertCircle,
-  CheckCircle2,
-  FileText,
-  Mail,
-  ChevronDown,
-  ChevronUp,
+  Sparkles, Download, Plus, Loader2, AlertCircle,
+  CheckCircle2, FileText, Mail, ChevronDown, ChevronUp, X,
 } from "lucide-react";
 import { resumeApi, profileApi } from "../services/api";
 import type { UserProfile, ResumeHistory } from "../types";
 import { HarvardCV } from "../components/resume/HarvardCV";
 import { ExecutiveCV } from "../components/resume/ExecutiveCV";
+import {
+  ModernProfessionalCV,
+  ModernProfessionalPreview,
+  ModernProfessionalCoverLetterPreview,
+} from "../components/resume/ModernProfessionalCV";
+import {
+  ModernMinimalistCV,
+  ModernMinimalistPreview,
+  ModernMinimalistCoverLetterPreview,
+} from "../components/resume/ModernMinimalistCV";
 
-type Template = "harvard" | "executive";
+type Template = "harvard" | "executive" | "modern" | "minimalist";
 
 // ─── Sidebar helpers ────────────────────────────────────────────────────────────
 function SidebarSection({ title, children, onAdd }: { title: string; children: React.ReactNode; onAdd?: () => void }) {
@@ -54,58 +56,54 @@ function SkillTag({ label, variant = "blue" }: { label: string; variant?: "blue"
   return <span className={`font-sans text-[11px] font-medium px-2.5 py-1 rounded-full border ${cls}`}>{label}</span>;
 }
 
-// ─── Harvard CV Browser Preview ─────────────────────────────────────────────────
+// ─── Harvard CV Preview (browser) ──────────────────────────────────────────────
 function HarvardPreview({ profile, tailored }: { profile: UserProfile; tailored: NonNullable<ResumeHistory["tailored_data"]> }) {
   const contact = [profile.contact_email, profile.phone_number, profile.location, profile.linkedin_url].filter(Boolean).join("  ·  ");
   return (
     <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", padding: "25.4mm", fontFamily: "Arial, sans-serif", fontSize: "12px", lineHeight: "1.5", color: "#1a1a2e", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box" }}>
       <h1 style={{ fontSize: "20px", fontWeight: "700", textAlign: "center", textTransform: "uppercase", letterSpacing: "2.5px", marginBottom: "5px" }}>{profile.full_name}</h1>
       <p style={{ fontSize: "11px", textAlign: "center", color: "#4b5563", marginBottom: "10px" }}>{contact}</p>
-      <hr style={{ border: "none", borderTop: "1.5px solid #1a1a2e", marginBottom: "12px" }} />
-
+      <hr style={{ border: "none", borderTop: "1.5px solid #1a1a2e", marginBottom: "14px" }} />
       {tailored.summary && (
-        <div style={{ marginBottom: "14px" }}>
-          <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "3px", marginBottom: "7px" }}>Professional Summary</p>
-          <p style={{ fontSize: "12px", fontStyle: "italic", color: "#374151", lineHeight: "1.6" }}>{tailored.summary}</p>
+        <div style={{ marginBottom: "16px" }}>
+          <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "8px" }}>Professional Summary</p>
+          <p style={{ fontSize: "12px", fontStyle: "italic", color: "#374151", lineHeight: "1.7" }}>{tailored.summary}</p>
         </div>
       )}
-
       {tailored.experience?.length > 0 && (
-        <div style={{ marginBottom: "14px" }}>
-          <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "3px", marginBottom: "7px" }}>Professional Experience</p>
+        <div style={{ marginBottom: "16px" }}>
+          <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Professional Experience</p>
           {tailored.experience.map((exp, i) => (
-            <div key={i} style={{ marginBottom: "10px" }}>
+            <div key={i} style={{ marginBottom: "14px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={{ fontWeight: "700", fontSize: "12px" }}>{exp.role}</span>
+                <span style={{ fontWeight: "700", fontSize: "13px" }}>{exp.role}</span>
                 <span style={{ fontSize: "11px", color: "#6b7280" }}>{exp.duration}</span>
               </div>
-              <p style={{ fontStyle: "italic", fontSize: "11px", color: "#374151", marginBottom: "4px" }}>{exp.company}</p>
-              <ul style={{ marginLeft: "14px", marginTop: "3px" }}>
-                {exp.responsibilities?.map((r, j) => <li key={j} style={{ fontSize: "11px", lineHeight: "1.5", marginBottom: "2px" }}>{r}</li>)}
+              <p style={{ fontStyle: "italic", fontSize: "12px", color: "#374151", marginBottom: "6px", marginTop: "2px" }}>{exp.company}</p>
+              <ul style={{ marginLeft: "16px" }}>
+                {exp.responsibilities?.map((r, j) => <li key={j} style={{ fontSize: "12px", lineHeight: "1.6", marginBottom: "4px" }}>{r}</li>)}
               </ul>
             </div>
           ))}
         </div>
       )}
-
       {tailored.education?.length > 0 && (
-        <div style={{ marginBottom: "14px" }}>
-          <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "3px", marginBottom: "7px" }}>Education</p>
+        <div style={{ marginBottom: "16px" }}>
+          <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Education</p>
           {tailored.education.map((edu, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
               <div>
-                <p style={{ fontWeight: "700", fontSize: "12px" }}>{edu.degree}</p>
-                <p style={{ fontStyle: "italic", fontSize: "11px", color: "#374151" }}>{edu.university}</p>
+                <p style={{ fontWeight: "700", fontSize: "13px" }}>{edu.degree}</p>
+                <p style={{ fontStyle: "italic", fontSize: "12px", color: "#374151" }}>{edu.university}</p>
               </div>
-              <span style={{ fontSize: "11px", color: "#6b7280" }}>{edu.graduation_year}</span>
+              <span style={{ fontSize: "12px", color: "#6b7280" }}>{edu.graduation_year}</span>
             </div>
           ))}
         </div>
       )}
-
       <div>
-        <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "3px", marginBottom: "7px" }}>Skills & Languages</p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "11px" }}>
+        <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Skills & Languages</p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "12px" }}>
           {tailored.tech_skills?.length > 0 && <div><span style={{ fontWeight: "700" }}>Technical: </span><span style={{ color: "#374151" }}>{tailored.tech_skills.join(", ")}</span></div>}
           {tailored.soft_skills?.length > 0 && <div><span style={{ fontWeight: "700" }}>Soft Skills: </span><span style={{ color: "#374151" }}>{tailored.soft_skills.join(", ")}</span></div>}
           {tailored.languages?.length > 0 && <div><span style={{ fontWeight: "700" }}>Languages: </span><span style={{ color: "#374151" }}>{tailored.languages.join(", ")}</span></div>}
@@ -115,99 +113,97 @@ function HarvardPreview({ profile, tailored }: { profile: UserProfile; tailored:
   );
 }
 
-// ─── Executive CV Browser Preview ───────────────────────────────────────────────
-function ExecutivePreview({ profile, tailored }: { profile: UserProfile; tailored: NonNullable<ResumeHistory["tailored_data"]> }) {
-  const NAVY = "#1e2d4a";
-  const GOLD = "#b8972e";
-  const LIGHT = "#f4f6f9";
+// ─── Harvard Cover Letter Preview ──────────────────────────────────────────────
+function HarvardCoverLetterPreview({ profile, tailored, jobTitle, companyName }: { profile: UserProfile; tailored: NonNullable<ResumeHistory["tailored_data"]>; jobTitle: string; companyName: string }) {
+  const contact = [profile.contact_email, profile.phone_number, profile.location, profile.linkedin_url].filter(Boolean).join("  ·  ");
+  const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   return (
-    <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", fontFamily: "Arial, sans-serif", fontSize: "11px", lineHeight: "1.5", color: "#2d3748", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box", overflow: "hidden" }}>
-      {/* Navy Header */}
-      <div style={{ background: NAVY, padding: "28px 32px 20px", color: "white" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: "700", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "6px", color: "white" }}>{profile.full_name}</h1>
-        <div style={{ width: "48px", height: "3px", background: GOLD, marginBottom: "10px" }} />
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", fontSize: "10px", color: "#cbd5e0" }}>
+    <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", padding: "25.4mm", fontFamily: "Arial, sans-serif", fontSize: "12px", lineHeight: "1.7", color: "#1a1a2e", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box" }}>
+      <h1 style={{ fontSize: "20px", fontWeight: "700", textAlign: "center", textTransform: "uppercase", letterSpacing: "2.5px", marginBottom: "5px" }}>{profile.full_name}</h1>
+      <p style={{ fontSize: "11px", textAlign: "center", color: "#4b5563", marginBottom: "10px" }}>{contact}</p>
+      <hr style={{ border: "none", borderTop: "1.5px solid #1a1a2e", marginBottom: "28px" }} />
+      <p style={{ fontSize: "12px", marginBottom: "20px" }}>{today}</p>
+      <p style={{ fontSize: "12px", marginBottom: "6px" }}><strong>Hiring Manager</strong></p>
+      <p style={{ fontSize: "12px", marginBottom: "24px" }}>{companyName}</p>
+      <p style={{ fontSize: "12px", fontWeight: "700", marginBottom: "24px" }}>Re: Application for {jobTitle}</p>
+      {tailored.cover_letter?.split("\n\n").map((para, i) => (
+        <p key={i} style={{ fontSize: "12px", lineHeight: "1.8", marginBottom: "16px" }}>{para.trim()}</p>
+      ))}
+      <div style={{ marginTop: "36px", fontSize: "12px" }}>
+        <p style={{ marginBottom: "48px" }}>Sincerely,</p>
+        <p style={{ fontWeight: "700", fontSize: "13px" }}>{profile.full_name}</p>
+        {profile.contact_email && <p style={{ fontSize: "11px", color: "#4b5563", marginTop: "4px" }}>{profile.contact_email}</p>}
+        {profile.phone_number && <p style={{ fontSize: "11px", color: "#4b5563" }}>{profile.phone_number}</p>}
+      </div>
+    </div>
+  );
+}
+
+// ─── Executive CV Preview (browser) ────────────────────────────────────────────
+function ExecutivePreview({ profile, tailored }: { profile: UserProfile; tailored: NonNullable<ResumeHistory["tailored_data"]> }) {
+  const NAVY = "#1e2d4a"; const GOLD = "#b8972e"; const LIGHT = "#f4f6f9";
+  return (
+    <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", fontFamily: "Arial, sans-serif", fontSize: "11px", lineHeight: "1.6", color: "#2d3748", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box", overflow: "hidden" }}>
+      <div style={{ background: NAVY, padding: "32px 36px 24px" }}>
+        <h1 style={{ fontSize: "26px", fontWeight: "700", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "8px", color: "white" }}>{profile.full_name}</h1>
+        <div style={{ width: "56px", height: "3px", background: GOLD, marginBottom: "12px" }} />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", fontSize: "10.5px", color: "#cbd5e0" }}>
           {profile.contact_email && <span>✉ {profile.contact_email}</span>}
           {profile.phone_number && <span>✆ {profile.phone_number}</span>}
           {profile.location && <span>⊙ {profile.location}</span>}
           {profile.linkedin_url && <span>in {profile.linkedin_url}</span>}
         </div>
       </div>
-      {/* Two columns */}
-      <div style={{ display: "flex" }}>
-        {/* Left sidebar */}
-        <div style={{ width: "33%", background: LIGHT, padding: "24px 20px", borderRight: `3px solid ${NAVY}` }}>
+      <div style={{ display: "flex", minHeight: "calc(297mm - 120px)" }}>
+        <div style={{ width: "34%", background: LIGHT, padding: "28px 22px", borderRight: `3px solid ${NAVY}` }}>
           {tailored.tech_skills?.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <div style={{ fontSize: "9px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "4px", marginBottom: "10px" }}>Technical Skills</div>
-              {tailored.tech_skills.map((s, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "5px" }}>
-                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: GOLD, flexShrink: 0 }} />
-                  <span style={{ fontSize: "10px" }}>{s}</span>
-                </div>
-              ))}
+            <div style={{ marginBottom: "24px" }}>
+              <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Technical Skills</div>
+              {tailored.tech_skills.map((s, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: GOLD, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{s}</span></div>)}
             </div>
           )}
           {tailored.soft_skills?.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <div style={{ fontSize: "9px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "4px", marginBottom: "10px" }}>Core Competencies</div>
-              {tailored.soft_skills.map((s, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "5px" }}>
-                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: NAVY, flexShrink: 0 }} />
-                  <span style={{ fontSize: "10px" }}>{s}</span>
-                </div>
-              ))}
+            <div style={{ marginBottom: "24px" }}>
+              <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Core Competencies</div>
+              {tailored.soft_skills.map((s, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: NAVY, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{s}</span></div>)}
             </div>
           )}
           {tailored.education?.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <div style={{ fontSize: "9px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "4px", marginBottom: "10px" }}>Education</div>
-              {tailored.education.map((edu, i) => (
-                <div key={i} style={{ marginBottom: "10px" }}>
-                  <p style={{ fontWeight: "700", fontSize: "10px", color: NAVY }}>{edu.degree}</p>
-                  <p style={{ fontSize: "10px", color: "#4a5568", fontStyle: "italic" }}>{edu.university}</p>
-                  <p style={{ fontSize: "9px", color: "#718096" }}>{edu.graduation_year}</p>
-                </div>
-              ))}
+            <div style={{ marginBottom: "24px" }}>
+              <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Education</div>
+              {tailored.education.map((edu, i) => <div key={i} style={{ marginBottom: "12px" }}><p style={{ fontWeight: "700", fontSize: "11px", color: NAVY }}>{edu.degree}</p><p style={{ fontSize: "10.5px", color: "#4a5568", fontStyle: "italic" }}>{edu.university}</p><p style={{ fontSize: "10.5px", color: "#718096" }}>{edu.graduation_year}</p></div>)}
             </div>
           )}
           {tailored.languages?.length > 0 && (
             <div>
-              <div style={{ fontSize: "9px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "4px", marginBottom: "10px" }}>Languages</div>
-              {tailored.languages.map((l, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "5px" }}>
-                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: GOLD, flexShrink: 0 }} />
-                  <span style={{ fontSize: "10px" }}>{l}</span>
-                </div>
-              ))}
+              <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Languages</div>
+              {tailored.languages.map((l, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: GOLD, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{l}</span></div>)}
             </div>
           )}
         </div>
-        {/* Right main */}
-        <div style={{ flex: 1, padding: "24px 28px" }}>
+        <div style={{ flex: 1, padding: "28px 32px" }}>
           {tailored.summary && (
-            <div style={{ marginBottom: "20px" }}>
-              <div style={{ fontSize: "9px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "4px", marginBottom: "10px" }}>Executive Summary</div>
-              <p style={{ fontSize: "11px", color: "#4a5568", lineHeight: "1.7", fontStyle: "italic" }}>{tailored.summary}</p>
+            <div style={{ marginBottom: "24px" }}>
+              <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Executive Summary</div>
+              <p style={{ fontSize: "12px", color: "#4a5568", lineHeight: "1.8", fontStyle: "italic" }}>{tailored.summary}</p>
             </div>
           )}
           {tailored.experience?.length > 0 && (
             <div>
-              <div style={{ fontSize: "9px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "4px", marginBottom: "12px" }}>Professional Experience</div>
+              <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "14px" }}>Professional Experience</div>
               {tailored.experience.map((exp, i) => (
-                <div key={i} style={{ marginBottom: "14px", paddingLeft: "10px", borderLeft: `3px solid ${GOLD}` }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2px" }}>
-                    <p style={{ fontWeight: "700", fontSize: "12px", color: NAVY }}>{exp.role}</p>
-                    <span style={{ fontSize: "9px", color: "white", background: NAVY, padding: "2px 8px", borderRadius: "20px", whiteSpace: "nowrap", marginLeft: "8px", flexShrink: 0 }}>{exp.duration}</span>
+                <div key={i} style={{ marginBottom: "18px", paddingLeft: "14px", borderLeft: `3px solid ${GOLD}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "3px" }}>
+                    <p style={{ fontWeight: "700", fontSize: "13px", color: NAVY }}>{exp.role}</p>
+                    <span style={{ fontSize: "10px", color: "white", background: NAVY, padding: "3px 10px", borderRadius: "20px", marginLeft: "10px", flexShrink: 0, whiteSpace: "nowrap" }}>{exp.duration}</span>
                   </div>
-                  <p style={{ fontSize: "10px", color: GOLD, fontWeight: "600", marginBottom: "6px" }}>{exp.company}</p>
-                  <ul style={{ marginLeft: "2px" }}>
-                    {exp.responsibilities?.map((r, j) => (
-                      <li key={j} style={{ fontSize: "10px", lineHeight: "1.5", marginBottom: "3px", color: "#4a5568", listStyle: "none", paddingLeft: "10px", position: "relative" }}>
-                        <span style={{ position: "absolute", left: 0, color: GOLD }}>›</span>{r}
-                      </li>
-                    ))}
-                  </ul>
+                  <p style={{ fontSize: "11px", color: GOLD, fontWeight: "700", marginBottom: "8px" }}>{exp.company}</p>
+                  {exp.responsibilities?.map((r, j) => (
+                    <div key={j} style={{ display: "flex", marginBottom: "5px", paddingLeft: "4px" }}>
+                      <span style={{ color: GOLD, marginRight: "6px", fontSize: "13px", lineHeight: "1.5" }}>›</span>
+                      <span style={{ fontSize: "11px", lineHeight: "1.6", color: "#4a5568" }}>{r}</span>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -218,26 +214,194 @@ function ExecutivePreview({ profile, tailored }: { profile: UserProfile; tailore
   );
 }
 
-// ─── Cover Letter Browser Preview ───────────────────────────────────────────────
-function CoverLetterPreview({ profile, tailored, jobTitle, companyName }: { profile: UserProfile; tailored: NonNullable<ResumeHistory["tailored_data"]>; jobTitle: string; companyName: string }) {
-  const contact = [profile.contact_email, profile.phone_number, profile.location, profile.linkedin_url].filter(Boolean).join("  ·  ");
+// ─── Executive Cover Letter Preview ────────────────────────────────────────────
+function ExecutiveCoverLetterPreview({ profile, tailored, jobTitle, companyName }: { profile: UserProfile; tailored: NonNullable<ResumeHistory["tailored_data"]>; jobTitle: string; companyName: string }) {
+  const NAVY = "#1e2d4a"; const GOLD = "#b8972e";
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  const contact = [profile.contact_email, profile.phone_number, profile.location, profile.linkedin_url].filter(Boolean).join("  ·  ");
   return (
-    <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", padding: "25.4mm", fontFamily: "Arial, sans-serif", fontSize: "12px", lineHeight: "1.7", color: "#1a1a2e", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box" }}>
-      <h1 style={{ fontSize: "20px", fontWeight: "700", textAlign: "center", textTransform: "uppercase", letterSpacing: "2.5px", marginBottom: "5px" }}>{profile.full_name}</h1>
-      <p style={{ fontSize: "11px", textAlign: "center", color: "#4b5563", marginBottom: "10px" }}>{contact}</p>
-      <hr style={{ border: "none", borderTop: "1.5px solid #1a1a2e", marginBottom: "20px" }} />
-      <p style={{ fontSize: "12px", marginBottom: "16px" }}>{today}</p>
-      <p style={{ fontSize: "12px", marginBottom: "16px", lineHeight: "1.6" }}><strong>Hiring Manager</strong><br />{companyName}</p>
-      <p style={{ fontSize: "12px", fontWeight: "700", marginBottom: "20px" }}>Re: Application for {jobTitle}</p>
-      {tailored.cover_letter?.split("\n\n").map((para, i) => (
-        <p key={i} style={{ fontSize: "12px", lineHeight: "1.7", marginBottom: "14px", color: "#1a1a2e" }}>{para.trim()}</p>
-      ))}
-      <div style={{ marginTop: "32px", fontSize: "12px" }}>
-        <p style={{ marginBottom: "40px" }}>Sincerely,</p>
-        <p style={{ fontWeight: "700" }}>{profile.full_name}</p>
-        {profile.contact_email && <p style={{ fontSize: "11px", color: "#4b5563" }}>{profile.contact_email}</p>}
-        {profile.phone_number && <p style={{ fontSize: "11px", color: "#4b5563" }}>{profile.phone_number}</p>}
+    <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", fontFamily: "Arial, sans-serif", fontSize: "12px", lineHeight: "1.7", color: "#2d3748", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box", overflow: "hidden" }}>
+      <div style={{ background: NAVY, padding: "32px 36px 24px" }}>
+        <h1 style={{ fontSize: "26px", fontWeight: "700", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "8px", color: "white" }}>{profile.full_name}</h1>
+        <div style={{ width: "56px", height: "3px", background: GOLD, marginBottom: "12px" }} />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", fontSize: "10.5px", color: "#cbd5e0" }}>
+          {profile.contact_email && <span>✉ {profile.contact_email}</span>}
+          {profile.phone_number && <span>✆ {profile.phone_number}</span>}
+          {profile.location && <span>⊙ {profile.location}</span>}
+          {profile.linkedin_url && <span>in {profile.linkedin_url}</span>}
+        </div>
+      </div>
+      <div style={{ padding: "36px 40px" }}>
+        <p style={{ fontSize: "12px", color: "#718096", marginBottom: "28px" }}>{today}</p>
+        <div style={{ width: "40px", height: "2px", background: GOLD, marginBottom: "12px" }} />
+        <p style={{ fontSize: "13px", fontWeight: "700", color: NAVY, marginBottom: "4px" }}>Hiring Manager</p>
+        <p style={{ fontSize: "12px", color: "#4a5568", marginBottom: "24px" }}>{companyName}</p>
+        <div style={{ background: NAVY, padding: "10px 16px", borderRadius: "6px", marginBottom: "28px", borderLeft: `4px solid ${GOLD}` }}>
+          <p style={{ fontSize: "12px", fontWeight: "700", color: "white", margin: 0 }}>Re: Application for {jobTitle}</p>
+        </div>
+        {tailored.cover_letter?.split("\n\n").map((para, i) => (
+          <p key={i} style={{ fontSize: "12px", lineHeight: "1.8", marginBottom: "18px", color: "#374151" }}>{para.trim()}</p>
+        ))}
+        <div style={{ marginTop: "36px", paddingTop: "24px", borderTop: `2px solid ${GOLD}` }}>
+          <p style={{ fontSize: "12px", color: "#4a5568", marginBottom: "36px" }}>Sincerely,</p>
+          <p style={{ fontSize: "15px", fontWeight: "700", color: NAVY, marginBottom: "6px" }}>{profile.full_name}</p>
+          {profile.contact_email && <p style={{ fontSize: "11px", color: "#718096" }}>{profile.contact_email}</p>}
+          {profile.phone_number && <p style={{ fontSize: "11px", color: "#718096" }}>{profile.phone_number}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Mini Template Previews ─────────────────────────────────────────────────────
+function ModernMiniPreview() {
+  return (
+    <div className="w-full aspect-[3/4] rounded-md border border-slate-200 overflow-hidden bg-white flex flex-col">
+      <div className="bg-slate-800 px-2 py-1.5 flex items-center gap-1.5 shrink-0">
+        <div className="w-4 h-4 rounded-full bg-blue-400 shrink-0" />
+        <div className="space-y-0.5">
+          <div className="h-1.5 w-12 bg-white/80 rounded-sm" />
+          <div className="h-1 w-8 bg-white/40 rounded-sm" />
+        </div>
+      </div>
+      <div className="flex flex-1 overflow-hidden">
+        <div className="w-2/5 bg-slate-100 p-1 space-y-1 shrink-0 border-r border-slate-200">
+          <div className="h-1 w-3/4 bg-blue-400 rounded-sm" />
+          {[0,1,2,3].map(i => (
+            <div key={i} className="flex items-center gap-0.5">
+              <div className="w-1 h-1 rounded-full bg-slate-400 shrink-0" />
+              <div className={`h-0.5 rounded-sm bg-slate-300 ${i % 2 === 0 ? "w-3/4" : "w-1/2"}`} />
+            </div>
+          ))}
+          <div className="h-px bg-slate-200" />
+          <div className="h-1 w-2/3 bg-blue-400 rounded-sm" />
+          {[0,1,2].map(i => (
+            <div key={i} className={`h-0.5 rounded-sm bg-slate-300 ${i % 2 === 0 ? "w-full" : "w-3/4"}`} />
+          ))}
+        </div>
+        <div className="flex-1 p-1 space-y-1 overflow-hidden">
+          <div className="h-1 w-2/3 bg-slate-700 rounded-sm" />
+          <div className="h-0.5 w-full bg-slate-200 rounded-sm" />
+          <div className="h-0.5 w-5/6 bg-slate-200 rounded-sm" />
+          <div className="h-0.5 w-3/4 bg-slate-200 rounded-sm" />
+          <div className="h-px bg-slate-100" />
+          <div className="h-1 w-1/2 bg-slate-700 rounded-sm" />
+          {[0,1,2,3].map(i => (
+            <div key={i} className={`h-0.5 rounded-sm bg-slate-200 ${i % 2 === 0 ? "w-full" : "w-4/5"}`} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveMiniPreview() {
+  return (
+    <div className="w-full aspect-[3/4] rounded-md border border-slate-200 overflow-hidden bg-white flex flex-col">
+      <div className="bg-[#1e2d4a] px-2 py-2 shrink-0">
+        <div className="h-2 w-14 bg-white/90 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-5 bg-[#b8972e] mb-1" />
+        <div className="h-0.5 w-16 bg-white/30 rounded-sm" />
+      </div>
+      <div className="flex flex-1 overflow-hidden">
+        <div className="w-[35%] bg-slate-100 p-1 space-y-1 shrink-0 border-r-2 border-[#1e2d4a]">
+          <div className="h-0.5 w-3/4 bg-[#1e2d4a] rounded-sm" />
+          {[0,1,2].map(i => (
+            <div key={i} className="flex items-center gap-0.5">
+              <div className="w-1 h-1 rounded-full bg-[#b8972e] shrink-0" />
+              <div className={`h-0.5 bg-slate-300 rounded-sm ${i === 0 ? "w-full" : i === 1 ? "w-3/4" : "w-1/2"}`} />
+            </div>
+          ))}
+          <div className="h-0.5 w-2/3 bg-[#1e2d4a] rounded-sm mt-1" />
+          {[0,1].map(i => (
+            <div key={i} className="flex items-center gap-0.5">
+              <div className="w-1 h-1 rounded-full bg-slate-400 shrink-0" />
+              <div className={`h-0.5 bg-slate-300 rounded-sm ${i === 0 ? "w-3/4" : "w-1/2"}`} />
+            </div>
+          ))}
+        </div>
+        <div className="flex-1 p-1 space-y-1 overflow-hidden">
+          <div className="h-0.5 w-2/3 bg-[#1e2d4a] rounded-sm" />
+          <div className="h-0.5 w-full bg-slate-200 rounded-sm" />
+          <div className="h-0.5 w-4/5 bg-slate-200 rounded-sm" />
+          {[0,1].map(i => (
+            <div key={i} className="pl-1 border-l-2 border-[#b8972e] space-y-0.5 mt-0.5">
+              <div className="h-1 w-3/4 bg-[#1e2d4a] rounded-sm" />
+              <div className="h-0.5 w-1/2 bg-[#b8972e] rounded-sm" />
+              <div className="h-0.5 w-full bg-slate-200 rounded-sm" />
+              <div className="h-0.5 w-4/5 bg-slate-200 rounded-sm" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MinimalistMiniPreview() {
+  return (
+    <div className="w-full aspect-[3/4] rounded-md border border-slate-200 overflow-hidden bg-white flex flex-col">
+      <div className="h-0.5 bg-slate-700 shrink-0" />
+      <div className="px-2 py-1.5 border-b border-slate-200 shrink-0">
+        <div className="h-1.5 w-3/4 bg-slate-800 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-1/2 bg-slate-400 rounded-sm" />
+      </div>
+      <div className="flex flex-1 overflow-hidden">
+        <div className="w-[30%] bg-slate-50 p-1 space-y-0.5 shrink-0 border-r border-slate-200">
+          <div className="h-0.5 w-3/4 bg-slate-500 rounded-sm mb-0.5" />
+          {[0,1,2].map(i => (
+            <div key={i} className={`h-0.5 rounded-sm bg-slate-300 ${i === 0 ? "w-full" : i === 1 ? "w-3/4" : "w-1/2"}`} />
+          ))}
+          <div className="h-px bg-slate-200" />
+          <div className="h-0.5 w-2/3 bg-slate-500 rounded-sm mb-0.5" />
+          {[0,1,2,3].map(i => (
+            <div key={i} className="h-0.5 bg-slate-200 rounded-sm" style={{ width: `${60 + (i % 2) * 20}%` }} />
+          ))}
+        </div>
+        <div className="flex-1 p-1 space-y-0.5 overflow-hidden">
+          <div className="h-0.5 w-2/3 bg-slate-600 rounded-sm" />
+          <div className="h-px bg-slate-200" />
+          <div className="h-0.5 w-full bg-slate-200 rounded-sm" />
+          <div className="h-0.5 w-5/6 bg-slate-200 rounded-sm" />
+          <div className="h-px bg-slate-100" />
+          <div className="h-0.5 w-1/2 bg-slate-600 rounded-sm" />
+          {[0,1,2,3].map(i => (
+            <div key={i} className={`h-0.5 rounded-sm bg-slate-200 ${i % 2 === 0 ? "w-full" : "w-4/5"}`} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HarvardMiniPreview() {
+  return (
+    <div className="w-full aspect-[3/4] rounded-md border border-slate-200 overflow-hidden bg-white p-2 flex flex-col">
+      <div className="flex flex-col items-center mb-1.5 shrink-0">
+        <div className="h-2 w-3/4 bg-slate-800 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-full bg-slate-300 rounded-sm" />
+      </div>
+      <div className="h-px bg-slate-800 mb-1.5 shrink-0" />
+      <div className="mb-1.5">
+        <div className="h-0.5 w-16 bg-slate-700 rounded-sm mb-0.5" />
+        <div className="h-px bg-slate-200 mb-0.5" />
+        <div className="h-0.5 w-full bg-slate-200 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-5/6 bg-slate-200 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-3/4 bg-slate-200 rounded-sm" />
+      </div>
+      <div className="mb-1.5">
+        <div className="h-0.5 w-20 bg-slate-700 rounded-sm mb-0.5" />
+        <div className="h-px bg-slate-200 mb-0.5" />
+        <div className="h-1 w-3/4 bg-slate-600 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-full bg-slate-200 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-5/6 bg-slate-200 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-4/5 bg-slate-200 rounded-sm" />
+      </div>
+      <div>
+        <div className="h-0.5 w-14 bg-slate-700 rounded-sm mb-0.5" />
+        <div className="h-px bg-slate-200 mb-0.5" />
+        <div className="h-1 w-2/3 bg-slate-600 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-1/2 bg-slate-200 rounded-sm" />
       </div>
     </div>
   );
@@ -255,7 +419,8 @@ export default function TailorPage() {
   const [jobDescription, setJobDescription] = useState("");
   const [cvLoading, setCvLoading] = useState(false);
   const [clLoading, setClLoading] = useState(false);
-  const [template, setTemplate] = useState<Template>("harvard");
+  const [template, setTemplate] = useState<Template>("modern");
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     profileApi.get().then(setProfile).catch(() => {});
@@ -276,38 +441,38 @@ export default function TailorPage() {
   };
 
   const handleDownloadCV = async () => {
-  if (!profile || !tailored) return;
-  setCvLoading(true);
-  try {
-    const { pdf } = await import("@react-pdf/renderer");
-    const doc = template === "executive"
-      ? <ExecutiveCV profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />
-      : <HarvardCV profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />;
-
-    const blob = await pdf(doc).toBlob();
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${profile.full_name?.replace(/\s/g, "_")}_${template === "executive" ? "Executive" : "Harvard"}_CV.pdf`;
-    link.setAttribute("type", "application/pdf");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-  } catch (err) {
-    alert("CV download failed: " + String(err));
-  } finally {
-    setCvLoading(false);
-  }
-};
+    if (!profile || !tailored) return;
+    setCvLoading(true);
+    try {
+      const { pdf } = await import("@react-pdf/renderer");
+      const doc =
+        template === "executive"  ? <ExecutiveCV          profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "modern"     ? <ModernProfessionalCV profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "minimalist" ? <ModernMinimalistCV   profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+                                    <HarvardCV            profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />;
+      const blob = await pdf(doc).toBlob();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${profile.full_name?.replace(/\s/g, "_")}_CV.pdf`;
+      link.setAttribute("type", "application/pdf");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (err) { alert("CV download failed: " + String(err)); }
+    finally { setCvLoading(false); }
+  };
 
   const handleDownloadCoverLetter = async () => {
     if (!profile || !tailored) return;
     setClLoading(true);
     try {
       const { pdf } = await import("@react-pdf/renderer");
-      const doc = template === "executive"
-        ? <ExecutiveCV profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />
-        : <HarvardCV profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />;
+      const doc =
+        template === "executive"  ? <ExecutiveCV          profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "modern"     ? <ModernProfessionalCV profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "minimalist" ? <ModernMinimalistCV   profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+                                    <HarvardCV            profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />;
       const blob = await pdf(doc).toBlob();
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -317,12 +482,18 @@ export default function TailorPage() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
-    } catch (err) {
-      alert("Cover letter download failed: " + String(err));
-    } finally { setClLoading(false); }
+    } catch (err) { alert("Cover letter download failed: " + String(err)); }
+    finally { setClLoading(false); }
   };
 
   const tailored = result?.tailored_data;
+
+  const TEMPLATES: { id: Template; label: string; desc: string; badge?: string }[] = [
+    { id: "modern",      label: "Modern Professional", desc: "Two-column, skill chips, ATS-friendly",    badge: "⭐ Recommended" },
+    { id: "minimalist",  label: "Modern Minimalist",   desc: "Clean SaaS design, slate palette",         badge: "✨ New"          },
+    { id: "executive",   label: "Executive Navy",      desc: "Navy banner, gold accents, two-column"                              },
+    { id: "harvard",     label: "Harvard Classic",     desc: "Traditional centered header, clean layout"                         },
+  ];
 
   return (
     <div className="flex h-[calc(100vh-60px)] overflow-hidden">
@@ -364,40 +535,31 @@ export default function TailorPage() {
 
       {/* Main */}
       <main className="flex-1 overflow-y-auto bg-stone-50 p-6">
-        {/* Form */}
         <div className="bg-white border border-stone-200 rounded-2xl p-6 mb-5">
           <h2 className="text-[18px] font-bold text-slate-900 tracking-tight mb-1">AI Resume Tailoring</h2>
-          <p className="font-sans text-[13px] text-slate-400 mb-5">Enter the job details below. Gemini AI will craft a tailored resume and cover letter matched to this specific role.</p>
+          <p className="font-sans text-[13px] text-slate-400 mb-5">Enter the job details below. Gemini 2.5 Flash will craft a tailored resume and cover letter matched to this specific role.</p>
 
           {/* Template Selector */}
           <div className="mb-5">
             <label className="label-xs mb-3 block">Choose Template</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => setTemplate("harvard")}
-                className={`p-4 rounded-xl border-2 text-left transition-all ${template === "harvard" ? "border-blue-600 bg-blue-50" : "border-stone-200 hover:border-stone-300 bg-white"}`}
-              >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${template === "harvard" ? "border-blue-600" : "border-stone-300"}`}>
-                    {template === "harvard" && <div className="w-2 h-2 rounded-full bg-blue-600" />}
-                  </div>
-                  <p className="font-sans font-semibold text-[13px] text-slate-900">Harvard Classic</p>
+            <button
+              type="button"
+              onClick={() => setModalOpen(true)}
+              className="flex items-center justify-between w-full px-4 py-3 border-2 border-stone-200 hover:border-blue-400 rounded-xl bg-white transition-all group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                  <FileText size={16} className="text-blue-600" />
                 </div>
-                <p className="font-sans text-[11px] text-slate-400 ml-6">Traditional centered header · Clean serif layout</p>
-              </button>
-              <button
-                onClick={() => setTemplate("executive")}
-                className={`p-4 rounded-xl border-2 text-left transition-all ${template === "executive" ? "border-blue-600 bg-blue-50" : "border-stone-200 hover:border-stone-300 bg-white"}`}
-              >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${template === "executive" ? "border-blue-600" : "border-stone-300"}`}>
-                    {template === "executive" && <div className="w-2 h-2 rounded-full bg-blue-600" />}
-                  </div>
-                  <p className="font-sans font-semibold text-[13px] text-slate-900">Executive Navy</p>
+                <div className="text-left">
+                  <p className="font-sans font-semibold text-[13px] text-slate-900">Choose Template</p>
+                  <p className="font-sans text-[11px] text-slate-400 mt-0.5">
+                    Selected: <span className="text-blue-600 font-semibold">{TEMPLATES.find(t => t.id === template)?.label}</span>
+                  </p>
                 </div>
-                <p className="font-sans text-[11px] text-slate-400 ml-6">Navy header · Two-column · Gold accents</p>
-              </button>
-            </div>
+              </div>
+              <ChevronDown size={15} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+            </button>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -429,7 +591,6 @@ export default function TailorPage() {
           </button>
         </div>
 
-        {/* Result */}
         <AnimatePresence>
           {result && tailored && !tailored.error && profile && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="bg-white border border-stone-200 rounded-2xl p-6">
@@ -451,15 +612,15 @@ export default function TailorPage() {
               <div className="flex gap-2 mb-6">
                 <span className="inline-flex items-center gap-1 font-sans text-[11px] font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-700"><CheckCircle2 size={10} /> AI Tailored</span>
                 <span className="inline-flex items-center gap-1 font-sans text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700">
-                  <FileText size={10} /> {template === "harvard" ? "Harvard Classic" : "Executive Navy"}
+                  <FileText size={10} /> {TEMPLATES.find(t => t.id === template)?.label}
                 </span>
               </div>
 
-              {/* Live preview switches with template */}
-              {template === "harvard"
-                ? <HarvardPreview profile={profile} tailored={tailored} />
-                : <ExecutivePreview profile={profile} tailored={tailored} />
-              }
+              {/* CV Preview */}
+              {template === "harvard"    && <HarvardPreview profile={profile} tailored={tailored} />}
+              {template === "executive"  && <ExecutivePreview profile={profile} tailored={tailored} />}
+              {template === "modern"     && <ModernProfessionalPreview profile={profile} tailored={tailored} jobTitle={jobTitle} />}
+              {template === "minimalist" && <ModernMinimalistPreview profile={profile} tailored={tailored} jobTitle={jobTitle} />}
 
               {/* Cover Letter Toggle */}
               {tailored.cover_letter && (
@@ -471,7 +632,10 @@ export default function TailorPage() {
                   <AnimatePresence>
                     {coverOpen && (
                       <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                        <CoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />
+                        {template === "harvard"    && <HarvardCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
+                        {template === "executive"  && <ExecutiveCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
+                        {template === "modern"     && <ModernProfessionalCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
+                        {template === "minimalist" && <ModernMinimalistCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -487,6 +651,77 @@ export default function TailorPage() {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Template Modal */}
+      <AnimatePresence>
+        {modalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm"
+            onClick={() => setModalOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              className="bg-white rounded-2xl p-5 w-full max-w-4xl shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between mb-5">
+                <div>
+                  <h3 className="font-bold text-[16px] text-slate-900 tracking-tight">Choose a Template</h3>
+                  <p className="font-sans text-[12px] text-slate-400 mt-0.5">Select a layout for your resume and cover letter</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="w-8 h-8 rounded-full hover:bg-stone-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="grid grid-cols-4 gap-3">
+                {TEMPLATES.map(({ id, label, desc, badge }) => (
+                  <motion.button
+                    key={id}
+                    type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => { setTemplate(id); setModalOpen(false); }}
+                    className={`relative rounded-xl border-2 p-2.5 text-left transition-colors ${
+                      template === id ? "border-blue-600 bg-blue-50/60" : "border-stone-200 hover:border-blue-300 bg-white"
+                    }`}
+                  >
+                    {badge && (
+                      <span className="absolute top-2 right-2 font-sans text-[9px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full z-10">
+                        {badge}
+                      </span>
+                    )}
+                    {id === "modern"      && <ModernMiniPreview />}
+                    {id === "minimalist"  && <MinimalistMiniPreview />}
+                    {id === "executive"   && <ExecutiveMiniPreview />}
+                    {id === "harvard"     && <HarvardMiniPreview />}
+                    <div className="mt-2 flex items-start gap-1.5">
+                      <div className={`w-3 h-3 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        template === id ? "border-blue-600" : "border-slate-300"
+                      }`}>
+                        {template === id && <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
+                      </div>
+                      <div>
+                        <p className="font-sans font-semibold text-[11px] text-slate-900 leading-tight">{label}</p>
+                        <p className="font-sans text-[9px] text-slate-400 mt-0.5 leading-snug">{desc}</p>
+                      </div>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

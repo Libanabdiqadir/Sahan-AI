@@ -433,7 +433,7 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
       {tailored.cover_letter && (
         <Page size="A4" style={styles.coverPage}>
           <Text style={styles.coverName}>{profile.full_name}</Text>
-          <Text style={styles.coverContact}>{contactParts.join("  ·  ")}</Text>
+          <Text style={styles.coverContact}>{contactParts.join("  |  ")}</Text>
           <View style={styles.coverGoldBar} />
           <View style={styles.coverDivider} />
 
