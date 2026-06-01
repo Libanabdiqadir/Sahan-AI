@@ -18,8 +18,13 @@ import {
   ModernMinimalistPreview,
   ModernMinimalistCoverLetterPreview,
 } from "../components/resume/ModernMinimalistCV";
+import {
+  BoldChronologicalCV,
+  BoldChronologicalPreview,
+  BoldChronologicalCoverLetterPreview,
+} from "../components/resume/BoldChronologicalCV";
 
-type Template = "harvard" | "executive" | "modern" | "minimalist";
+type Template = "harvard" | "executive" | "modern" | "minimalist" | "boldChronological";
 
 // ─── Sidebar helpers ────────────────────────────────────────────────────────────
 function SidebarSection({ title, children, onAdd }: { title: string; children: React.ReactNode; onAdd?: () => void }) {
@@ -256,7 +261,7 @@ function ExecutiveCoverLetterPreview({ profile, tailored, jobTitle, companyName 
 // ─── Mini Template Previews ─────────────────────────────────────────────────────
 function ModernMiniPreview() {
   return (
-    <div className="w-full aspect-[3/4] rounded-md border border-slate-200 overflow-hidden bg-white flex flex-col">
+    <div className="w-full aspect-[4/5] rounded-md border border-slate-200 overflow-hidden bg-white flex flex-col">
       <div className="bg-slate-800 px-2 py-1.5 flex items-center gap-1.5 shrink-0">
         <div className="w-4 h-4 rounded-full bg-blue-400 shrink-0" />
         <div className="space-y-0.5">
@@ -297,7 +302,7 @@ function ModernMiniPreview() {
 
 function ExecutiveMiniPreview() {
   return (
-    <div className="w-full aspect-[3/4] rounded-md border border-slate-200 overflow-hidden bg-white flex flex-col">
+    <div className="w-full aspect-[4/5] rounded-md border border-slate-200 overflow-hidden bg-white flex flex-col">
       <div className="bg-[#1e2d4a] px-2 py-2 shrink-0">
         <div className="h-2 w-14 bg-white/90 rounded-sm mb-0.5" />
         <div className="h-0.5 w-5 bg-[#b8972e] mb-1" />
@@ -340,7 +345,7 @@ function ExecutiveMiniPreview() {
 
 function MinimalistMiniPreview() {
   return (
-    <div className="w-full aspect-[3/4] rounded-md border border-slate-200 overflow-hidden bg-white flex flex-col">
+    <div className="w-full aspect-[4/5] rounded-md border border-slate-200 overflow-hidden bg-white flex flex-col">
       <div className="h-0.5 bg-slate-700 shrink-0" />
       <div className="px-2 py-1.5 border-b border-slate-200 shrink-0">
         <div className="h-1.5 w-3/4 bg-slate-800 rounded-sm mb-0.5" />
@@ -376,7 +381,7 @@ function MinimalistMiniPreview() {
 
 function HarvardMiniPreview() {
   return (
-    <div className="w-full aspect-[3/4] rounded-md border border-slate-200 overflow-hidden bg-white p-2 flex flex-col">
+    <div className="w-full aspect-[4/5] rounded-md border border-slate-200 overflow-hidden bg-white p-2 flex flex-col">
       <div className="flex flex-col items-center mb-1.5 shrink-0">
         <div className="h-2 w-3/4 bg-slate-800 rounded-sm mb-0.5" />
         <div className="h-0.5 w-full bg-slate-300 rounded-sm" />
@@ -402,6 +407,58 @@ function HarvardMiniPreview() {
         <div className="h-px bg-slate-200 mb-0.5" />
         <div className="h-1 w-2/3 bg-slate-600 rounded-sm mb-0.5" />
         <div className="h-0.5 w-1/2 bg-slate-200 rounded-sm" />
+      </div>
+    </div>
+  );
+}
+
+function BoldChronologicalMiniPreview() {
+  return (
+    <div className="w-full aspect-[4/5] rounded-md border border-slate-200 overflow-hidden bg-white p-2 flex flex-col gap-1.5">
+      {/* Centered name + heavy rule */}
+      <div className="flex flex-col items-center shrink-0">
+        <div className="h-2.5 w-2/3 bg-slate-900 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-1/2 bg-slate-300 rounded-sm" />
+      </div>
+      <div className="h-[1.5px] bg-slate-900 shrink-0" />
+      {/* Summary */}
+      <div>
+        <div className="h-0.5 w-1/4 bg-slate-700 rounded-sm mx-auto mb-0.5" />
+        <div className="h-px bg-slate-800 mb-0.5" />
+        <div className="h-0.5 w-full bg-slate-200 rounded-sm mb-0.5" />
+        <div className="h-0.5 w-4/5 bg-slate-200 rounded-sm" />
+      </div>
+      {/* Experience */}
+      <div>
+        <div className="h-0.5 w-1/4 bg-slate-700 rounded-sm mx-auto mb-0.5" />
+        <div className="h-px bg-slate-800 mb-0.5" />
+        {[0,1].map(i => (
+          <div key={i} className="mb-1">
+            <div className="flex justify-between mb-0.5">
+              <div className="h-1 w-1/3 bg-slate-800 rounded-sm" />
+              <div className="h-0.5 w-1/5 bg-slate-400 rounded-sm" />
+            </div>
+            <div className="h-0.5 w-full bg-slate-200 rounded-sm mb-0.5" />
+            <div className="h-0.5 w-5/6 bg-slate-200 rounded-sm mb-0.5" />
+            <div className="h-0.5 w-4/5 bg-slate-200 rounded-sm" />
+          </div>
+        ))}
+      </div>
+      {/* Education */}
+      <div>
+        <div className="h-0.5 w-1/4 bg-slate-700 rounded-sm mx-auto mb-0.5" />
+        <div className="h-px bg-slate-800 mb-0.5" />
+        <div className="flex justify-between mb-0.5">
+          <div className="h-1 w-1/3 bg-slate-800 rounded-sm" />
+          <div className="h-0.5 w-1/5 bg-slate-400 rounded-sm" />
+        </div>
+        <div className="h-0.5 w-1/2 bg-slate-200 rounded-sm" />
+      </div>
+      {/* Skills inline */}
+      <div>
+        <div className="h-0.5 w-1/4 bg-slate-700 rounded-sm mx-auto mb-0.5" />
+        <div className="h-px bg-slate-800 mb-0.5" />
+        <div className="h-0.5 w-full bg-slate-300 rounded-sm" />
       </div>
     </div>
   );
@@ -446,10 +503,11 @@ export default function TailorPage() {
     try {
       const { pdf } = await import("@react-pdf/renderer");
       const doc =
-        template === "executive"  ? <ExecutiveCV          profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
-        template === "modern"     ? <ModernProfessionalCV profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
-        template === "minimalist" ? <ModernMinimalistCV   profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
-                                    <HarvardCV            profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />;
+        template === "executive"         ? <ExecutiveCV           profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "modern"            ? <ModernProfessionalCV  profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "minimalist"        ? <ModernMinimalistCV    profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "boldChronological" ? <BoldChronologicalCV   profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+                                           <HarvardCV             profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />;
       const blob = await pdf(doc).toBlob();
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -469,10 +527,11 @@ export default function TailorPage() {
     try {
       const { pdf } = await import("@react-pdf/renderer");
       const doc =
-        template === "executive"  ? <ExecutiveCV          profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
-        template === "modern"     ? <ModernProfessionalCV profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
-        template === "minimalist" ? <ModernMinimalistCV   profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
-                                    <HarvardCV            profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />;
+        template === "executive"         ? <ExecutiveCV           profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "modern"            ? <ModernProfessionalCV  profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "minimalist"        ? <ModernMinimalistCV    profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+        template === "boldChronological" ? <BoldChronologicalCV   profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} /> :
+                                           <HarvardCV             profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />;
       const blob = await pdf(doc).toBlob();
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -489,10 +548,11 @@ export default function TailorPage() {
   const tailored = result?.tailored_data;
 
   const TEMPLATES: { id: Template; label: string; desc: string; badge?: string }[] = [
-    { id: "modern",      label: "Modern Professional", desc: "Two-column, skill chips, ATS-friendly",    badge: "⭐ Recommended" },
-    { id: "minimalist",  label: "Modern Minimalist",   desc: "Clean SaaS design, slate palette",         badge: "✨ New"          },
-    { id: "executive",   label: "Executive Navy",      desc: "Navy banner, gold accents, two-column"                              },
-    { id: "harvard",     label: "Harvard Classic",     desc: "Traditional centered header, clean layout"                         },
+    { id: "modern",             label: "Modern Professional",   desc: "Two-column, skill chips, ATS-friendly",    badge: "⭐ Recommended" },
+    { id: "minimalist",         label: "Modern Minimalist",     desc: "Clean SaaS design, slate palette",         badge: "✨ New"          },
+    { id: "boldChronological",  label: "Bold Chronological",    desc: "Editorial B&W, single-column serif",       badge: "✦ New"          },
+    { id: "executive",          label: "Executive Navy",        desc: "Navy banner, gold accents, two-column"                              },
+    { id: "harvard",            label: "Harvard Classic",       desc: "Traditional centered header, clean layout"                         },
   ];
 
   return (
@@ -617,10 +677,11 @@ export default function TailorPage() {
               </div>
 
               {/* CV Preview */}
-              {template === "harvard"    && <HarvardPreview profile={profile} tailored={tailored} />}
-              {template === "executive"  && <ExecutivePreview profile={profile} tailored={tailored} />}
-              {template === "modern"     && <ModernProfessionalPreview profile={profile} tailored={tailored} jobTitle={jobTitle} />}
-              {template === "minimalist" && <ModernMinimalistPreview profile={profile} tailored={tailored} jobTitle={jobTitle} />}
+              {template === "harvard"            && <HarvardPreview profile={profile} tailored={tailored} />}
+              {template === "executive"          && <ExecutivePreview profile={profile} tailored={tailored} />}
+              {template === "modern"             && <ModernProfessionalPreview profile={profile} tailored={tailored} jobTitle={jobTitle} />}
+              {template === "minimalist"         && <ModernMinimalistPreview profile={profile} tailored={tailored} jobTitle={jobTitle} />}
+              {template === "boldChronological"  && <BoldChronologicalPreview profile={profile} tailored={tailored} jobTitle={jobTitle} />}
 
               {/* Cover Letter Toggle */}
               {tailored.cover_letter && (
@@ -632,10 +693,11 @@ export default function TailorPage() {
                   <AnimatePresence>
                     {coverOpen && (
                       <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                        {template === "harvard"    && <HarvardCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
-                        {template === "executive"  && <ExecutiveCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
-                        {template === "modern"     && <ModernProfessionalCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
-                        {template === "minimalist" && <ModernMinimalistCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
+                        {template === "harvard"            && <HarvardCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
+                        {template === "executive"          && <ExecutiveCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
+                        {template === "modern"             && <ModernProfessionalCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
+                        {template === "minimalist"         && <ModernMinimalistCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
+                        {template === "boldChronological"  && <BoldChronologicalCoverLetterPreview profile={profile} tailored={tailored} jobTitle={jobTitle} companyName={companyName} />}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -667,7 +729,7 @@ export default function TailorPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 16 }}
               transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="bg-white rounded-2xl p-5 w-full max-w-4xl shadow-2xl"
+              className="bg-white rounded-2xl p-5 w-full max-w-3xl shadow-2xl max-h-[85vh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between mb-5">
@@ -683,40 +745,43 @@ export default function TailorPage() {
                   <X size={16} />
                 </button>
               </div>
-              <div className="grid grid-cols-4 gap-3">
-                {TEMPLATES.map(({ id, label, desc, badge }) => (
-                  <motion.button
-                    key={id}
-                    type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => { setTemplate(id); setModalOpen(false); }}
-                    className={`relative rounded-xl border-2 p-2.5 text-left transition-colors ${
-                      template === id ? "border-blue-600 bg-blue-50/60" : "border-stone-200 hover:border-blue-300 bg-white"
-                    }`}
-                  >
-                    {badge && (
-                      <span className="absolute top-2 right-2 font-sans text-[9px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full z-10">
-                        {badge}
-                      </span>
-                    )}
-                    {id === "modern"      && <ModernMiniPreview />}
-                    {id === "minimalist"  && <MinimalistMiniPreview />}
-                    {id === "executive"   && <ExecutiveMiniPreview />}
-                    {id === "harvard"     && <HarvardMiniPreview />}
-                    <div className="mt-2 flex items-start gap-1.5">
-                      <div className={`w-3 h-3 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        template === id ? "border-blue-600" : "border-slate-300"
-                      }`}>
-                        {template === id && <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
+              <div className="overflow-y-auto flex-1 -mr-1 pr-1">
+                <div className="grid grid-cols-4 gap-2">
+                  {TEMPLATES.map(({ id, label, desc, badge }) => (
+                    <motion.button
+                      key={id}
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => { setTemplate(id); setModalOpen(false); }}
+                      className={`relative rounded-xl border-2 p-2 text-left transition-colors ${
+                        template === id ? "border-blue-600 bg-blue-50/60" : "border-stone-200 hover:border-blue-300 bg-white"
+                      }`}
+                    >
+                      {badge && (
+                        <span className="absolute top-1.5 right-1.5 font-sans text-[8px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full z-10">
+                          {badge}
+                        </span>
+                      )}
+                      {id === "modern"            && <ModernMiniPreview />}
+                      {id === "minimalist"         && <MinimalistMiniPreview />}
+                      {id === "boldChronological"  && <BoldChronologicalMiniPreview />}
+                      {id === "executive"          && <ExecutiveMiniPreview />}
+                      {id === "harvard"            && <HarvardMiniPreview />}
+                      <div className="mt-1.5 flex items-start gap-1">
+                        <div className={`w-2.5 h-2.5 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                          template === id ? "border-blue-600" : "border-slate-300"
+                        }`}>
+                          {template === id && <div className="w-1 h-1 rounded-full bg-blue-600" />}
+                        </div>
+                        <div>
+                          <p className="font-sans font-semibold text-[10.5px] text-slate-900 leading-tight">{label}</p>
+                          <p className="font-sans text-[8.5px] text-slate-400 mt-0.5 leading-snug">{desc}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-sans font-semibold text-[11px] text-slate-900 leading-tight">{label}</p>
-                        <p className="font-sans text-[9px] text-slate-400 mt-0.5 leading-snug">{desc}</p>
-                      </div>
-                    </div>
-                  </motion.button>
-                ))}
+                    </motion.button>
+                  ))}
+                </div>
               </div>
             </motion.div>
           </motion.div>
