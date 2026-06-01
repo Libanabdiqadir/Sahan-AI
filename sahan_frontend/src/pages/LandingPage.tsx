@@ -15,10 +15,6 @@ const fadeUp = (delay = 0) => ({
 });
 
 // ─── Resume Mockup ───────────────────────────────────────────────────────────────
-// Mirrors the Modern Minimalist CV template exactly:
-//   – 3 px slate-700 accent strip
-//   – Full-width header (name + italic role)
-//   – 29 % sidebar (contact, skills, languages) | 71 % main panel
 function ResumeMockup() {
   const skills     = ["React", "TypeScript", "Node.js", "Python", "AWS"];
   const softSkills = ["Leadership", "Strategy", "Agile"];
