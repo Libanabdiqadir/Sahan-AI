@@ -140,12 +140,12 @@ const S = StyleSheet.create({
     color: C.softText,
   },
 
-  // Language list
+  // Sidebar vertical list (skills + languages share this style)
   sideItem: {
     flexDirection: "row",
     alignItems: "center",
     gap: 7,
-    marginBottom: 5,
+    marginBottom: 8,
   },
   sideDot: {
     width: 4,
@@ -155,9 +155,10 @@ const S = StyleSheet.create({
   },
   sideItemText: {
     fontFamily: "Helvetica",
-    fontSize: 9,
+    fontSize: 10.5,
     color: C.muted,
     flex: 1,
+    lineHeight: 1.4,
   },
 
   // ── Main panel (71%) ──────────────────────────────────────────────────
@@ -446,26 +447,24 @@ export function ModernMinimalistCV({ profile, tailored, jobTitle, companyName }:
             {tailored.tech_skills?.length > 0 && (
               <View style={S.sideSection}>
                 <Text style={S.sideTitle}>Technical Skills</Text>
-                <View style={S.chipsWrap}>
-                  {tailored.tech_skills.map((s, i) => (
-                    <View key={i} style={S.chip}>
-                      <Text style={S.chipLabel}>{s}</Text>
-                    </View>
-                  ))}
-                </View>
+                {tailored.tech_skills.map((s, i) => (
+                  <View key={i} style={S.sideItem}>
+                    <View style={S.sideDot} />
+                    <Text style={S.sideItemText}>{s}</Text>
+                  </View>
+                ))}
               </View>
             )}
 
             {tailored.soft_skills?.length > 0 && (
               <View style={S.sideSection}>
                 <Text style={S.sideTitle}>Core Competencies</Text>
-                <View style={S.chipsWrap}>
-                  {tailored.soft_skills.map((s, i) => (
-                    <View key={i} style={S.softChip}>
-                      <Text style={S.softChipLabel}>{s}</Text>
-                    </View>
-                  ))}
-                </View>
+                {tailored.soft_skills.map((s, i) => (
+                  <View key={i} style={S.sideItem}>
+                    <View style={{ ...S.sideDot, backgroundColor: C.softText }} />
+                    <Text style={{ ...S.sideItemText, color: C.softText }}>{s}</Text>
+                  </View>
+                ))}
               </View>
             )}
 
@@ -572,13 +571,12 @@ export function ModernMinimalistCV({ profile, tailored, jobTitle, companyName }:
               {tailored.tech_skills?.length > 0 && (
                 <View style={S.clMetaBlock}>
                   <Text style={S.clMetaLabel}>Key Skills</Text>
-                  <View style={S.chipsWrap}>
-                    {tailored.tech_skills.slice(0, 5).map((s, i) => (
-                      <View key={i} style={S.chip}>
-                        <Text style={S.chipLabel}>{s}</Text>
-                      </View>
-                    ))}
-                  </View>
+                  {tailored.tech_skills.slice(0, 5).map((s, i) => (
+                    <View key={i} style={S.sideItem}>
+                      <View style={S.sideDot} />
+                      <Text style={S.sideItemText}>{s}</Text>
+                    </View>
+                  ))}
                 </View>
               )}
             </View>
@@ -680,35 +678,33 @@ export function ModernMinimalistPreview({
             ))}
           </div>
 
-          {/* Technical Skills */}
+          {/* Technical Skills — vertical dot list */}
           {tailored.tech_skills?.length > 0 && (
             <div style={{ marginBottom: "18px" }}>
               <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "7px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
                 Technical Skills
               </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                {tailored.tech_skills.map((s, i) => (
-                  <span key={i} style={{ fontFamily: FONT, fontSize: "8px", color: CHIP_TXT, background: CHIP_BG, padding: "3px 7px", borderRadius: "4px" }}>
-                    {s}
-                  </span>
-                ))}
-              </div>
+              {tailored.tech_skills.map((s, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                  <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: ACCENT, flexShrink: 0 }} />
+                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: MUTED }}>{s}</span>
+                </div>
+              ))}
             </div>
           )}
 
-          {/* Core Competencies */}
+          {/* Core Competencies — vertical dot list */}
           {tailored.soft_skills?.length > 0 && (
             <div style={{ marginBottom: "18px" }}>
               <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "7px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
                 Core Competencies
               </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                {tailored.soft_skills.map((s, i) => (
-                  <span key={i} style={{ fontFamily: FONT, fontSize: "8px", color: SOFT_TXT, background: SOFT_BG, padding: "3px 7px", borderRadius: "4px" }}>
-                    {s}
-                  </span>
-                ))}
-              </div>
+              {tailored.soft_skills.map((s, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                  <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: SOFT_TXT, flexShrink: 0 }} />
+                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: SOFT_TXT }}>{s}</span>
+                </div>
+              ))}
             </div>
           )}
 
@@ -719,9 +715,9 @@ export function ModernMinimalistPreview({
                 Languages
               </p>
               {tailored.languages.map((l, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "5px" }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
                   <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: MID, flexShrink: 0 }} />
-                  <span style={{ fontFamily: FONT, fontSize: "9px", color: MUTED }}>{l}</span>
+                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: MUTED }}>{l}</span>
                 </div>
               ))}
             </div>
@@ -902,13 +898,12 @@ export function ModernMinimalistCoverLetterPreview({
           {tailored.tech_skills?.length > 0 && (
             <div>
               <p style={sideLabelStyle}>Key Skills</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                {tailored.tech_skills.slice(0, 5).map((s, i) => (
-                  <span key={i} style={{ fontFamily: FONT, fontSize: "8px", color: CHIP_TXT, background: CHIP_BG, padding: "3px 7px", borderRadius: "4px" }}>
-                    {s}
-                  </span>
-                ))}
-              </div>
+              {tailored.tech_skills.slice(0, 5).map((s, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                  <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: ACCENT, flexShrink: 0 }} />
+                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: MUTED }}>{s}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>

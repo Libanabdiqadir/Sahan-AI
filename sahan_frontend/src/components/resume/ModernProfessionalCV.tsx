@@ -78,12 +78,12 @@ const S = StyleSheet.create({
   chipText: { fontSize: 8.5, color: C.chipText, fontFamily: "Times-Bold" },
 
   // Sidebar plain list
-  sidebarItem: { flexDirection: "row", alignItems: "center", marginBottom: 5, gap: 6 },
+  sidebarItem: { flexDirection: "row", alignItems: "center", marginBottom: 8, gap: 7 },
   sidebarDot: {
     width: 5, height: 5, borderRadius: 3,
     backgroundColor: C.primary,
   },
-  sidebarItemText: { fontSize: 9.5, color: C.muted, fontFamily: "Times-Roman", flex: 1 },
+  sidebarItemText: { fontSize: 10.5, color: C.muted, fontFamily: "Times-Roman", flex: 1, lineHeight: 1.4 },
 
   // ── Main ─────────────────────────────────────────────────────
   main: {
@@ -410,31 +410,29 @@ export function ModernProfessionalCV({
             ))}
           </View>
 
-          {/* Technical Skills as chips */}
+          {/* Technical Skills — vertical dot list */}
           {tailored.tech_skills?.length > 0 && (
             <View style={S.sidebarSection}>
               <Text style={S.sidebarTitle}>Technical Skills</Text>
-              <View style={S.chipsWrap}>
-                {tailored.tech_skills.map((s, i) => (
-                  <View key={i} style={S.chip}>
-                    <Text style={S.chipText}>{s}</Text>
-                  </View>
-                ))}
-              </View>
+              {tailored.tech_skills.map((s, i) => (
+                <View key={i} style={S.sidebarItem}>
+                  <View style={S.sidebarDot} />
+                  <Text style={S.sidebarItemText}>{s}</Text>
+                </View>
+              ))}
             </View>
           )}
 
-          {/* Soft Skills as chips */}
+          {/* Core Skills — vertical dot list */}
           {tailored.soft_skills?.length > 0 && (
             <View style={S.sidebarSection}>
               <Text style={S.sidebarTitle}>Core Skills</Text>
-              <View style={S.chipsWrap}>
-                {tailored.soft_skills.map((s, i) => (
-                  <View key={i} style={{ ...S.chip, backgroundColor: "#e8f5e9" }}>
-                    <Text style={{ ...S.chipText, color: "#2e7d32" }}>{s}</Text>
-                  </View>
-                ))}
-              </View>
+              {tailored.soft_skills.map((s, i) => (
+                <View key={i} style={S.sidebarItem}>
+                  <View style={{ ...S.sidebarDot, backgroundColor: "#2e7d32" }} />
+                  <Text style={{ ...S.sidebarItemText, color: "#2e7d32" }}>{s}</Text>
+                </View>
+              ))}
             </View>
           )}
 
@@ -540,17 +538,16 @@ export function ModernProfessionalCV({
                 <Text key={i} style={[S.clSidebarMetaValue, { marginBottom: 3 }]}>{c.icon}  {c.value}</Text>
               ))}
             </View>
-            {/* Skills summary */}
+            {/* Skills summary — vertical dot list */}
             {tailored.tech_skills?.length > 0 && (
               <View style={S.clSidebarMeta}>
                 <Text style={S.clSidebarMetaLabel}>Key Skills</Text>
-                <View style={S.chipsWrap}>
-                  {tailored.tech_skills.slice(0, 6).map((s, i) => (
-                    <View key={i} style={S.chip}>
-                      <Text style={S.chipText}>{s}</Text>
-                    </View>
-                  ))}
-                </View>
+                {tailored.tech_skills.slice(0, 6).map((s, i) => (
+                  <View key={i} style={S.sidebarItem}>
+                    <View style={S.sidebarDot} />
+                    <Text style={S.sidebarItemText}>{s}</Text>
+                  </View>
+                ))}
               </View>
             )}
           </View>
@@ -642,27 +639,29 @@ export function ModernProfessionalPreview({
           ))}
         </div>
 
-        {/* Tech Skills */}
+        {/* Tech Skills — vertical dot list */}
         {tailored.tech_skills?.length > 0 && (
           <div style={{ marginBottom: "20px" }}>
             <p style={{ fontWeight: "700", fontSize: "8px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Technical Skills</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-              {tailored.tech_skills.map((s, i) => (
-                <span key={i} style={{ background: CHIP_BG, color: CHIP_TEXT, fontSize: "8.5px", fontWeight: "700", padding: "3px 8px", borderRadius: "12px" }}>{s}</span>
-              ))}
-            </div>
+            {tailored.tech_skills.map((s, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: BLUE, flexShrink: 0 }} />
+                <span style={{ fontSize: "10.5px", color: MUTED }}>{s}</span>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Soft Skills */}
+        {/* Soft Skills — vertical dot list */}
         {tailored.soft_skills?.length > 0 && (
           <div style={{ marginBottom: "20px" }}>
             <p style={{ fontWeight: "700", fontSize: "8px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Core Skills</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-              {tailored.soft_skills.map((s, i) => (
-                <span key={i} style={{ background: "#e8f5e9", color: "#2e7d32", fontSize: "8.5px", fontWeight: "700", padding: "3px 8px", borderRadius: "12px" }}>{s}</span>
-              ))}
-            </div>
+            {tailored.soft_skills.map((s, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#2e7d32", flexShrink: 0 }} />
+                <span style={{ fontSize: "10.5px", color: "#2e7d32" }}>{s}</span>
+              </div>
+            ))}
           </div>
         )}
 
@@ -671,9 +670,9 @@ export function ModernProfessionalPreview({
           <div>
             <p style={{ fontWeight: "700", fontSize: "8px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Languages</p>
             {tailored.languages.map((l, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
                 <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: BLUE, flexShrink: 0 }} />
-                <span style={{ fontSize: "9.5px", color: MUTED }}>{l}</span>
+                <span style={{ fontSize: "10.5px", color: MUTED }}>{l}</span>
               </div>
             ))}
           </div>
@@ -794,15 +793,16 @@ export function ModernProfessionalCoverLetterPreview({
             <p key={i} style={{ fontSize: "9px", color: MUTED, marginBottom: "4px" }}>{c.icon}  {c.value}</p>
           ))}
         </div>
-        {/* Key skills */}
+        {/* Key skills — vertical dot list */}
         {tailored.tech_skills?.length > 0 && (
           <div>
             <p style={{ fontWeight: "700", fontSize: "8px", textTransform: "uppercase", letterSpacing: "1.5px", color: BLUE, marginBottom: "8px" }}>Key Skills</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-              {tailored.tech_skills.slice(0, 6).map((s, i) => (
-                <span key={i} style={{ background: CHIP_BG, color: CHIP_TEXT, fontSize: "8px", fontWeight: "700", padding: "3px 7px", borderRadius: "10px" }}>{s}</span>
-              ))}
-            </div>
+            {tailored.tech_skills.slice(0, 6).map((s, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: BLUE, flexShrink: 0 }} />
+                <span style={{ fontSize: "10.5px", color: MUTED }}>{s}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>
