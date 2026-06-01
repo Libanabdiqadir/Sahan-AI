@@ -4,8 +4,6 @@ import {
   Text,
   View,
   StyleSheet,
-  Line,
-  Svg,
 } from "@react-pdf/renderer";
 import type { UserProfile, TailoredData } from "../../types";
 

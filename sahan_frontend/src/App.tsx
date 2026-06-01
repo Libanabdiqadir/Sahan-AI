@@ -6,6 +6,7 @@ import AuthPage from "./pages/Authpage";
 import DashboardPage from "./pages/DashboardPage";
 import TailorPage from "./pages/TailorPage";
 import ProfilePage from "./pages/ProfilePage";
+import LandingPage from "./pages/LandingPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -26,6 +27,7 @@ function AppRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route
           path="/dashboard"
@@ -57,7 +59,7 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>
   );
