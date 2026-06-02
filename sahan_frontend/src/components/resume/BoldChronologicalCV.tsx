@@ -25,7 +25,7 @@ const S = StyleSheet.create({
   page: {
     flexDirection: "column",
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 10.5,
     color: C.ink,
     backgroundColor: C.white,
     paddingTop: PV,
@@ -37,7 +37,7 @@ const S = StyleSheet.create({
   // ── Header ────────────────────────────────────────────────────────────────
   candidateName: {
     fontFamily: "Times-Bold",
-    fontSize: 27,
+    fontSize: 28,
     color: C.ink,
     textAlign: "center",
     letterSpacing: 0.5,
@@ -45,7 +45,7 @@ const S = StyleSheet.create({
   },
   jobTitleLine: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 10.5,
+    fontSize: 12.5,
     color: C.ink,
     textAlign: "center",
     marginBottom: 4,
@@ -59,12 +59,12 @@ const S = StyleSheet.create({
   },
   subtitlePiece: {
     fontFamily: "Helvetica",
-    fontSize: 9.5,
+    fontSize: 11,
     color: C.gray,
   },
   subtitleDot: {
     fontFamily: "Helvetica",
-    fontSize: 9,
+    fontSize: 10.5,
     color: "#94a3b8",
     marginLeft: 5,
     marginRight: 5,
@@ -72,14 +72,14 @@ const S = StyleSheet.create({
   headRule: {
     borderBottomWidth: 1.5,
     borderBottomColor: C.rule,
-    marginBottom: 18,
+    marginBottom: 16,
   },
 
   // ── Section block ─────────────────────────────────────────────────────────
-  section: { marginBottom: 14 },
+  section: { marginBottom: 13 },
   secTitle: {
     fontFamily: "Times-Bold",
-    fontSize: 10.5,
+    fontSize: 12,
     textTransform: "uppercase",
     letterSpacing: 2.5,
     color: C.ink,
@@ -89,19 +89,19 @@ const S = StyleSheet.create({
   secRule: {
     borderBottomWidth: 1,
     borderBottomColor: C.rule,
-    marginBottom: 10,
+    marginBottom: 9,
   },
 
   // ── Summary ───────────────────────────────────────────────────────────────
   summaryText: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 11.5,
     color: C.ink,
-    lineHeight: 1.72,
+    lineHeight: 1.75,
   },
 
   // ── Experience / Education entries ────────────────────────────────────────
-  entryBlock: { marginBottom: 13 },
+  entryBlock: { marginBottom: 11 },
   entryHeadRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -110,13 +110,13 @@ const S = StyleSheet.create({
   },
   entryOrg: {
     fontFamily: "Times-Bold",
-    fontSize: 11,
+    fontSize: 12.5,
     color: C.ink,
     flex: 1,
   },
   entryMeta: {
     fontFamily: "Helvetica",
-    fontSize: 9,
+    fontSize: 11,
     color: C.gray,
     textAlign: "right",
   },
@@ -129,13 +129,13 @@ const S = StyleSheet.create({
   },
   entryRole: {
     fontFamily: "Helvetica-Oblique",
-    fontSize: 10,
+    fontSize: 12,
     color: C.ink,
     flex: 1,
   },
   entryDate: {
     fontFamily: "Helvetica",
-    fontSize: 9,
+    fontSize: 11,
     color: C.gray,
   },
   bulletRow: {
@@ -146,17 +146,17 @@ const S = StyleSheet.create({
   },
   bulletMark: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 11.5,
     color: C.gray,
-    width: 11,
-    lineHeight: 1.5,
+    width: 12,
+    lineHeight: 1.55,
   },
   bulletText: {
     flex: 1,
     fontFamily: "Helvetica",
-    fontSize: 9.5,
+    fontSize: 11.5,
     color: C.ink,
-    lineHeight: 1.62,
+    lineHeight: 1.7,
   },
 
   // ── Languages ─────────────────────────────────────────────────────────────
@@ -173,7 +173,7 @@ const S = StyleSheet.create({
   },
   langName: {
     fontFamily: "Times-Bold",
-    fontSize: 10,
+    fontSize: 12,
     color: C.ink,
   },
   dotsRow: {
@@ -198,29 +198,29 @@ const S = StyleSheet.create({
   // ── Skills ────────────────────────────────────────────────────────────────
   skillsText: {
     fontFamily: "Helvetica",
-    fontSize: 9.5,
+    fontSize: 11.5,
     color: C.ink,
-    lineHeight: 1.7,
+    lineHeight: 1.75,
     textAlign: "center",
   },
 
   // ── Cover Letter ──────────────────────────────────────────────────────────
   clDate: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 11,
     color: C.gray,
     marginBottom: 18,
   },
-  clRecipientWrap: { marginBottom: 20 },
+  clRecipientWrap: { marginBottom: 18 },
   clRecipientLine: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 11,
     color: C.ink,
     lineHeight: 1.65,
   },
   clSubject: {
     fontFamily: "Times-Bold",
-    fontSize: 11,
+    fontSize: 12.5,
     color: C.ink,
     textAlign: "center",
     marginBottom: 18,
@@ -232,33 +232,33 @@ const S = StyleSheet.create({
   },
   clGreeting: {
     fontFamily: "Helvetica",
-    fontSize: 10.5,
+    fontSize: 12,
     color: C.ink,
-    marginBottom: 14,
+    marginBottom: 13,
   },
   clPara: {
     fontFamily: "Helvetica",
-    fontSize: 10.5,
+    fontSize: 12,
     color: C.ink,
-    lineHeight: 1.78,
-    marginBottom: 14,
+    lineHeight: 1.8,
+    marginBottom: 13,
   },
   clSignoff: {
     fontFamily: "Helvetica",
-    fontSize: 10.5,
+    fontSize: 12,
     color: C.ink,
     marginTop: 18,
-    marginBottom: 28,
+    marginBottom: 26,
   },
   clSignName: {
     fontFamily: "Times-Bold",
-    fontSize: 13,
+    fontSize: 14,
     color: C.ink,
     marginBottom: 2,
   },
   clSignRole: {
     fontFamily: "Helvetica-Oblique",
-    fontSize: 10,
+    fontSize: 11.5,
     color: C.gray,
   },
 });
@@ -498,7 +498,7 @@ export function BoldChronologicalPreview({
 
   const SectionHead = ({ title }: { title: string }) => (
     <div style={{ textAlign: "center", marginBottom: "12px" }}>
-      <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "10px", textTransform: "uppercase", letterSpacing: "2.5px", color: INK, marginBottom: "6px" }}>
+      <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "12px", textTransform: "uppercase", letterSpacing: "2.5px", color: INK, marginBottom: "6px" }}>
         {title}
       </p>
       <div style={{ borderBottom: `1px solid ${RULE}` }} />
@@ -510,7 +510,7 @@ export function BoldChronologicalPreview({
     const cleanName = lang.replace(/\s*[\(\[].*?[\)\]]/g, "").replace(/\s*[-–].*$/, "").trim();
     return (
       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-        <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "10.5px", color: INK }}>{cleanName}</span>
+        <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "12px", color: INK }}>{cleanName}</span>
         <div style={{ display: "flex", gap: "3px", alignItems: "center" }}>
           {[1,2,3,4,5].map(n => (
             <div key={n} style={{ width: "7px", height: "7px", borderRadius: "50%", background: n <= filled ? INK : BDOT }} />
@@ -521,29 +521,29 @@ export function BoldChronologicalPreview({
   };
 
   return (
-    <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", fontFamily: SANS, fontSize: "10.5px", lineHeight: 1.6, color: INK, border: `1px solid ${BDOT}`, borderRadius: "8px", boxSizing: "border-box", padding: "50px 56px" }}>
+    <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", fontFamily: SANS, fontSize: "11.5px", lineHeight: 1.65, color: INK, border: `1px solid ${BDOT}`, borderRadius: "8px", boxSizing: "border-box", padding: "50px 56px" }}>
 
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: "12px" }}>
-        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "28px", color: INK, letterSpacing: "0.5px", marginBottom: "5px" }}>
+        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "29px", color: INK, letterSpacing: "0.5px", marginBottom: "5px" }}>
           {profile.full_name}
         </h1>
         {jobTitle && (
-          <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "11px", color: INK, marginBottom: "5px" }}>
+          <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "12.5px", color: INK, marginBottom: "5px" }}>
             {jobTitle}
           </p>
         )}
-        <p style={{ fontFamily: SANS, fontSize: "9.5px", color: GRAY }}>
+        <p style={{ fontFamily: SANS, fontSize: "11px", color: GRAY }}>
           {contactParts.join("   •   ")}
         </p>
       </div>
-      <div style={{ borderBottom: `1.5px solid ${RULE}`, marginBottom: "20px" }} />
+      <div style={{ borderBottom: `1.5px solid ${RULE}`, marginBottom: "18px" }} />
 
       {/* Summary */}
       {tailored.summary && (
-        <div style={{ marginBottom: "16px" }}>
+        <div style={{ marginBottom: "15px" }}>
           <SectionHead title="Summary" />
-          <p style={{ fontFamily: SANS, fontSize: "10px", color: INK, lineHeight: 1.75 }}>
+          <p style={{ fontFamily: SANS, fontSize: "11.5px", color: INK, lineHeight: 1.75 }}>
             {tailored.summary}
           </p>
         </div>
@@ -551,21 +551,21 @@ export function BoldChronologicalPreview({
 
       {/* Experience */}
       {tailored.experience?.length > 0 && (
-        <div style={{ marginBottom: "16px" }}>
+        <div style={{ marginBottom: "15px" }}>
           <SectionHead title="Experience" />
           {tailored.experience.map((exp, i) => (
-            <div key={i} style={{ marginBottom: "14px" }}>
-              <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "11.5px", color: INK, marginBottom: "1px" }}>
+            <div key={i} style={{ marginBottom: "13px" }}>
+              <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "12.5px", color: INK, marginBottom: "1px" }}>
                 {exp.company}
               </p>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "5px" }}>
-                <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: "10px", color: INK }}>{exp.role}</span>
-                <span style={{ fontFamily: SANS, fontSize: "9px", color: GRAY, flexShrink: 0, marginLeft: "10px" }}>{exp.duration}</span>
+                <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: "12px", color: INK }}>{exp.role}</span>
+                <span style={{ fontFamily: SANS, fontSize: "11px", color: GRAY, flexShrink: 0, marginLeft: "10px" }}>{exp.duration}</span>
               </div>
               {exp.responsibilities?.map((r, j) => (
                 <div key={j} style={{ display: "flex", gap: "6px", marginBottom: "3px", paddingLeft: "4px" }}>
-                  <span style={{ color: GRAY, fontSize: "10px", lineHeight: "1.5", flexShrink: 0 }}>•</span>
-                  <span style={{ fontFamily: SANS, fontSize: "9.5px", color: INK, lineHeight: 1.62 }}>{r}</span>
+                  <span style={{ color: GRAY, fontSize: "11.5px", lineHeight: "1.55", flexShrink: 0 }}>•</span>
+                  <span style={{ fontFamily: SANS, fontSize: "11.5px", color: INK, lineHeight: 1.7 }}>{r}</span>
                 </div>
               ))}
             </div>
@@ -575,16 +575,16 @@ export function BoldChronologicalPreview({
 
       {/* Education */}
       {tailored.education?.length > 0 && (
-        <div style={{ marginBottom: "16px" }}>
+        <div style={{ marginBottom: "15px" }}>
           <SectionHead title="Education" />
           {tailored.education.map((edu, i) => (
             <div key={i} style={{ marginBottom: "10px" }}>
-              <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "11.5px", color: INK, marginBottom: "1px" }}>
+              <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "12.5px", color: INK, marginBottom: "1px" }}>
                 {edu.university}
               </p>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: "10px", color: INK }}>{edu.degree}</span>
-                <span style={{ fontFamily: SANS, fontSize: "9px", color: GRAY }}>{edu.graduation_year}</span>
+                <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: "12px", color: INK }}>{edu.degree}</span>
+                <span style={{ fontFamily: SANS, fontSize: "11px", color: GRAY }}>{edu.graduation_year}</span>
               </div>
             </div>
           ))}
@@ -593,7 +593,7 @@ export function BoldChronologicalPreview({
 
       {/* Languages */}
       {tailored.languages?.length > 0 && (
-        <div style={{ marginBottom: "16px" }}>
+        <div style={{ marginBottom: "15px" }}>
           <SectionHead title="Languages" />
           <div style={{ display: "flex", flexWrap: "wrap", gap: "22px", justifyContent: "center" }}>
             {tailored.languages.map((lang, i) => <LangDots key={i} lang={lang} />)}
@@ -605,7 +605,7 @@ export function BoldChronologicalPreview({
       {allSkills.length > 0 && (
         <div>
           <SectionHead title="Skills" />
-          <p style={{ fontFamily: SANS, fontSize: "9.5px", color: INK, lineHeight: 1.7, textAlign: "center" }}>
+          <p style={{ fontFamily: SANS, fontSize: "11.5px", color: INK, lineHeight: 1.75, textAlign: "center" }}>
             {allSkills.join("   •   ")}
           </p>
         </div>

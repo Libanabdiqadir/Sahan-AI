@@ -64,6 +64,10 @@ function SkillTag({ label, variant = "blue" }: { label: string; variant?: "blue"
 // ─── Harvard CV Preview (browser) ──────────────────────────────────────────────
 function HarvardPreview({ profile, tailored }: { profile: UserProfile; tailored: NonNullable<ResumeHistory["tailored_data"]> }) {
   const contact = [profile.contact_email, profile.phone_number, profile.location, profile.linkedin_url].filter(Boolean).join("  ·  ");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
   return (
     <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", padding: "25.4mm", fontFamily: "Arial, sans-serif", fontSize: "12px", lineHeight: "1.5", color: "#1a1a2e", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box" }}>
       <h1 style={{ fontSize: "20px", fontWeight: "700", textAlign: "center", textTransform: "uppercase", letterSpacing: "2.5px", marginBottom: "5px" }}>{profile.full_name}</h1>
@@ -92,6 +96,23 @@ function HarvardPreview({ profile, tailored }: { profile: UserProfile; tailored:
           ))}
         </div>
       )}
+      {/* Projects */}
+      {projects.length > 0 && (
+        <div style={{ marginBottom: "16px" }}>
+          <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Projects</p>
+          {projects.map((p, i) => (
+            <div key={i} style={{ marginBottom: "12px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <span style={{ fontWeight: "700", fontSize: "13px" }}>{p.name || p.title || ""}</span>
+                <span style={{ fontSize: "11px", color: "#6b7280" }}>{p.dates || p.duration || ""}</span>
+              </div>
+              {!!(p.role_title) && <p style={{ fontStyle: "italic", fontSize: "12px", color: "#374151", marginTop: "2px" }}>{p.role_title}</p>}
+              {!!(p.link || p.url) && <p style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>{p.link || p.url}</p>}
+              {!!(p.description) && <p style={{ fontSize: "12px", lineHeight: "1.6", marginTop: "4px" }}>• {p.description}</p>}
+            </div>
+          ))}
+        </div>
+      )}
       {tailored.education?.length > 0 && (
         <div style={{ marginBottom: "16px" }}>
           <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Education</p>
@@ -114,6 +135,20 @@ function HarvardPreview({ profile, tailored }: { profile: UserProfile; tailored:
           {tailored.languages?.length > 0 && <div><span style={{ fontWeight: "700" }}>Languages: </span><span style={{ color: "#374151" }}>{tailored.languages.join(", ")}</span></div>}
         </div>
       </div>
+      {/* Certifications */}
+      {certifications.length > 0 && (
+        <div style={{ marginTop: "16px" }}>
+          <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Certifications</p>
+          {certifications.map((c, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+              <span style={{ fontWeight: "700", fontSize: "12px" }}>{c.name || ""}</span>
+              <span style={{ fontSize: "11px", color: "#6b7280" }}>
+                {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -146,6 +181,10 @@ function HarvardCoverLetterPreview({ profile, tailored, jobTitle, companyName }:
 
 // ─── Executive CV Preview (browser) ────────────────────────────────────────────
 function ExecutivePreview({ profile, tailored }: { profile: UserProfile; tailored: NonNullable<ResumeHistory["tailored_data"]> }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
   const NAVY = "#1e2d4a"; const GOLD = "#b8972e"; const LIGHT = "#f4f6f9";
   return (
     <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", fontFamily: "Arial, sans-serif", fontSize: "11px", lineHeight: "1.6", color: "#2d3748", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box", overflow: "hidden" }}>
@@ -180,9 +219,22 @@ function ExecutivePreview({ profile, tailored }: { profile: UserProfile; tailore
             </div>
           )}
           {tailored.languages?.length > 0 && (
-            <div>
+            <div style={{ marginBottom: "24px" }}>
               <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Languages</div>
               {tailored.languages.map((l, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: GOLD, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{l}</span></div>)}
+            </div>
+          )}
+          {certifications.length > 0 && (
+            <div>
+              <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Certifications</div>
+              {certifications.map((c, i) => (
+                <div key={i} style={{ marginBottom: "10px" }}>
+                  <p style={{ fontWeight: "700", fontSize: "11px", color: NAVY }}>{c.name || ""}</p>
+                  <p style={{ fontSize: "10.5px", color: "#718096" }}>
+                    {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
+                  </p>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -209,6 +261,27 @@ function ExecutivePreview({ profile, tailored }: { profile: UserProfile; tailore
                       <span style={{ fontSize: "11px", lineHeight: "1.6", color: "#4a5568" }}>{r}</span>
                     </div>
                   ))}
+                </div>
+              ))}
+            </div>
+          )}
+          {projects.length > 0 && (
+            <div>
+              <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "14px" }}>Notable Projects</div>
+              {projects.map((p, i) => (
+                <div key={i} style={{ marginBottom: "18px", paddingLeft: "14px", borderLeft: `3px solid ${GOLD}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "3px" }}>
+                    <p style={{ fontWeight: "700", fontSize: "13px", color: NAVY }}>{p.name || p.title || ""}</p>
+                    <span style={{ fontSize: "10px", color: "white", background: NAVY, padding: "3px 10px", borderRadius: "20px", marginLeft: "10px", flexShrink: 0 }}>{p.dates || p.duration || ""}</span>
+                  </div>
+                  {!!(p.role_title) && <p style={{ fontSize: "11px", color: GOLD, fontWeight: "700", marginBottom: "5px" }}>{p.role_title}</p>}
+                  {!!(p.link || p.url) && <p style={{ fontSize: "10px", color: "#718096", marginBottom: "5px", fontStyle: "italic" }}>{p.link || p.url}</p>}
+                  {!!(p.description) && (
+                    <div style={{ display: "flex", marginBottom: "4px" }}>
+                      <span style={{ color: GOLD, marginRight: "6px", fontSize: "13px" }}>›</span>
+                      <span style={{ fontSize: "11px", lineHeight: "1.6", color: "#4a5568" }}>{p.description}</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

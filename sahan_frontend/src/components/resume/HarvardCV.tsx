@@ -13,24 +13,24 @@ const INCH = 72;
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Times-Roman",
-    fontSize: 10,
+    fontSize: 10.5,
     color: "#1a1a2e",
-    paddingTop: INCH * 0.7,
-    paddingBottom: INCH * 0.7,
+    paddingTop: INCH * 0.65,
+    paddingBottom: INCH * 0.65,
     paddingLeft: INCH,
     paddingRight: INCH,
-    lineHeight: 1.3,
+    lineHeight: 1.45,
   },
   name: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: "Times-Bold",
     textAlign: "center",
     textTransform: "uppercase",
     letterSpacing: 2,
-    marginBottom: 3,
+    marginBottom: 4,
   },
   contactLine: {
-    fontSize: 8.5,
+    fontSize: 10,
     fontFamily: "Times-Roman",
     textAlign: "center",
     color: "#4b5563",
@@ -42,74 +42,74 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   section: {
-    marginBottom: 7,
+    marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 9,
+    fontSize: 11,
     fontFamily: "Times-Bold",
     textTransform: "uppercase",
     letterSpacing: 1.5,
     borderBottomWidth: 0.5,
     borderBottomColor: "#d1d5db",
     paddingBottom: 2,
-    marginBottom: 4,
+    marginBottom: 5,
   },
   summary: {
-    fontSize: 9.5,
+    fontSize: 11,
     fontFamily: "Times-Italic",
     color: "#374151",
-    lineHeight: 1.4,
+    lineHeight: 1.55,
   },
   expHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 1,
+    marginBottom: 2,
   },
   expTitle: {
-    fontSize: 9.5,
+    fontSize: 11.5,
     fontFamily: "Times-Bold",
   },
   expDate: {
-    fontSize: 8.5,
+    fontSize: 10,
     fontFamily: "Times-Roman",
     color: "#6b7280",
   },
   expCompany: {
-    fontSize: 9,
+    fontSize: 11,
     fontFamily: "Times-Italic",
     color: "#374151",
-    marginBottom: 2,
+    marginBottom: 3,
   },
   bullet: {
     flexDirection: "row",
-    marginBottom: 1,
-    paddingLeft: 8,
+    marginBottom: 2,
+    paddingLeft: 10,
   },
   bulletDot: {
-    width: 8,
-    fontSize: 9,
+    width: 10,
+    fontSize: 10.5,
     fontFamily: "Times-Roman",
   },
   bulletText: {
     flex: 1,
-    fontSize: 9,
+    fontSize: 11,
     fontFamily: "Times-Roman",
-    lineHeight: 1.3,
+    lineHeight: 1.55,
   },
   expBlock: {
-    marginBottom: 5,
+    marginBottom: 7,
   },
   eduRow: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
   eduDegree: {
-    fontSize: 9.5,
+    fontSize: 11.5,
     fontFamily: "Times-Bold",
   },
   eduSchool: {
-    fontSize: 9,
+    fontSize: 11,
     fontFamily: "Times-Italic",
     color: "#374151",
   },
@@ -121,25 +121,33 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   skillCategory: {
-    fontSize: 8.5,
+    fontSize: 10.5,
     fontFamily: "Times-Bold",
-    marginBottom: 1,
+    marginBottom: 2,
   },
   skillText: {
-    fontSize: 8.5,
+    fontSize: 10.5,
     fontFamily: "Times-Roman",
     color: "#374151",
-    lineHeight: 1.4,
+    lineHeight: 1.6,
   },
   coverLetterBody: {
-    fontSize: 10,
+    fontSize: 11.5,
     fontFamily: "Times-Roman",
-    lineHeight: 1.6,
+    lineHeight: 1.7,
     color: "#1a1a2e",
   },
   coverLetterParagraph: {
-    marginBottom: 8,
+    marginBottom: 9,
   },
+  projBlock: { marginBottom: 7 },
+  projHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 2 },
+  projTitle: { fontSize: 11.5, fontFamily: "Times-Bold" },
+  projRole: { fontSize: 11, fontFamily: "Times-Italic", color: "#374151", marginBottom: 2 },
+  projLink: { fontSize: 10, fontFamily: "Times-Roman", color: "#6b7280", marginBottom: 2 },
+  certRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 5 },
+  certName: { fontSize: 11.5, fontFamily: "Times-Bold" },
+  certSub: { fontSize: 10, fontFamily: "Times-Italic", color: "#6b7280" },
 });
 
 interface HarvardCVProps {
@@ -150,6 +158,11 @@ interface HarvardCVProps {
 }
 
 export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardCVProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+
   const contactParts = [
     profile.contact_email,
     profile.phone_number,
@@ -189,6 +202,35 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
                   <View key={j} style={styles.bullet}>
                     <Text style={styles.bulletDot}>•</Text>
                     <Text style={styles.bulletText}>{r}</Text>
+                  </View>
+                ))}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Projects */}
+        {projects.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Projects</Text>
+            {projects.map((p, i) => (
+              <View key={i} style={styles.projBlock}>
+                <View style={styles.projHeader}>
+                  <Text style={styles.projTitle}>{p.name || p.title || ""}</Text>
+                  <Text style={styles.expDate}>{p.dates || p.duration || ""}</Text>
+                </View>
+                {!!(p.role_title) && <Text style={styles.projRole}>{p.role_title}</Text>}
+                {!!(p.link || p.url) && <Text style={styles.projLink}>{p.link || p.url}</Text>}
+                {!!(p.description) && (
+                  <View style={styles.bullet}>
+                    <Text style={styles.bulletDot}>•</Text>
+                    <Text style={styles.bulletText}>{p.description}</Text>
+                  </View>
+                )}
+                {(p.highlights || []).map((h: string, j: number) => (
+                  <View key={j} style={styles.bullet}>
+                    <Text style={styles.bulletDot}>•</Text>
+                    <Text style={styles.bulletText}>{h}</Text>
                   </View>
                 ))}
               </View>
@@ -238,6 +280,20 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
             </View>
           </View>
         </View>
+        {/* Certifications */}
+        {certifications.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Certifications</Text>
+            {certifications.map((c, i) => (
+              <View key={i} style={styles.certRow}>
+                <Text style={styles.certName}>{c.name || ""}</Text>
+                <Text style={styles.certSub}>
+                  {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
       </Page>
 
       {/* ── COVER LETTER PAGE ─────────────────────────────────────────────── */}

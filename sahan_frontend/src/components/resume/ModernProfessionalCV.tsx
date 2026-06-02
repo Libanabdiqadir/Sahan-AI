@@ -31,7 +31,7 @@ const S = StyleSheet.create({
   page: {
     flexDirection: "row",
     fontFamily: "Times-Roman",
-    fontSize: 10,
+    fontSize: 10.5,
     color: C.text,
     backgroundColor: C.white,
   },
@@ -47,23 +47,23 @@ const S = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: C.border,
   },
-  sidebarSection: { marginBottom: 18 },
+  sidebarSection: { marginBottom: 16 },
   sidebarTitle: {
     fontFamily: "Times-Bold",
-    fontSize: 7.5,
+    fontSize: 9,
     textTransform: "uppercase",
     letterSpacing: 1.8,
     color: C.primary,
-    marginBottom: 7,
+    marginBottom: 8,
     paddingBottom: 4,
     borderBottomWidth: 1.5,
     borderBottomColor: C.primary,
   },
 
   // Contact
-  contactRow: { flexDirection: "row", alignItems: "flex-start", marginBottom: 5, gap: 6 },
-  contactIcon: { fontSize: 9, color: C.primary, width: 12, fontFamily: "Times-Roman" },
-  contactText: { fontSize: 9, color: C.muted, flex: 1, fontFamily: "Times-Roman", lineHeight: 1.4 },
+  contactRow: { flexDirection: "row", alignItems: "flex-start", marginBottom: 6, gap: 6 },
+  contactIcon: { fontSize: 10, color: C.primary, width: 13, fontFamily: "Times-Roman" },
+  contactText: { fontSize: 10.5, color: C.muted, flex: 1, fontFamily: "Times-Roman", lineHeight: 1.55 },
 
   // Skills chips
   chipsWrap: { flexDirection: "row", flexWrap: "wrap", gap: 4 },
@@ -75,15 +75,15 @@ const S = StyleSheet.create({
     paddingRight: 7,
     borderRadius: 12,
   },
-  chipText: { fontSize: 8.5, color: C.chipText, fontFamily: "Times-Bold" },
+  chipText: { fontSize: 9.5, color: C.chipText, fontFamily: "Times-Bold" },
 
   // Sidebar plain list
-  sidebarItem: { flexDirection: "row", alignItems: "center", marginBottom: 8, gap: 7 },
+  sidebarItem: { flexDirection: "row", alignItems: "center", marginBottom: 9, gap: 7 },
   sidebarDot: {
     width: 5, height: 5, borderRadius: 3,
     backgroundColor: C.primary,
   },
-  sidebarItemText: { fontSize: 10.5, color: C.muted, fontFamily: "Times-Roman", flex: 1, lineHeight: 1.4 },
+  sidebarItemText: { fontSize: 12, color: C.muted, fontFamily: "Times-Roman", flex: 1, lineHeight: 1.5 },
 
   // ── Main ─────────────────────────────────────────────────────
   main: {
@@ -98,34 +98,34 @@ const S = StyleSheet.create({
   nameBlock: { marginBottom: 4 },
   name: {
     fontFamily: "Times-Bold",
-    fontSize: 22,
+    fontSize: 24,
     color: C.text,
     letterSpacing: 0.5,
     marginBottom: 3,
   },
   title: {
     fontFamily: "Times-Italic",
-    fontSize: 12,
+    fontSize: 13,
     color: C.primary,
     marginBottom: 10,
   },
   headerRule: {
     borderBottomWidth: 2,
     borderBottomColor: C.primary,
-    marginBottom: 14,
+    marginBottom: 12,
   },
 
   // Section
-  section: { marginBottom: 16 },
+  section: { marginBottom: 14 },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 9,
+    marginBottom: 8,
     gap: 8,
   },
   sectionTitle: {
     fontFamily: "Times-Bold",
-    fontSize: 9,
+    fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: 1.8,
     color: C.primary,
@@ -140,13 +140,13 @@ const S = StyleSheet.create({
   // Summary
   summaryText: {
     fontFamily: "Times-Roman",
-    fontSize: 10,
+    fontSize: 11,
     color: C.muted,
-    lineHeight: 1.65,
+    lineHeight: 1.7,
   },
 
   // Experience
-  expBlock: { marginBottom: 13 },
+  expBlock: { marginBottom: 11 },
   expTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -155,12 +155,12 @@ const S = StyleSheet.create({
   },
   expCompany: {
     fontFamily: "Times-Bold",
-    fontSize: 11,
+    fontSize: 12.5,
     color: C.text,
   },
   expDate: {
     fontFamily: "Times-Roman",
-    fontSize: 9,
+    fontSize: 10.5,
     color: C.light,
     backgroundColor: C.chip,
     paddingTop: 2,
@@ -171,7 +171,7 @@ const S = StyleSheet.create({
   },
   expRole: {
     fontFamily: "Times-Italic",
-    fontSize: 10,
+    fontSize: 11.5,
     color: C.primary,
     marginBottom: 5,
   },
@@ -182,21 +182,21 @@ const S = StyleSheet.create({
   },
   bulletDot: {
     width: 10,
-    fontSize: 12,
+    fontSize: 13,
     color: C.primary,
     fontFamily: "Times-Roman",
-    lineHeight: 1.3,
+    lineHeight: 1.4,
   },
   bulletText: {
     flex: 1,
     fontFamily: "Times-Roman",
-    fontSize: 9.5,
+    fontSize: 11,
     color: C.muted,
-    lineHeight: 1.5,
+    lineHeight: 1.6,
   },
 
   // Education
-  eduBlock: { marginBottom: 10 },
+  eduBlock: { marginBottom: 9 },
   eduTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -205,17 +205,17 @@ const S = StyleSheet.create({
   },
   eduDegree: {
     fontFamily: "Times-Bold",
-    fontSize: 10.5,
+    fontSize: 12,
     color: C.text,
   },
   eduYear: {
     fontFamily: "Times-Roman",
-    fontSize: 9,
+    fontSize: 10.5,
     color: C.light,
   },
   eduSchool: {
     fontFamily: "Times-Italic",
-    fontSize: 9.5,
+    fontSize: 11,
     color: C.muted,
   },
 
@@ -233,17 +233,17 @@ const S = StyleSheet.create({
   },
   achieveText: {
     fontFamily: "Times-Roman",
-    fontSize: 9.5,
+    fontSize: 11,
     color: C.muted,
     flex: 1,
-    lineHeight: 1.5,
+    lineHeight: 1.6,
   },
 
   // ── Cover Letter ──────────────────────────────────────────────
   clPage: {
     flexDirection: "row",
     fontFamily: "Times-Roman",
-    fontSize: 10,
+    fontSize: 10.5,
     color: C.text,
     backgroundColor: C.white,
   },
@@ -266,21 +266,21 @@ const S = StyleSheet.create({
   },
   clDate: {
     fontFamily: "Times-Roman",
-    fontSize: 10,
+    fontSize: 10.5,
     color: C.light,
-    marginBottom: 20,
+    marginBottom: 18,
   },
   clRecipientLabel: {
     fontFamily: "Times-Bold",
-    fontSize: 10.5,
+    fontSize: 11.5,
     color: C.text,
     marginBottom: 2,
   },
   clRecipientCompany: {
     fontFamily: "Times-Roman",
-    fontSize: 10,
+    fontSize: 11,
     color: C.muted,
-    marginBottom: 18,
+    marginBottom: 16,
   },
   clSubjectBox: {
     backgroundColor: C.chip,
@@ -291,56 +291,56 @@ const S = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 12,
     borderRadius: 4,
-    marginBottom: 20,
+    marginBottom: 18,
   },
   clSubjectText: {
     fontFamily: "Times-Bold",
-    fontSize: 10,
+    fontSize: 11,
     color: C.primary,
   },
   clGreeting: {
     fontFamily: "Times-Roman",
-    fontSize: 11,
+    fontSize: 12,
     color: C.text,
-    marginBottom: 14,
+    marginBottom: 13,
   },
   clBodyPara: {
     fontFamily: "Times-Roman",
-    fontSize: 10.5,
+    fontSize: 11.5,
     color: C.muted,
-    lineHeight: 1.75,
-    marginBottom: 12,
+    lineHeight: 1.8,
+    marginBottom: 11,
   },
   clSignoffWrap: {
-    marginTop: 24,
-    paddingTop: 16,
+    marginTop: 22,
+    paddingTop: 14,
     borderTopWidth: 1,
     borderTopColor: C.border,
   },
   clSignoff: {
     fontFamily: "Times-Roman",
-    fontSize: 10.5,
+    fontSize: 11,
     color: C.muted,
-    marginBottom: 28,
+    marginBottom: 26,
   },
   clSignName: {
     fontFamily: "Times-Bold",
-    fontSize: 13,
+    fontSize: 14,
     color: C.text,
     marginBottom: 4,
   },
   clSignDetail: {
     fontFamily: "Times-Roman",
-    fontSize: 9.5,
+    fontSize: 10.5,
     color: C.light,
   },
   // Sidebar meta items for cover letter
   clSidebarMeta: {
-    marginBottom: 20,
+    marginBottom: 18,
   },
   clSidebarMetaLabel: {
     fontFamily: "Times-Bold",
-    fontSize: 7.5,
+    fontSize: 9,
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: C.primary,
@@ -348,9 +348,9 @@ const S = StyleSheet.create({
   },
   clSidebarMetaValue: {
     fontFamily: "Times-Roman",
-    fontSize: 9.5,
+    fontSize: 10.5,
     color: C.muted,
-    lineHeight: 1.5,
+    lineHeight: 1.55,
   },
 });
 
@@ -378,6 +378,11 @@ export function ModernProfessionalCV({
   jobTitle,
   companyName,
 }: ModernProfessionalCVProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+
   const today = new Date().toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
@@ -448,6 +453,21 @@ export function ModernProfessionalCV({
               ))}
             </View>
           )}
+
+          {/* Certifications */}
+          {certifications.length > 0 && (
+            <View style={S.sidebarSection}>
+              <Text style={S.sidebarTitle}>Certifications</Text>
+              {certifications.map((c, i) => (
+                <View key={i} style={{ marginBottom: 8 }}>
+                  <Text style={{ fontFamily: "Times-Bold", fontSize: 9.5, color: C.text }}>{c.name || ""}</Text>
+                  <Text style={{ fontFamily: "Times-Roman", fontSize: 8.5, color: C.light }}>
+                    {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* ── MAIN CONTENT ── */}
@@ -483,6 +503,39 @@ export function ModernProfessionalCV({
                     <View key={j} style={S.bulletRow}>
                       <Text style={S.bulletDot}>•</Text>
                       <Text style={S.bulletText}>{r}</Text>
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Projects */}
+          {projects.length > 0 && (
+            <View style={S.section}>
+              <SectionHeader title="Projects" />
+              {projects.map((p, i) => (
+                <View key={i} style={S.expBlock}>
+                  <View style={S.expTopRow}>
+                    <Text style={S.expCompany}>{p.name || p.title || ""}</Text>
+                    <Text style={S.expDate}>{p.dates || p.duration || ""}</Text>
+                  </View>
+                  {!!(p.role_title) && <Text style={S.expRole}>{p.role_title}</Text>}
+                  {!!(p.link || p.url) && (
+                    <Text style={{ fontFamily: "Times-Roman", fontSize: 8.5, color: C.light, marginBottom: 4 }}>
+                      {p.link || p.url}
+                    </Text>
+                  )}
+                  {!!(p.description) && (
+                    <View style={S.bulletRow}>
+                      <Text style={S.bulletDot}>•</Text>
+                      <Text style={S.bulletText}>{p.description}</Text>
+                    </View>
+                  )}
+                  {(p.highlights || []).map((h: string, j: number) => (
+                    <View key={j} style={S.bulletRow}>
+                      <Text style={S.bulletDot}>•</Text>
+                      <Text style={S.bulletText}>{h}</Text>
                     </View>
                   ))}
                 </View>
@@ -607,6 +660,11 @@ export function ModernProfessionalPreview({
   tailored: TailoredData;
   jobTitle: string;
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+
   const BLUE = "#1a56db";
   const SIDEBAR_BG = "#f0f4ff";
   const MUTED = "#5c6b80";
@@ -623,18 +681,18 @@ export function ModernProfessionalPreview({
   ].filter((c) => c.value);
 
   return (
-    <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", display: "flex", fontFamily: "Arial, sans-serif", fontSize: "11px", lineHeight: "1.5", color: "#1e2939", border: "1px solid #e8e6e0", borderRadius: "8px", overflow: "hidden", boxSizing: "border-box" }}>
+    <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", display: "flex", fontFamily: "Arial, sans-serif", fontSize: "11.5px", lineHeight: "1.55", color: "#1e2939", border: "1px solid #e8e6e0", borderRadius: "8px", overflow: "hidden", boxSizing: "border-box" }}>
 
       {/* LEFT SIDEBAR */}
       <div style={{ width: "31%", background: SIDEBAR_BG, padding: "28px 18px", borderRight: `1px solid ${BORDER}`, flexShrink: 0 }}>
 
         {/* Contact */}
         <div style={{ marginBottom: "20px" }}>
-          <p style={{ fontWeight: "700", fontSize: "8px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Contact</p>
+          <p style={{ fontWeight: "700", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Contact</p>
           {contacts.map((c, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "6px", marginBottom: "6px" }}>
+            <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "6px", marginBottom: "7px" }}>
               <span style={{ fontSize: "10px", color: BLUE, width: "14px", flexShrink: 0 }}>{c.icon}</span>
-              <span style={{ fontSize: "9.5px", color: MUTED, wordBreak: "break-all" }}>{c.value}</span>
+              <span style={{ fontSize: "10.5px", color: MUTED, wordBreak: "break-all", lineHeight: "1.55" }}>{c.value}</span>
             </div>
           ))}
         </div>
@@ -642,11 +700,11 @@ export function ModernProfessionalPreview({
         {/* Tech Skills — vertical dot list */}
         {tailored.tech_skills?.length > 0 && (
           <div style={{ marginBottom: "20px" }}>
-            <p style={{ fontWeight: "700", fontSize: "8px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Technical Skills</p>
+            <p style={{ fontWeight: "700", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Technical Skills</p>
             {tailored.tech_skills.map((s, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                 <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: BLUE, flexShrink: 0 }} />
-                <span style={{ fontSize: "10.5px", color: MUTED }}>{s}</span>
+                <span style={{ fontSize: "12px", color: MUTED }}>{s}</span>
               </div>
             ))}
           </div>
@@ -655,11 +713,11 @@ export function ModernProfessionalPreview({
         {/* Soft Skills — vertical dot list */}
         {tailored.soft_skills?.length > 0 && (
           <div style={{ marginBottom: "20px" }}>
-            <p style={{ fontWeight: "700", fontSize: "8px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Core Skills</p>
+            <p style={{ fontWeight: "700", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Core Skills</p>
             {tailored.soft_skills.map((s, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                 <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#2e7d32", flexShrink: 0 }} />
-                <span style={{ fontSize: "10.5px", color: "#2e7d32" }}>{s}</span>
+                <span style={{ fontSize: "12px", color: "#2e7d32" }}>{s}</span>
               </div>
             ))}
           </div>
@@ -667,12 +725,27 @@ export function ModernProfessionalPreview({
 
         {/* Languages */}
         {tailored.languages?.length > 0 && (
-          <div>
-            <p style={{ fontWeight: "700", fontSize: "8px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Languages</p>
+          <div style={{ marginBottom: "20px" }}>
+            <p style={{ fontWeight: "700", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Languages</p>
             {tailored.languages.map((l, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px" }}>
                 <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: BLUE, flexShrink: 0 }} />
-                <span style={{ fontSize: "10.5px", color: MUTED }}>{l}</span>
+                <span style={{ fontSize: "12px", color: MUTED }}>{l}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Certifications */}
+        {certifications.length > 0 && (
+          <div>
+            <p style={{ fontWeight: "700", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE, borderBottom: `1.5px solid ${BLUE}`, paddingBottom: "4px", marginBottom: "10px" }}>Certifications</p>
+            {certifications.map((c, i) => (
+              <div key={i} style={{ marginBottom: "10px" }}>
+                <p style={{ fontWeight: "700", fontSize: "11px", color: "#1e2939" }}>{c.name || ""}</p>
+                <p style={{ fontSize: "10px", color: LIGHT, lineHeight: "1.5" }}>
+                  {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
+                </p>
               </div>
             ))}
           </div>
@@ -682,39 +755,71 @@ export function ModernProfessionalPreview({
       {/* MAIN CONTENT */}
       <div style={{ flex: 1, padding: "22px 28px 28px 22px" }}>
         {/* Name + Title */}
-        <p style={{ fontSize: "22px", fontWeight: "700", color: "#1e2939", letterSpacing: "0.5px", marginBottom: "3px" }}>{profile.full_name}</p>
-        <p style={{ fontSize: "12px", fontStyle: "italic", color: BLUE, marginBottom: "10px" }}>{jobTitle || "Professional"}</p>
-        <hr style={{ border: "none", borderTop: `2px solid ${BLUE}`, marginBottom: "14px" }} />
+        <p style={{ fontSize: "24px", fontWeight: "700", color: "#1e2939", letterSpacing: "0.5px", marginBottom: "3px" }}>{profile.full_name}</p>
+        <p style={{ fontSize: "13px", fontStyle: "italic", color: BLUE, marginBottom: "10px" }}>{jobTitle || "Professional"}</p>
+        <hr style={{ border: "none", borderTop: `2px solid ${BLUE}`, marginBottom: "12px" }} />
 
         {/* Summary */}
         {tailored.summary && (
-          <div style={{ marginBottom: "16px" }}>
+          <div style={{ marginBottom: "14px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-              <span style={{ fontWeight: "700", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE }}>Professional Summary</span>
+              <span style={{ fontWeight: "700", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE }}>Professional Summary</span>
               <div style={{ flex: 1, borderBottom: `1px solid ${BORDER}` }} />
             </div>
-            <p style={{ fontSize: "10px", color: MUTED, lineHeight: "1.65" }}>{tailored.summary}</p>
+            <p style={{ fontSize: "11px", color: MUTED, lineHeight: "1.7" }}>{tailored.summary}</p>
           </div>
         )}
 
         {/* Experience */}
         {tailored.experience?.length > 0 && (
-          <div style={{ marginBottom: "16px" }}>
+          <div style={{ marginBottom: "14px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-              <span style={{ fontWeight: "700", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE }}>Work Experience</span>
+              <span style={{ fontWeight: "700", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE }}>Work Experience</span>
               <div style={{ flex: 1, borderBottom: `1px solid ${BORDER}` }} />
             </div>
             {tailored.experience.map((exp, i) => (
-              <div key={i} style={{ marginBottom: "14px" }}>
+              <div key={i} style={{ marginBottom: "12px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2px" }}>
-                  <span style={{ fontWeight: "700", fontSize: "11.5px", color: "#1e2939" }}>{exp.company}</span>
-                  <span style={{ fontSize: "9px", color: LIGHT, background: CHIP_BG, padding: "2px 8px", borderRadius: "10px" }}>{exp.duration}</span>
+                  <span style={{ fontWeight: "700", fontSize: "12.5px", color: "#1e2939" }}>{exp.company}</span>
+                  <span style={{ fontSize: "10.5px", color: LIGHT, background: CHIP_BG, padding: "2px 8px", borderRadius: "10px" }}>{exp.duration}</span>
                 </div>
-                <p style={{ fontStyle: "italic", fontSize: "10px", color: BLUE, marginBottom: "6px" }}>{exp.role}</p>
+                <p style={{ fontStyle: "italic", fontSize: "11.5px", color: BLUE, marginBottom: "6px" }}>{exp.role}</p>
                 {exp.responsibilities?.map((r, j) => (
                   <div key={j} style={{ display: "flex", marginBottom: "3px" }}>
-                    <span style={{ color: BLUE, marginRight: "6px", fontSize: "14px", lineHeight: "1.2" }}>•</span>
-                    <span style={{ fontSize: "9.5px", color: MUTED, lineHeight: "1.5" }}>{r}</span>
+                    <span style={{ color: BLUE, marginRight: "6px", fontSize: "14px", lineHeight: "1.3" }}>•</span>
+                    <span style={{ fontSize: "11px", color: MUTED, lineHeight: "1.6" }}>{r}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Projects */}
+        {projects.length > 0 && (
+          <div style={{ marginBottom: "14px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+              <span style={{ fontWeight: "700", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE }}>Projects</span>
+              <div style={{ flex: 1, borderBottom: `1px solid ${BORDER}` }} />
+            </div>
+            {projects.map((p, i) => (
+              <div key={i} style={{ marginBottom: "12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2px" }}>
+                  <span style={{ fontWeight: "700", fontSize: "12.5px", color: "#1e2939" }}>{p.name || p.title || ""}</span>
+                  <span style={{ fontSize: "10.5px", color: LIGHT, background: CHIP_BG, padding: "2px 8px", borderRadius: "10px" }}>{p.dates || p.duration || ""}</span>
+                </div>
+                {!!(p.role_title) && <p style={{ fontStyle: "italic", fontSize: "11.5px", color: BLUE, marginBottom: "4px" }}>{p.role_title}</p>}
+                {!!(p.link || p.url) && <p style={{ fontSize: "10px", color: LIGHT, marginBottom: "4px" }}>{p.link || p.url}</p>}
+                {!!(p.description) && (
+                  <div style={{ display: "flex", marginBottom: "3px" }}>
+                    <span style={{ color: BLUE, marginRight: "6px", fontSize: "14px", lineHeight: "1.3" }}>•</span>
+                    <span style={{ fontSize: "11px", color: MUTED, lineHeight: "1.6" }}>{p.description}</span>
+                  </div>
+                )}
+                {(p.highlights || []).map((h: string, j: number) => (
+                  <div key={j} style={{ display: "flex", marginBottom: "3px" }}>
+                    <span style={{ color: BLUE, marginRight: "6px", fontSize: "14px", lineHeight: "1.3" }}>•</span>
+                    <span style={{ fontSize: "11px", color: MUTED, lineHeight: "1.6" }}>{h}</span>
                   </div>
                 ))}
               </div>
@@ -726,16 +831,16 @@ export function ModernProfessionalPreview({
         {tailored.education?.length > 0 && (
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-              <span style={{ fontWeight: "700", fontSize: "9px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE }}>Education</span>
+              <span style={{ fontWeight: "700", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE }}>Education</span>
               <div style={{ flex: 1, borderBottom: `1px solid ${BORDER}` }} />
             </div>
             {tailored.education.map((edu, i) => (
               <div key={i} style={{ marginBottom: "10px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <span style={{ fontWeight: "700", fontSize: "11px", color: "#1e2939" }}>{edu.degree}</span>
-                  <span style={{ fontSize: "9px", color: LIGHT }}>{edu.graduation_year}</span>
+                  <span style={{ fontWeight: "700", fontSize: "12px", color: "#1e2939" }}>{edu.degree}</span>
+                  <span style={{ fontSize: "10.5px", color: LIGHT }}>{edu.graduation_year}</span>
                 </div>
-                <p style={{ fontStyle: "italic", fontSize: "10px", color: MUTED }}>{edu.university}</p>
+                <p style={{ fontStyle: "italic", fontSize: "11px", color: MUTED }}>{edu.university}</p>
               </div>
             ))}
           </div>

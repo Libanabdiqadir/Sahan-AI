@@ -31,7 +31,7 @@ const S = StyleSheet.create({
   page: {
     flexDirection: "column",
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 10.5,
     color: C.body,
     backgroundColor: C.white,
   },
@@ -53,14 +53,14 @@ const S = StyleSheet.create({
   },
   name: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 22,
+    fontSize: 24,
     color: C.body,
     letterSpacing: 0.2,
     marginBottom: 3,
   },
   roleLabel: {
     fontFamily: "Helvetica-Oblique",
-    fontSize: 11,
+    fontSize: 12,
     color: C.muted,
   },
 
@@ -81,10 +81,10 @@ const S = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 14,
   },
-  sideSection: { marginBottom: 18 },
+  sideSection: { marginBottom: 16 },
   sideTitle: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 7,
+    fontSize: 8.5,
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: C.mid,
@@ -99,20 +99,20 @@ const S = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 6,
-    marginBottom: 5,
+    marginBottom: 6,
   },
   contactIcon: {
     fontFamily: "Helvetica",
-    fontSize: 8.5,
+    fontSize: 9.5,
     color: C.accent,
-    width: 11,
+    width: 12,
   },
   contactText: {
     fontFamily: "Helvetica",
-    fontSize: 8.5,
+    fontSize: 10,
     color: C.muted,
     flex: 1,
-    lineHeight: 1.4,
+    lineHeight: 1.55,
   },
 
   // Skill chips
@@ -125,7 +125,7 @@ const S = StyleSheet.create({
   },
   chipLabel: {
     fontFamily: "Helvetica",
-    fontSize: 8,
+    fontSize: 9.5,
     color: C.chipText,
   },
   softChip: {
@@ -136,7 +136,7 @@ const S = StyleSheet.create({
   },
   softChipLabel: {
     fontFamily: "Helvetica",
-    fontSize: 8,
+    fontSize: 9.5,
     color: C.softText,
   },
 
@@ -145,7 +145,7 @@ const S = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 7,
-    marginBottom: 8,
+    marginBottom: 9,
   },
   sideDot: {
     width: 4,
@@ -155,10 +155,10 @@ const S = StyleSheet.create({
   },
   sideItemText: {
     fontFamily: "Helvetica",
-    fontSize: 10.5,
+    fontSize: 12,
     color: C.muted,
     flex: 1,
-    lineHeight: 1.4,
+    lineHeight: 1.5,
   },
 
   // ── Main panel (71%) ──────────────────────────────────────────────────
@@ -169,16 +169,16 @@ const S = StyleSheet.create({
     paddingLeft: 22,
     paddingRight: PH,
   },
-  section: { marginBottom: 15 },
+  section: { marginBottom: 13 },
   sectionHead: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    marginBottom: 9,
+    marginBottom: 8,
   },
   sectionTitle: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 7.5,
+    fontSize: 9.5,
     textTransform: "uppercase",
     letterSpacing: 2,
     color: C.mid,
@@ -193,13 +193,13 @@ const S = StyleSheet.create({
   // Summary
   summaryText: {
     fontFamily: "Helvetica",
-    fontSize: 9.5,
+    fontSize: 11,
     color: C.muted,
     lineHeight: 1.7,
   },
 
   // Experience
-  expBlock: { marginBottom: 13 },
+  expBlock: { marginBottom: 11 },
   expTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -208,12 +208,12 @@ const S = StyleSheet.create({
   },
   expCompany: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 10.5,
+    fontSize: 12.5,
     color: C.body,
   },
   expBadge: {
     fontFamily: "Helvetica",
-    fontSize: 8,
+    fontSize: 9.5,
     color: C.subtle,
     backgroundColor: C.chipBg,
     paddingTop: 2,    paddingBottom: 2,
@@ -222,7 +222,7 @@ const S = StyleSheet.create({
   },
   expRole: {
     fontFamily: "Helvetica-Oblique",
-    fontSize: 9.5,
+    fontSize: 11,
     color: C.mid,
     marginBottom: 5,
   },
@@ -234,21 +234,21 @@ const S = StyleSheet.create({
   },
   bulletMark: {
     fontFamily: "Helvetica",
-    fontSize: 11,
+    fontSize: 12,
     color: C.mid,
-    width: 10,
-    lineHeight: 1.3,
+    width: 11,
+    lineHeight: 1.4,
   },
   bulletText: {
     flex: 1,
     fontFamily: "Helvetica",
-    fontSize: 9,
+    fontSize: 11,
     color: C.muted,
-    lineHeight: 1.55,
+    lineHeight: 1.65,
   },
 
   // Education
-  eduBlock: { marginBottom: 10 },
+  eduBlock: { marginBottom: 9 },
   eduTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -257,17 +257,17 @@ const S = StyleSheet.create({
   },
   eduDegree: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 10,
+    fontSize: 12,
     color: C.body,
   },
   eduYear: {
     fontFamily: "Helvetica",
-    fontSize: 9,
+    fontSize: 10.5,
     color: C.subtle,
   },
   eduSchool: {
     fontFamily: "Helvetica-Oblique",
-    fontSize: 9.5,
+    fontSize: 11,
     color: C.muted,
   },
 
@@ -289,10 +289,10 @@ const S = StyleSheet.create({
     paddingLeft: 22,
     paddingRight: PH,
   },
-  clMetaBlock: { marginBottom: 16 },
+  clMetaBlock: { marginBottom: 15 },
   clMetaLabel: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 7,
+    fontSize: 8.5,
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: C.mid,
@@ -303,32 +303,32 @@ const S = StyleSheet.create({
   },
   clMetaValue: {
     fontFamily: "Helvetica",
-    fontSize: 9,
+    fontSize: 10.5,
     color: C.muted,
-    lineHeight: 1.5,
+    lineHeight: 1.55,
   },
   clDivider: {
     borderBottomWidth: 0.5,
     borderBottomColor: C.border,
-    marginBottom: 16,
+    marginBottom: 15,
   },
   clDate: {
     fontFamily: "Helvetica",
-    fontSize: 9,
+    fontSize: 10.5,
     color: C.subtle,
-    marginBottom: 18,
+    marginBottom: 16,
   },
   clRecipient: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 10.5,
+    fontSize: 12,
     color: C.body,
     marginBottom: 2,
   },
   clCompany: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 11,
     color: C.muted,
-    marginBottom: 16,
+    marginBottom: 15,
   },
   clSubjectBox: {
     backgroundColor: C.chipBg,
@@ -337,47 +337,47 @@ const S = StyleSheet.create({
     paddingTop: 8,    paddingBottom: 8,
     paddingLeft: 12,  paddingRight: 12,
     borderRadius: 3,
-    marginBottom: 18,
+    marginBottom: 16,
   },
   clSubjectText: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 9.5,
+    fontSize: 11,
     color: C.accent,
   },
   clGreeting: {
     fontFamily: "Helvetica",
-    fontSize: 10.5,
+    fontSize: 12,
     color: C.body,
     marginBottom: 12,
   },
   clBodyPara: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 11.5,
     color: C.muted,
-    lineHeight: 1.75,
+    lineHeight: 1.78,
     marginBottom: 11,
   },
   clSignoffWrap: {
-    marginTop: 20,
+    marginTop: 18,
     paddingTop: 14,
     borderTopWidth: 0.5,
     borderTopColor: C.border,
   },
   clSignoff: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 11,
     color: C.muted,
-    marginBottom: 24,
+    marginBottom: 22,
   },
   clSignName: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 12,
+    fontSize: 13,
     color: C.body,
     marginBottom: 4,
   },
   clSignDetail: {
     fontFamily: "Helvetica",
-    fontSize: 9,
+    fontSize: 10.5,
     color: C.subtle,
   },
 });
@@ -402,6 +402,11 @@ interface Props {
 
 // ─── PDF Document ───────────────────────────────────────────────────────────────
 export function ModernMinimalistCV({ profile, tailored, jobTitle, companyName }: Props) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+
   const today = new Date().toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
@@ -479,6 +484,20 @@ export function ModernMinimalistCV({ profile, tailored, jobTitle, companyName }:
                 ))}
               </View>
             )}
+
+            {certifications.length > 0 && (
+              <View style={S.sideSection}>
+                <Text style={S.sideTitle}>Certifications</Text>
+                {certifications.map((c, i) => (
+                  <View key={i} style={{ marginBottom: 8 }}>
+                    <Text style={{ fontFamily: "Helvetica-Bold", fontSize: 9, color: C.body }}>{c.name || ""}</Text>
+                    <Text style={{ fontFamily: "Helvetica", fontSize: 8, color: C.subtle }}>
+                      {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
 
           {/* ── Main ── */}
@@ -505,6 +524,38 @@ export function ModernMinimalistCV({ profile, tailored, jobTitle, companyName }:
                       <View key={j} style={S.bulletRow}>
                         <Text style={S.bulletMark}>·</Text>
                         <Text style={S.bulletText}>{r}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {projects.length > 0 && (
+              <View style={S.section}>
+                <SH title="Projects" />
+                {projects.map((p, i) => (
+                  <View key={i} style={S.expBlock}>
+                    <View style={S.expTopRow}>
+                      <Text style={S.expCompany}>{p.name || p.title || ""}</Text>
+                      <Text style={S.expBadge}>{p.dates || p.duration || ""}</Text>
+                    </View>
+                    {!!(p.role_title) && <Text style={S.expRole}>{p.role_title}</Text>}
+                    {!!(p.link || p.url) && (
+                      <Text style={{ fontFamily: "Helvetica", fontSize: 8, color: C.subtle, marginBottom: 4 }}>
+                        {p.link || p.url}
+                      </Text>
+                    )}
+                    {!!(p.description) && (
+                      <View style={S.bulletRow}>
+                        <Text style={S.bulletMark}>·</Text>
+                        <Text style={S.bulletText}>{p.description}</Text>
+                      </View>
+                    )}
+                    {(p.highlights || []).map((h: string, j: number) => (
+                      <View key={j} style={S.bulletRow}>
+                        <Text style={S.bulletMark}>·</Text>
+                        <Text style={S.bulletText}>{h}</Text>
                       </View>
                     ))}
                   </View>
@@ -617,6 +668,11 @@ export function ModernMinimalistPreview({
   tailored: TailoredData;
   jobTitle: string;
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+
   const FONT     = '"Inter", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif';
   const ACCENT   = "#334155";
   const MID      = "#475569";
@@ -640,7 +696,7 @@ export function ModernMinimalistPreview({
   return (
     <div style={{
       background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto",
-      fontFamily: FONT, fontSize: "11px", lineHeight: 1.5, color: BODY,
+      fontFamily: FONT, fontSize: "11.5px", lineHeight: 1.55, color: BODY,
       border: `1px solid ${BORDER}`, borderRadius: "8px", overflow: "hidden",
       boxSizing: "border-box",
     }}>
@@ -649,11 +705,11 @@ export function ModernMinimalistPreview({
 
       {/* Header */}
       <div style={{ padding: "20px 40px 14px", borderBottom: `1px solid ${BORDER}` }}>
-        <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "22px", color: BODY, letterSpacing: "0.2px", marginBottom: "3px" }}>
+        <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "24px", color: BODY, letterSpacing: "0.2px", marginBottom: "3px" }}>
           {profile.full_name}
         </p>
         {jobTitle && (
-          <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "11px", color: MUTED }}>
+          <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "12px", color: MUTED }}>
             {jobTitle}
           </p>
         )}
@@ -667,13 +723,13 @@ export function ModernMinimalistPreview({
 
           {/* Contact */}
           <div style={{ marginBottom: "18px" }}>
-            <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "7px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
+            <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "8.5px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
               Contact
             </p>
             {contacts.map((c, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "6px", marginBottom: "5px" }}>
-                <span style={{ fontSize: "8.5px", color: ACCENT, width: "12px", flexShrink: 0 }}>{c.icon}</span>
-                <span style={{ fontFamily: FONT, fontSize: "8.5px", color: MUTED, wordBreak: "break-all" }}>{c.value}</span>
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "6px", marginBottom: "6px" }}>
+                <span style={{ fontSize: "9.5px", color: ACCENT, width: "12px", flexShrink: 0 }}>{c.icon}</span>
+                <span style={{ fontFamily: FONT, fontSize: "10px", color: MUTED, wordBreak: "break-all", lineHeight: "1.55" }}>{c.value}</span>
               </div>
             ))}
           </div>
@@ -681,13 +737,13 @@ export function ModernMinimalistPreview({
           {/* Technical Skills — vertical dot list */}
           {tailored.tech_skills?.length > 0 && (
             <div style={{ marginBottom: "18px" }}>
-              <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "7px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
+              <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "8.5px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
                 Technical Skills
               </p>
               {tailored.tech_skills.map((s, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                   <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: ACCENT, flexShrink: 0 }} />
-                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: MUTED }}>{s}</span>
+                  <span style={{ fontFamily: FONT, fontSize: "12px", color: MUTED }}>{s}</span>
                 </div>
               ))}
             </div>
@@ -696,13 +752,13 @@ export function ModernMinimalistPreview({
           {/* Core Competencies — vertical dot list */}
           {tailored.soft_skills?.length > 0 && (
             <div style={{ marginBottom: "18px" }}>
-              <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "7px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
+              <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "8.5px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
                 Core Competencies
               </p>
               {tailored.soft_skills.map((s, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                   <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: SOFT_TXT, flexShrink: 0 }} />
-                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: SOFT_TXT }}>{s}</span>
+                  <span style={{ fontFamily: FONT, fontSize: "12px", color: SOFT_TXT }}>{s}</span>
                 </div>
               ))}
             </div>
@@ -710,14 +766,31 @@ export function ModernMinimalistPreview({
 
           {/* Languages */}
           {tailored.languages?.length > 0 && (
-            <div>
-              <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "7px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
+            <div style={{ marginBottom: "18px" }}>
+              <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "8.5px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
                 Languages
               </p>
               {tailored.languages.map((l, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                   <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: MID, flexShrink: 0 }} />
-                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: MUTED }}>{l}</span>
+                  <span style={{ fontFamily: FONT, fontSize: "12px", color: MUTED }}>{l}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Certifications */}
+          {certifications.length > 0 && (
+            <div>
+              <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "8.5px", textTransform: "uppercase", letterSpacing: "1.5px", color: MID, borderBottom: `0.5px solid ${BORDER}`, paddingBottom: "4px", marginBottom: "8px" }}>
+                Certifications
+              </p>
+              {certifications.map((c, i) => (
+                <div key={i} style={{ marginBottom: "10px" }}>
+                  <p style={{ fontFamily: FONT, fontWeight: 700, fontSize: "11px", color: BODY }}>{c.name || ""}</p>
+                  <p style={{ fontFamily: FONT, fontSize: "9.5px", color: SUBTLE }}>
+                    {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
+                  </p>
                 </div>
               ))}
             </div>
@@ -729,14 +802,14 @@ export function ModernMinimalistPreview({
 
           {/* Summary */}
           {tailored.summary && (
-            <div style={{ marginBottom: "15px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px" }}>
-                <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "7.5px", textTransform: "uppercase", letterSpacing: "2px", color: MID, whiteSpace: "nowrap" }}>
+            <div style={{ marginBottom: "13px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "9.5px", textTransform: "uppercase", letterSpacing: "2px", color: MID, whiteSpace: "nowrap" }}>
                   Professional Summary
                 </span>
                 <div style={{ flex: 1, borderBottom: `0.5px solid ${BORDER}` }} />
               </div>
-              <p style={{ fontFamily: FONT, fontSize: "9.5px", color: MUTED, lineHeight: 1.7 }}>
+              <p style={{ fontFamily: FONT, fontSize: "11px", color: MUTED, lineHeight: 1.7 }}>
                 {tailored.summary}
               </p>
             </div>
@@ -744,28 +817,64 @@ export function ModernMinimalistPreview({
 
           {/* Experience */}
           {tailored.experience?.length > 0 && (
-            <div style={{ marginBottom: "15px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px" }}>
-                <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "7.5px", textTransform: "uppercase", letterSpacing: "2px", color: MID, whiteSpace: "nowrap" }}>
+            <div style={{ marginBottom: "13px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "9.5px", textTransform: "uppercase", letterSpacing: "2px", color: MID, whiteSpace: "nowrap" }}>
                   Work Experience
                 </span>
                 <div style={{ flex: 1, borderBottom: `0.5px solid ${BORDER}` }} />
               </div>
               {tailored.experience.map((exp, i) => (
-                <div key={i} style={{ marginBottom: "13px" }}>
+                <div key={i} style={{ marginBottom: "12px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2px" }}>
-                    <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "10.5px", color: BODY }}>{exp.company}</span>
-                    <span style={{ fontFamily: FONT, fontSize: "8px", color: SUBTLE, background: CHIP_BG, padding: "2px 8px", borderRadius: "3px", flexShrink: 0, marginLeft: "8px" }}>
+                    <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "12.5px", color: BODY }}>{exp.company}</span>
+                    <span style={{ fontFamily: FONT, fontSize: "9.5px", color: SUBTLE, background: CHIP_BG, padding: "2px 8px", borderRadius: "3px", flexShrink: 0, marginLeft: "8px" }}>
                       {exp.duration}
                     </span>
                   </div>
-                  <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "9.5px", color: MID, marginBottom: "5px" }}>
+                  <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "11px", color: MID, marginBottom: "5px" }}>
                     {exp.role}
                   </p>
                   {exp.responsibilities?.map((r, j) => (
                     <div key={j} style={{ display: "flex", marginBottom: "3px" }}>
-                      <span style={{ color: MID, marginRight: "6px", fontSize: "13px", lineHeight: "1.3", flexShrink: 0 }}>·</span>
-                      <span style={{ fontFamily: FONT, fontSize: "9px", color: MUTED, lineHeight: 1.55 }}>{r}</span>
+                      <span style={{ color: MID, marginRight: "6px", fontSize: "14px", lineHeight: "1.35", flexShrink: 0 }}>·</span>
+                      <span style={{ fontFamily: FONT, fontSize: "11px", color: MUTED, lineHeight: 1.65 }}>{r}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Projects */}
+          {projects.length > 0 && (
+            <div style={{ marginBottom: "13px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "9.5px", textTransform: "uppercase", letterSpacing: "2px", color: MID, whiteSpace: "nowrap" }}>
+                  Projects
+                </span>
+                <div style={{ flex: 1, borderBottom: `0.5px solid ${BORDER}` }} />
+              </div>
+              {projects.map((p, i) => (
+                <div key={i} style={{ marginBottom: "12px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2px" }}>
+                    <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "12.5px", color: BODY }}>{p.name || p.title || ""}</span>
+                    <span style={{ fontFamily: FONT, fontSize: "9.5px", color: SUBTLE, background: CHIP_BG, padding: "2px 8px", borderRadius: "3px", flexShrink: 0, marginLeft: "8px" }}>
+                      {p.dates || p.duration || ""}
+                    </span>
+                  </div>
+                  {!!(p.role_title) && <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "11px", color: MID, marginBottom: "4px" }}>{p.role_title}</p>}
+                  {!!(p.link || p.url) && <p style={{ fontFamily: FONT, fontSize: "9.5px", color: SUBTLE, marginBottom: "4px" }}>{p.link || p.url}</p>}
+                  {!!(p.description) && (
+                    <div style={{ display: "flex", marginBottom: "3px" }}>
+                      <span style={{ color: MID, marginRight: "6px", fontSize: "14px", lineHeight: "1.35", flexShrink: 0 }}>·</span>
+                      <span style={{ fontFamily: FONT, fontSize: "11px", color: MUTED, lineHeight: 1.65 }}>{p.description}</span>
+                    </div>
+                  )}
+                  {(p.highlights || []).map((h: string, j: number) => (
+                    <div key={j} style={{ display: "flex", marginBottom: "3px" }}>
+                      <span style={{ color: MID, marginRight: "6px", fontSize: "14px", lineHeight: "1.35", flexShrink: 0 }}>·</span>
+                      <span style={{ fontFamily: FONT, fontSize: "11px", color: MUTED, lineHeight: 1.65 }}>{h}</span>
                     </div>
                   ))}
                 </div>
@@ -776,8 +885,8 @@ export function ModernMinimalistPreview({
           {/* Education */}
           {tailored.education?.length > 0 && (
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px" }}>
-                <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "7.5px", textTransform: "uppercase", letterSpacing: "2px", color: MID, whiteSpace: "nowrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "9.5px", textTransform: "uppercase", letterSpacing: "2px", color: MID, whiteSpace: "nowrap" }}>
                   Education
                 </span>
                 <div style={{ flex: 1, borderBottom: `0.5px solid ${BORDER}` }} />
@@ -785,10 +894,10 @@ export function ModernMinimalistPreview({
               {tailored.education.map((edu, i) => (
                 <div key={i} style={{ marginBottom: "10px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1px" }}>
-                    <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "10px", color: BODY }}>{edu.degree}</span>
-                    <span style={{ fontFamily: FONT, fontSize: "9px", color: SUBTLE }}>{edu.graduation_year}</span>
+                    <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "12px", color: BODY }}>{edu.degree}</span>
+                    <span style={{ fontFamily: FONT, fontSize: "10.5px", color: SUBTLE }}>{edu.graduation_year}</span>
                   </div>
-                  <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "9.5px", color: MUTED }}>{edu.university}</p>
+                  <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "11px", color: MUTED }}>{edu.university}</p>
                 </div>
               ))}
             </div>

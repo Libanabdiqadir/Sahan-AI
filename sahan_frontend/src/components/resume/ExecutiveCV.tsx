@@ -17,9 +17,9 @@ const MUTED = "#718096";
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Times-Roman",
-    fontSize: 10,
+    fontSize: 10.5,
     color: BODY_TEXT,
-    lineHeight: 1.4,
+    lineHeight: 1.5,
   },
 
   // ── Header Banner ──────────────────────────────────────────────
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   },
   headerName: {
     fontFamily: "Times-Bold",
-    fontSize: 22,
+    fontSize: 24,
     color: "white",
     textTransform: "uppercase",
     letterSpacing: 3,
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   headerContactItem: {
-    fontSize: 9,
+    fontSize: 10,
     color: "#cbd5e0",
     fontFamily: "Times-Roman",
   },
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   },
   sidebarSectionTitle: {
     fontFamily: "Times-Bold",
-    fontSize: 8.5,
+    fontSize: 10,
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: NAVY,
@@ -84,12 +84,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sidebarSection: {
-    marginBottom: 16,
+    marginBottom: 15,
   },
   skillRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 5,
     gap: 6,
   },
   skillDot: {
@@ -106,25 +106,25 @@ const styles = StyleSheet.create({
   },
   skillLabel: {
     fontFamily: "Times-Roman",
-    fontSize: 9.5,
+    fontSize: 11.5,
     color: BODY_TEXT,
     flex: 1,
   },
   eduDegree: {
     fontFamily: "Times-Bold",
-    fontSize: 9.5,
+    fontSize: 11,
     color: NAVY,
     marginBottom: 1,
   },
   eduSchool: {
     fontFamily: "Times-Italic",
-    fontSize: 9,
+    fontSize: 10.5,
     color: "#4a5568",
     marginBottom: 1,
   },
   eduYear: {
     fontFamily: "Times-Roman",
-    fontSize: 9,
+    fontSize: 10.5,
     color: MUTED,
     marginBottom: 8,
   },
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
   mainSectionTitle: {
     fontFamily: "Times-Bold",
-    fontSize: 8.5,
+    fontSize: 10.5,
     textTransform: "uppercase",
     letterSpacing: 1.5,
     color: NAVY,
@@ -149,20 +149,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   mainSection: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
 
   // ── Summary ────────────────────────────────────────────────────
   summaryText: {
     fontFamily: "Times-Italic",
-    fontSize: 10,
+    fontSize: 11.5,
     color: "#4a5568",
-    lineHeight: 1.6,
+    lineHeight: 1.65,
   },
 
   // ── Experience ─────────────────────────────────────────────────
   expBlock: {
-    marginBottom: 12,
+    marginBottom: 11,
     paddingLeft: 10,
     borderLeftWidth: 2.5,
     borderLeftColor: GOLD,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   expRole: {
     fontFamily: "Times-Bold",
-    fontSize: 10.5,
+    fontSize: 12,
     color: NAVY,
     flex: 1,
   },
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: NAVY,
     color: "white",
     fontFamily: "Times-Roman",
-    fontSize: 8,
+    fontSize: 9,
     paddingTop: 2,
     paddingBottom: 2,
     paddingLeft: 7,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   expCompany: {
     fontFamily: "Times-Bold",
-    fontSize: 9.5,
+    fontSize: 11,
     color: GOLD,
     marginBottom: 5,
   },
@@ -204,33 +204,33 @@ const styles = StyleSheet.create({
   },
   bulletArrow: {
     fontFamily: "Times-Roman",
-    fontSize: 10,
+    fontSize: 11,
     color: GOLD,
-    width: 10,
+    width: 11,
     marginTop: 0.5,
   },
   bulletText: {
     fontFamily: "Times-Roman",
-    fontSize: 9.5,
+    fontSize: 11.5,
     color: BODY_TEXT,
     flex: 1,
-    lineHeight: 1.4,
+    lineHeight: 1.6,
   },
 
   // ── Cover letter page ──────────────────────────────────────────
   coverPage: {
     fontFamily: "Times-Roman",
-    fontSize: 11,
+    fontSize: 11.5,
     color: BODY_TEXT,
     paddingTop: INCH,
     paddingBottom: INCH,
     paddingLeft: INCH,
     paddingRight: INCH,
-    lineHeight: 1.6,
+    lineHeight: 1.65,
   },
   coverName: {
     fontFamily: "Times-Bold",
-    fontSize: 18,
+    fontSize: 20,
     textTransform: "uppercase",
     letterSpacing: 2,
     color: NAVY,
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   },
   coverContact: {
     fontFamily: "Times-Roman",
-    fontSize: 9,
+    fontSize: 10.5,
     color: MUTED,
     textAlign: "center",
     marginBottom: 6,
@@ -258,48 +258,59 @@ const styles = StyleSheet.create({
   },
   coverDate: {
     fontFamily: "Times-Roman",
-    fontSize: 10.5,
+    fontSize: 11,
     marginBottom: 14,
   },
   coverRecipientBold: {
     fontFamily: "Times-Bold",
-    fontSize: 10.5,
+    fontSize: 11.5,
     marginBottom: 2,
   },
   coverRecipient: {
     fontFamily: "Times-Roman",
-    fontSize: 10.5,
+    fontSize: 11.5,
     marginBottom: 14,
   },
   coverSubject: {
     fontFamily: "Times-Bold",
-    fontSize: 10.5,
+    fontSize: 11.5,
     color: NAVY,
     marginBottom: 16,
   },
   coverBody: {
     fontFamily: "Times-Roman",
-    fontSize: 11,
-    lineHeight: 1.7,
+    fontSize: 11.5,
+    lineHeight: 1.75,
     marginBottom: 12,
   },
   coverSignoff: {
     fontFamily: "Times-Roman",
-    fontSize: 11,
-    marginBottom: 32,
+    fontSize: 11.5,
+    marginBottom: 30,
     marginTop: 18,
   },
   coverSignName: {
     fontFamily: "Times-Bold",
-    fontSize: 11,
+    fontSize: 12,
     color: NAVY,
     marginBottom: 2,
   },
   coverSignDetail: {
     fontFamily: "Times-Roman",
-    fontSize: 10,
+    fontSize: 11,
     color: MUTED,
   },
+  certBlock: { marginBottom: 9 },
+  certName: { fontFamily: "Times-Bold", fontSize: 11, color: NAVY, marginBottom: 2 },
+  certSub: { fontFamily: "Times-Italic", fontSize: 10, color: MUTED },
+  projBlock: {
+    marginBottom: 11, paddingLeft: 10,
+    borderLeftWidth: 2.5, borderLeftColor: GOLD,
+  },
+  projHeaderRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 2 },
+  projTitle: { fontFamily: "Times-Bold", fontSize: 12, color: NAVY, flex: 1 },
+  projRole: { fontFamily: "Times-Bold", fontSize: 11, color: GOLD, marginBottom: 2 },
+  projLink: { fontFamily: "Times-Italic", fontSize: 10, color: MUTED, marginBottom: 4 },
 });
 
 interface ExecutiveCVProps {
@@ -310,6 +321,11 @@ interface ExecutiveCVProps {
 }
 
 export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: ExecutiveCVProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+
   const contactParts = [
     profile.contact_email,
     profile.phone_number,
@@ -392,6 +408,21 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
                 ))}
               </View>
             )}
+
+            {/* Certifications */}
+            {certifications.length > 0 && (
+              <View style={styles.sidebarSection}>
+                <Text style={styles.sidebarSectionTitle}>Certifications</Text>
+                {certifications.map((c, i) => (
+                  <View key={i} style={styles.certBlock}>
+                    <Text style={styles.certName}>{c.name || ""}</Text>
+                    <Text style={styles.certSub}>
+                      {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
 
           {/* RIGHT MAIN */}
@@ -419,6 +450,35 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
                       <View key={j} style={styles.bulletRow}>
                         <Text style={styles.bulletArrow}>›</Text>
                         <Text style={styles.bulletText}>{r}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Projects */}
+            {projects.length > 0 && (
+              <View style={styles.mainSection}>
+                <Text style={styles.mainSectionTitle}>Notable Projects</Text>
+                {projects.map((p, i) => (
+                  <View key={i} style={styles.projBlock}>
+                    <View style={styles.projHeaderRow}>
+                      <Text style={styles.projTitle}>{p.name || p.title || ""}</Text>
+                      <Text style={styles.expDateBadge}>{p.dates || p.duration || ""}</Text>
+                    </View>
+                    {!!(p.role_title) && <Text style={styles.projRole}>{p.role_title}</Text>}
+                    {!!(p.link || p.url) && <Text style={styles.projLink}>{p.link || p.url}</Text>}
+                    {!!(p.description) && (
+                      <View style={styles.bulletRow}>
+                        <Text style={styles.bulletArrow}>›</Text>
+                        <Text style={styles.bulletText}>{p.description}</Text>
+                      </View>
+                    )}
+                    {(p.highlights || []).map((h: string, j: number) => (
+                      <View key={j} style={styles.bulletRow}>
+                        <Text style={styles.bulletArrow}>›</Text>
+                        <Text style={styles.bulletText}>{h}</Text>
                       </View>
                     ))}
                   </View>

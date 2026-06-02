@@ -28,38 +28,61 @@ class ResumeService:
             master_data = profile.get_master_data()
             
             prompt = f"""
-                You are an expert resume writer. Using the Master Data provided, create a tailored resume 
-                for the following Job Description.
+                You are an elite, professional resume writer. Your goal is to write highly convincing, human-written resumes that completely avoid generic AI phrasing, buzzwords, or structural tells.
+
+                Analyze the provided Master Data and tailor it to match the target Job Description precisely.
 
                 Master Data: {master_data}
                 Job Description: {job_description}
 
-                RULES AND CONSTRAINTS.
-                1. Never invent, assume or hallucinate information that is not present in the provided Master Data or job Description.
-                2. Never provide placeholders such as: [Company Name], [Job Board], [Insert Here], [Add Company], [Add Position], [PlaceHolder].
-                3. If informaton is unavailable, omit it naturally and rewrite the sentence professionally.
-                4. Avoid generic AI phrases such as: "I am thrilled to apply", "I am excited to submit", "I would be delighted", "I am writing to express my profound interest".
-                5. Use clear, direct, professional business langauge.
-                6. if a requirement appears in the job Description but not in Master Data, do NOT claim the candidate possesses it.
-                7. The cover letter MUST NOT contain:
-                    "Sincerely"
-                    "Best Regards"
-                    "Kind Regards"
-                    "Any closing signature"
-                    "The applicants name at the end".
+                === RULES AND CONSTRAINTS ===
 
-                Output MUST be a JSON object with these EXACT keys:
-                
-                1. 'summary': A professional summary tailored to the job.
-                2. 'tech_skills': A list of relevant technical and hard skills.
-                3. 'soft_skills': A list of relevant soft skills (e.g., Leadership, Communication, Problem Solving).
-                4. 'experience': A list of objects. Each object MUST have:
-                - 'role', 'company', 'duration'
-                - 'responsibilities': A list of 3-4 bullet points showing achievements relevant to the job.
-                5. 'education': A list of objects. Each object MUST have:
-                - 'degree', 'university', 'graduation_year'
-                6. 'languages': A list of languages the candidate speaks.
-                7. 'cover_letter': A full, professional tailored cover letter.
+                Never Hallucinate: Do not invent, assume, or extrapolate facts, metrics, or technologies not present in the Master Data.
+
+                No Placeholders: Never output placeholders such as [Company Name], [Job Board], [Insert Here], or brackets. If information is missing, omit it naturally.
+
+                Writing Style (Write Like a Human):
+                - Write clear, punchy, professional business sentences.
+                - Banned words: Do NOT use "spearheaded", "leveraged", "fostered", "ensured", "testament", "showcased", "demonstrated", "passion", "thrilled", "excited", "delighted". Use simple, strong action verbs (e.g., "built", "designed", "optimized", "managed", "increased", "wrote", "led").
+                - NO HYPHENS OR BULLET SYMBOLS IN STRINGS: Never start descriptions, responsibilities, or highlights with dashes ("-"), bullet points ("•"), asterisks, or any list symbols. Return them as raw, clean text sentences. The frontend and PDF renderers will handle list formatting.
+
+                Cover Letter Closing Constraint: The cover letter MUST NOT contain closing salutations or signatures like "Sincerely", "Best regards", "Kind regards", or any name/placeholder at the end. Stop writing exactly at the final paragraph.
+
+                === OUTPUT JSON STRUCTURE ===
+                Output MUST be a valid, parseable JSON object with these EXACT keys:
+
+                'summary': A concise, professional summary tailored to the job (max 3 sentences).
+
+                'tech_skills': A list of relevant technical/hard skills matching the job.
+
+                'soft_skills': A list of relevant interpersonal/soft skills.
+
+                'experience': A list of objects, each representing work history:
+                'role': Targeted job title.
+                'company': Company name.
+                'duration': Date range.
+                'responsibilities': A list of 3-4 clean, high-impact achievement sentences (no leading dashes or bullet characters).
+
+                'projects': A list of objects representing personal or professional projects (draw from the Master Data projects if present):
+                'name': The name of the project.
+                'role_title': Role on the project (e.g., "Lead Creator", "Solo Developer").
+                'description': A single polished, impact-driven action statement explaining what was built and its relevance (no leading dashes or bullet characters).
+                'link': The repository or live URL (omit if not present).
+                'dates': Month/Year or duration (omit if not present).
+
+                'education': A list of objects:
+                'degree': Degree/course of study.
+                'university': Institution name.
+                'graduation_year': Year of graduation.
+
+                'certifications': A list of objects (draw from the Master Data certifications if present):
+                'name': Title of the certificate.
+                'issuer': Issuing organization.
+                'issue_date': Date received.
+                'credential_id': ID if present (omit key entirely if not present).
+                'languages': A list of languages spoken.
+
+                'cover_letter': A beautifully written, highly compelling, human-sounding cover letter (excluding any formal closures or signatures).
             """
             response = model.generate_content(
                 prompt,
