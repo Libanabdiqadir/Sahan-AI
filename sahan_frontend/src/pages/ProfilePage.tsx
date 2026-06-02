@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import {
@@ -44,8 +45,12 @@ function SkillChip({ label, onRemove }: { label: string; onRemove: () => void })
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [localUser, setLocalUser] = useState(user);
-  const [tab, setTab] = useState<Tab>("info");
+  const [tab, setTab] = useState<Tab>(() => {
+    const p = searchParams.get("tab");
+    return (p === "career" || p === "vault") ? p : "info";
+  });
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [resumes, setResumes] = useState<ResumeHistory[]>([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
