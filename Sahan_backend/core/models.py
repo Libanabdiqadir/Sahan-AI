@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
 
-# Create your models here.
-
 class CustomUserManager(BaseUserManager):
 
   def create_user(self, email, password=None, **extra_fields):
@@ -64,6 +62,8 @@ class UserProfile(models.Model):
 
   education_history = models.JSONField(default=list, blank=True)
   work_experience = models.JSONField(default=list, blank=True)
+  projects = models.JSONField(default=list, blank=True)
+  certifications = models.JSONField(default=list, blank=True)
 
   languages = models.JSONField(default=list, blank=True)
 
@@ -77,6 +77,8 @@ class UserProfile(models.Model):
       'location': self.location,
       'education': self.education_history,
       'experience': self.work_experience,
+      'projects': self.projects,
+      'certifications': self.certifications,
       'languages': self.languages,
       'phone_number': self.phone_number,
       'skills': self.master_data.get('tech_skills', []),

@@ -9,7 +9,10 @@ import {
 } from "lucide-react";
 import { profileApi, resumeApi, userApi } from "../services/api";
 import { useAuth } from "../hooks/useAuth";
-import type { UserProfile, ResumeHistory, EducationEntry, ExperienceEntry } from "../types";
+import type {
+  UserProfile, ResumeHistory, EducationEntry, ExperienceEntry,
+  ProjectEntry, CertificationEntry,
+} from "../types";
 import { HarvardCV } from "../components/resume/HarvardCV";
 
 type Tab = "info" | "career" | "vault";
@@ -17,7 +20,7 @@ type Tab = "info" | "career" | "vault";
 const TABS: { id: Tab; label: string; icon: typeof User }[] = [
   { id: "info", label: "Personal Info", icon: User },
   { id: "career", label: "Career Data", icon: Briefcase },
-  { id: "vault", label: "Document Vault", icon: FileText },
+  { id: "vault", label: "Resume History", icon: FileText },
 ];
 
 function StatusBadge({ status }: { status: ResumeHistory["status"] }) {
@@ -67,6 +70,15 @@ export default function ProfilePage() {
     university: "",
     graduation_year: "",
   });
+  const [showProjectForm, setShowProjectForm] = useState(false);
+  const [newProject, setNewProject] = useState<ProjectEntry>({
+    title: "", role_title: "", description: "", link: "", dates: "",
+  });
+  const [showCertForm, setShowCertForm] = useState(false);
+  const [newCert, setNewCert] = useState<CertificationEntry>({
+    name: "", issuer: "", issue_date: "", expiration_date: "",
+    credential_id: "", credential_url: "",
+  });
 
   useEffect(() => {
   profileApi.get()
@@ -101,6 +113,8 @@ export default function ProfilePage() {
         location: draft.location,
         education_history: draft.education_history,
         work_experience: draft.work_experience,
+        projects: draft.projects,
+        certifications: draft.certifications,
         languages: draft.languages,
         master_data: draft.master_data,
       };
@@ -127,6 +141,8 @@ export default function ProfilePage() {
         location: updatedDraft.location,
         education_history: updatedDraft.education_history,
         work_experience: updatedDraft.work_experience,
+        projects: updatedDraft.projects,
+        certifications: updatedDraft.certifications,
         languages: updatedDraft.languages,
         master_data: updatedDraft.master_data,
       };
@@ -187,6 +203,56 @@ export default function ProfilePage() {
     );
     setNewEdu({ degree: "", university: "", graduation_year: "" });
     setShowEduForm(false);
+  };
+
+  const handleAddProject = () => {
+    if (!newProject.title.trim()) return;
+    setDraft((prev) => {
+      const updated = { ...prev, projects: [...(prev.projects ?? []), newProject] };
+      saveCareerData(updated);
+      return updated;
+    });
+    setProfile((prev) => prev ? { ...prev, projects: [...(prev.projects ?? []), newProject] } : prev);
+    setNewProject({ title: "", role_title: "", description: "", link: "", dates: "" });
+    setShowProjectForm(false);
+  };
+
+  const handleDeleteProject = (idx: number) => {
+    setDraft((prev) => {
+      const updated = { ...prev, projects: (prev.projects ?? []).filter((_, i) => i !== idx) };
+      saveCareerData(updated);
+      return updated;
+    });
+    setProfile((prev) => prev ? { ...prev, projects: (prev.projects ?? []).filter((_, i) => i !== idx) } : prev);
+  };
+
+  const handleAddCertification = () => {
+    if (!newCert.name.trim() || !newCert.issuer.trim()) return;
+    const cleaned: CertificationEntry = {
+      name: newCert.name,
+      issuer: newCert.issuer,
+      issue_date: newCert.issue_date,
+      ...(newCert.expiration_date?.trim() ? { expiration_date: newCert.expiration_date } : {}),
+      ...(newCert.credential_id?.trim()   ? { credential_id:   newCert.credential_id }   : {}),
+      ...(newCert.credential_url?.trim()  ? { credential_url:  newCert.credential_url }  : {}),
+    };
+    setDraft((prev) => {
+      const updated = { ...prev, certifications: [...(prev.certifications ?? []), cleaned] };
+      saveCareerData(updated);
+      return updated;
+    });
+    setProfile((prev) => prev ? { ...prev, certifications: [...(prev.certifications ?? []), cleaned] } : prev);
+    setNewCert({ name: "", issuer: "", issue_date: "", expiration_date: "", credential_id: "", credential_url: "" });
+    setShowCertForm(false);
+  };
+
+  const handleDeleteCertification = (idx: number) => {
+    setDraft((prev) => {
+      const updated = { ...prev, certifications: (prev.certifications ?? []).filter((_, i) => i !== idx) };
+      saveCareerData(updated);
+      return updated;
+    });
+    setProfile((prev) => prev ? { ...prev, certifications: (prev.certifications ?? []).filter((_, i) => i !== idx) } : prev);
   };
 
   const handleAddSkill = (category: 'skills' | 'soft_skills') => {
@@ -352,7 +418,7 @@ export default function ProfilePage() {
                 { label: "Location", key: "location" as const, placeholder: "City, Country" },
               ].map(({ label, key, placeholder }) => (
                 <div key={key}>
-                  <label className="label-xs">{label}</label>
+                  <label className="label-xs mr-2">{label}</label>
                   {editMode ? (
                     <input
                       className="form-input"
@@ -368,7 +434,7 @@ export default function ProfilePage() {
                 </div>
               ))}
                 <div className="col-span-2">
-                  <label className="label-xs">LinkedIn URL</label>
+                  <label className="label-xs mr-2">LinkedIn URL</label>
                   {editMode ? (
                     <input
                       className="form-input"
@@ -627,6 +693,132 @@ export default function ProfilePage() {
   )}
 </div>
 
+          {/* Projects */}
+          <div className="bg-white border border-stone-200 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-[15px] text-slate-900">Projects</h2>
+              <button
+                onClick={() => setShowProjectForm(true)}
+                className="font-sans text-[13px] font-semibold text-blue-600 px-3 py-1.5 border border-blue-200 rounded-lg hover:bg-blue-50 flex items-center gap-1.5"
+              >
+                <Plus size={12} /> Add
+              </button>
+            </div>
+
+            {(draft.projects ?? []).length > 0 ? (
+              (draft.projects ?? []).map((proj, i) => (
+                <div key={i} className="flex items-start justify-between p-4 border border-stone-100 rounded-xl mb-3 group">
+                  <div className="flex gap-3 items-start">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 mt-0.5">
+                      <FileText size={15} className="text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[14px] text-slate-900">{proj.title}</p>
+                      <p className="font-sans text-[12px] text-slate-400 mt-0.5">
+                        {proj.role_title}{proj.dates ? ` · ${proj.dates}` : ""}
+                      </p>
+                      {proj.link && (
+                        <p className="font-sans text-[11px] text-blue-500 mt-0.5 truncate max-w-xs">{proj.link}</p>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteProject(i)}
+                    className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all mt-1"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="font-sans text-[13px] text-slate-300 italic">No projects added yet.</p>
+            )}
+
+            {showProjectForm && (
+              <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-6">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  className="bg-white rounded-2xl border border-stone-200 p-6 w-full max-w-[520px] shadow-xl"
+                >
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="font-bold text-[16px] text-slate-900">Add Project</h3>
+                    <button onClick={() => setShowProjectForm(false)} className="text-slate-400 hover:text-slate-600">
+                      <XCircle size={18} />
+                    </button>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="label-xs mr-3">Project Title *</label>
+                        <input
+                          className="form-input"
+                          value={newProject.title}
+                          onChange={e => setNewProject(p => ({ ...p, title: e.target.value }))}
+                          placeholder="e.g. E-Commerce Platform"
+                          autoFocus
+                        />
+                      </div>
+                      <div>
+                        <label className="label-xs mr-3">Your Role</label>
+                        <input
+                          className="form-input"
+                          value={newProject.role_title}
+                          onChange={e => setNewProject(p => ({ ...p, role_title: e.target.value }))}
+                          placeholder="e.g. Lead Developer"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="label-xs mr-3">Description</label>
+                      <textarea
+                        className="form-input min-h-[80px] resize-none w-full"
+                        value={newProject.description}
+                        onChange={e => setNewProject(p => ({ ...p, description: e.target.value }))}
+                        placeholder="Brief description of the project and your impact..."
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="label-xs mr-3">Link / URL</label>
+                        <input
+                          className="form-input"
+                          value={newProject.link}
+                          onChange={e => setNewProject(p => ({ ...p, link: e.target.value }))}
+                          placeholder="github.com/you/project"
+                        />
+                      </div>
+                      <div>
+                        <label className="label-xs mr-3">Dates</label>
+                        <input
+                          className="form-input"
+                          value={newProject.dates}
+                          onChange={e => setNewProject(p => ({ ...p, dates: e.target.value }))}
+                          placeholder="e.g. Jan 2023 – Mar 2024"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-6">
+                    <button
+                      onClick={() => setShowProjectForm(false)}
+                      className="flex-1 font-sans text-[13px] font-semibold text-slate-500 border border-stone-200 py-2.5 rounded-xl hover:bg-stone-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAddProject}
+                      disabled={!newProject.title.trim()}
+                      className="flex-1 font-sans text-[13px] font-semibold bg-slate-900 hover:bg-blue-600 disabled:opacity-40 text-white py-2.5 rounded-xl transition-colors"
+                    >
+                      Save Project
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </div>
+
           {/* Technical Skills */}
           <div className="bg-white border border-stone-200 rounded-xl p-6">
             <h2 className="font-bold text-[15px] text-slate-900 mb-4">Technical Skills</h2>
@@ -722,6 +914,144 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* Certifications */}
+          <div className="bg-white border border-stone-200 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-[15px] text-slate-900">Certifications</h2>
+              <button
+                onClick={() => setShowCertForm(true)}
+                className="font-sans text-[13px] font-semibold text-blue-600 px-3 py-1.5 border border-blue-200 rounded-lg hover:bg-blue-50 flex items-center gap-1.5"
+              >
+                <Plus size={12} /> Add
+              </button>
+            </div>
+
+            {(draft.certifications ?? []).length > 0 ? (
+              (draft.certifications ?? []).map((cert, i) => (
+                <div key={i} className="flex items-start justify-between p-4 border border-stone-100 rounded-xl mb-3 group">
+                  <div className="flex gap-3 items-start">
+                    <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0 mt-0.5">
+                      <CheckCircle2 size={15} className="text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[14px] text-slate-900">{cert.name}</p>
+                      <p className="font-sans text-[12px] text-slate-400 mt-0.5">
+                        {cert.issuer}{cert.issue_date ? ` · ${cert.issue_date}` : ""}
+                        {cert.expiration_date ? ` – ${cert.expiration_date}` : ""}
+                      </p>
+                      {cert.credential_url && (
+                        <p className="font-sans text-[11px] text-blue-500 mt-0.5 truncate max-w-xs">{cert.credential_url}</p>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteCertification(i)}
+                    className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all mt-1"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="font-sans text-[13px] text-slate-300 italic">No certifications added yet.</p>
+            )}
+
+            {showCertForm && (
+              <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-6">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  className="bg-white rounded-2xl border border-stone-200 p-6 w-full max-w-[520px] shadow-xl"
+                >
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="font-bold text-[16px] text-slate-900">Add Certification</h3>
+                    <button onClick={() => setShowCertForm(false)} className="text-slate-400 hover:text-slate-600">
+                      <XCircle size={18} />
+                    </button>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="label-xs mr-3">Certification Name *</label>
+                        <input
+                          className="form-input"
+                          value={newCert.name}
+                          onChange={e => setNewCert(p => ({ ...p, name: e.target.value }))}
+                          placeholder="e.g. AWS Solutions Architect"
+                          autoFocus
+                        />
+                      </div>
+                      <div>
+                        <label className="label-xs mr-3">Issuing Organization *</label>
+                        <input
+                          className="form-input"
+                          value={newCert.issuer}
+                          onChange={e => setNewCert(p => ({ ...p, issuer: e.target.value }))}
+                          placeholder="e.g. Amazon Web Services"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="label-xs mr-3">Issue Date</label>
+                        <input
+                          className="form-input"
+                          value={newCert.issue_date}
+                          onChange={e => setNewCert(p => ({ ...p, issue_date: e.target.value }))}
+                          placeholder="e.g. March 2024"
+                        />
+                      </div>
+                      <div>
+                        <label className="label-xs mr-3">Expiration Date</label>
+                        <input
+                          className="form-input"
+                          value={newCert.expiration_date}
+                          onChange={e => setNewCert(p => ({ ...p, expiration_date: e.target.value }))}
+                          placeholder="e.g. March 2027"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="label-xs mr-3">Credential ID</label>
+                        <input
+                          className="form-input"
+                          value={newCert.credential_id}
+                          onChange={e => setNewCert(p => ({ ...p, credential_id: e.target.value }))}
+                          placeholder="Optional credential ID"
+                        />
+                      </div>
+                      <div>
+                        <label className="label-xs mr-3">Credential URL</label>
+                        <input
+                          className="form-input"
+                          value={newCert.credential_url}
+                          onChange={e => setNewCert(p => ({ ...p, credential_url: e.target.value }))}
+                          placeholder="Optional verification link"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-6">
+                    <button
+                      onClick={() => setShowCertForm(false)}
+                      className="flex-1 font-sans text-[13px] font-semibold text-slate-500 border border-stone-200 py-2.5 rounded-xl hover:bg-stone-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAddCertification}
+                      disabled={!newCert.name.trim() || !newCert.issuer.trim()}
+                      className="flex-1 font-sans text-[13px] font-semibold bg-slate-900 hover:bg-blue-600 disabled:opacity-40 text-white py-2.5 rounded-xl transition-colors"
+                    >
+                      Save Certification
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </div>
+
         </motion.div>
       )}
 
@@ -757,10 +1087,10 @@ export default function ProfilePage() {
                   >
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-[14px] text-slate-900 truncate">
-                        {r.job_title || "Untitled Role"}
+                        {r.job_title || "Tailored Resume"}
                       </p>
                       <p className="font-sans text-[12px] text-slate-400 mt-0.5">
-                        {r.company_name || "No company"} ·{" "}
+                        {r.company_name || <span className="italic">General Application</span>} ·{" "}
                         {new Date(r.created_at).toLocaleDateString("en-US", {
                           month: "long", day: "numeric", year: "numeric",
                         })}

@@ -5,12 +5,10 @@ import {
   Sparkles,
   User,
   FileText,
-  Clock,
   CheckCircle2,
   XCircle,
   Loader2,
   ArrowRight,
-  TrendingUp,
 } from "lucide-react";
 import { resumeApi } from "../services/api";
 import { useAuth } from "../hooks/useAuth";
@@ -200,10 +198,10 @@ export default function DashboardPage() {
                   <FileText size={16} className="text-blue-600" />
                 </div>
                 <p className="font-semibold text-[14px] text-slate-900 mb-1 line-clamp-1">
-                  {r.job_title || "Untitled Role"}
+                  {r.job_title || "Tailored Resume"}
                 </p>
-                <p className="font-sans text-[12px] text-slate-400 mb-4">
-                  {r.company_name || "No company"}
+                <p className="font-sans text-[12px] text-slate-500 mb-4 line-clamp-1">
+                  {r.company_name || <span className="italic text-slate-400">General Application</span>}
                 </p>
                 <div className="flex items-center justify-between">
                   <StatusBadge status={r.status} />

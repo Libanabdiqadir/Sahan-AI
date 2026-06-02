@@ -7,9 +7,12 @@ class UserSerializer(serializers.ModelSerializer):
     fields = ['id', 'email', 'profile_picture', 'first_name', 'last_name']
 
 class DocumentSerializer(serializers.ModelSerializer):
+  job_title = serializers.CharField(source='resume_history.job_title', read_only=True)
+  company_name = serializers.CharField(source='resume_history.company_name', read_only=True)
+
   class Meta:
     model = Document
-    fields = ['id', 'pdf_file', 'template_name']
+    fields = ['id', 'resume_history', 'pdf_file', 'template_name', 'job_title', 'company_name']
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,7 +20,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = [
             'full_name', 'linkedin_url', 'contact_email',
             'phone_number', 'location', 'education_history',
-            'work_experience', 'languages', 'master_data',
+            'work_experience', 'projects','certifications', 'languages', 'master_data',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']

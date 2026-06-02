@@ -18,13 +18,28 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import HRFlowable, SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.enums import TA_CENTER
 from django.http import HttpResponse
-import json
+
+from .pdf_templates import (
+    harvard_classic,
+    modern_professional,
+    modern_minimalist,
+    executive_navy,
+    bold_chronological,
+)
+
+TEMPLATE_REGISTRY = {
+    'harvard_classic':     harvard_classic,
+    'modern_professional': modern_professional,
+    'modern_minimalist':   modern_minimalist,
+    'executive_navy':      executive_navy,
+    'bold_chronological':  bold_chronological,
+}
 
 
 User = get_user_model()
@@ -71,11 +86,16 @@ class ResumeHistoryViewSet(viewsets.ModelViewSet):
     @authentication_classes([TokenAuthentication])
     def tailor(self, request):
         job_description = request.data.get('job_description')
+        job_title = request.data.get('job_title', '')
+        company_name = request.data.get('company_name', '')
 
         if not job_description:
             return Response({'error': 'Job description is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        resume = ResumeService.tailor_resume(request.user, job_description)
+
+        resume = ResumeService.tailor_resume(
+            request.user, job_description,
+            job_title=job_title, company_name=company_name,
+        )
         serializer = self.get_serializer(resume)
         return Response(serializer.data)
 
@@ -117,98 +137,16 @@ def generate_cv_pdf(request):
     data = request.data
     profile = data.get('profile', {})
     tailored = data.get('tailored', {})
-    job_title = data.get('job_title', '')
-    company_name = data.get('company_name', '')
+    template_name = data.get('template', 'harvard_classic')
 
     response = HttpResponse(content_type='application/pdf')
-    filename = f"{profile.get('full_name', 'CV').replace(' ', '_')}_Harvard_CV.pdf"
+    filename = f"{profile.get('full_name', 'CV').replace(' ', '_')}_{template_name}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     response['Access-Control-Expose-Headers'] = 'Content-Disposition'
 
-    doc = SimpleDocTemplate(
-        response,
-        pagesize=A4,
-        rightMargin=inch,
-        leftMargin=inch,
-        topMargin=0.7 * inch,
-        bottomMargin=0.7 * inch,
-    )
+    template_module = TEMPLATE_REGISTRY.get(template_name, harvard_classic)
+    template_module.render_pdf(response, profile, tailored)
 
-    styles = getSampleStyleSheet()
-
-    name_style = ParagraphStyle('Name', fontName='Times-Bold', fontSize=16,
-                                 alignment=TA_CENTER, textTransform='uppercase',
-                                 letterSpacing=2, spaceAfter=3)
-    contact_style = ParagraphStyle('Contact', fontName='Times-Roman', fontSize=9,
-                                    alignment=TA_CENTER, textColor=colors.HexColor('#4b5563'),
-                                    spaceAfter=6)
-    section_style = ParagraphStyle('Section', fontName='Times-Bold', fontSize=9,
-                                    textTransform='uppercase', letterSpacing=1.5,
-                                    spaceBefore=6, spaceAfter=3)
-    body_style = ParagraphStyle('Body', fontName='Times-Roman', fontSize=9.5,
-                                 leading=14, spaceAfter=3)
-    italic_style = ParagraphStyle('Italic', fontName='Times-Italic', fontSize=9.5,
-                                   leading=14, textColor=colors.HexColor('#374151'),
-                                   spaceAfter=4)
-    bold_style = ParagraphStyle('Bold', fontName='Times-Bold', fontSize=9.5, spaceAfter=1)
-    small_style = ParagraphStyle('Small', fontName='Times-Roman', fontSize=8.5,
-                                  textColor=colors.HexColor('#6b7280'))
-
-    story = []
-
-    # Header
-    full_name = profile.get('full_name', '')
-    story.append(Paragraph(full_name, name_style))
-
-    contact_parts = [x for x in [
-        profile.get('contact_email'),
-        profile.get('phone_number'),
-        profile.get('location'),
-        profile.get('linkedin_url'),
-    ] if x]
-    story.append(Paragraph('  ·  '.join(contact_parts), contact_style))
-    story.append(HRFlowable(width='100%', thickness=1.2, color=colors.HexColor('#1a1a2e'), spaceAfter=8))
-
-    # Summary
-    if tailored.get('summary'):
-        story.append(Paragraph('PROFESSIONAL SUMMARY', section_style))
-        story.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#d1d5db'), spaceAfter=4))
-        story.append(Paragraph(tailored['summary'], italic_style))
-        story.append(Spacer(1, 4))
-
-    # Experience
-    if tailored.get('experience'):
-        story.append(Paragraph('PROFESSIONAL EXPERIENCE', section_style))
-        story.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#d1d5db'), spaceAfter=4))
-        for exp in tailored['experience']:
-            # Role + Date on same line
-            role_date = f"<b>{exp.get('role', '')}</b>"
-            story.append(Paragraph(role_date, bold_style))
-            story.append(Paragraph(f"<i>{exp.get('company', '')}</i>   {exp.get('duration', '')}", small_style))
-            for r in exp.get('responsibilities', []):
-                story.append(Paragraph(f"• {r}", body_style))
-            story.append(Spacer(1, 3))
-
-    # Education
-    if tailored.get('education'):
-        story.append(Paragraph('EDUCATION', section_style))
-        story.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#d1d5db'), spaceAfter=4))
-        for edu in tailored['education']:
-            story.append(Paragraph(f"<b>{edu.get('degree', '')}</b>   {edu.get('graduation_year', '')}", bold_style))
-            story.append(Paragraph(f"<i>{edu.get('university', '')}</i>", small_style))
-            story.append(Spacer(1, 3))
-
-    # Skills
-    story.append(Paragraph('SKILLS & LANGUAGES', section_style))
-    story.append(HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#d1d5db'), spaceAfter=4))
-    if tailored.get('tech_skills'):
-        story.append(Paragraph(f"<b>Technical:</b> {', '.join(tailored['tech_skills'])}", body_style))
-    if tailored.get('soft_skills'):
-        story.append(Paragraph(f"<b>Soft Skills:</b> {', '.join(tailored['soft_skills'])}", body_style))
-    if tailored.get('languages'):
-        story.append(Paragraph(f"<b>Languages:</b> {', '.join(tailored['languages'])}", body_style))
-
-    doc.build(story)
     return response
 
 
@@ -235,7 +173,6 @@ def generate_cover_letter_pdf(request):
         bottomMargin=0.7 * inch,
     )
 
-    styles = getSampleStyleSheet()
     name_style = ParagraphStyle('Name', fontName='Times-Bold', fontSize=16,
                                  alignment=TA_CENTER, spaceAfter=3)
     contact_style = ParagraphStyle('Contact', fontName='Times-Roman', fontSize=9,

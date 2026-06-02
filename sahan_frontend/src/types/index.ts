@@ -40,6 +40,23 @@ export interface ExperienceEntry {
   responsibilities: string[];
 }
 
+export interface ProjectEntry {
+  title: string;
+  role_title: string;
+  description: string;
+  link: string;
+  dates: string;
+}
+
+export interface CertificationEntry {
+  name: string;
+  issuer: string;
+  issue_date: string;
+  expiration_date?: string;
+  credential_id?: string;
+  credential_url?: string;
+}
+
 export interface MasterData {
   tech_skills?: string[];
   soft_skills?: string[];
@@ -54,6 +71,8 @@ export interface UserProfile {
   location: string;
   education_history: EducationEntry[];
   work_experience: ExperienceEntry[];
+  projects?: ProjectEntry[];
+  certifications?: CertificationEntry[];
   languages: string[];
   master_data: MasterData;
   created_at: string;
@@ -69,6 +88,20 @@ export interface TailoredData {
   soft_skills: string[];
   experience: ExperienceEntry[];
   education: EducationEntry[];
+  projects?: Array<{
+    name: string;
+    description?: string;
+    link?: string;
+    dates?: string;
+    tech_stack?: string[];
+    highlights?: string[];
+  }>;
+  certifications?: Array<{
+    name: string;
+    issuer?: string;
+    issue_date?: string;
+    year?: string;
+  }>;
   languages: string[];
   cover_letter: string;
   error?: string;

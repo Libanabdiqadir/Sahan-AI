@@ -111,7 +111,7 @@ export default function AuthPage() {
                   className="grid grid-cols-2 gap-3 overflow-hidden"
                 >
                   <div>
-                    <label className="label-xs">First name</label>
+                    <label className="label-xs mr-2">First name</label>
                     <input
                       className="form-input"
                       value={fields.first_name}
@@ -121,7 +121,7 @@ export default function AuthPage() {
                     />
                   </div>
                   <div>
-                    <label className="label-xs">Last name</label>
+                    <label className="label-xs mr-2">Last name</label>
                     <input
                       className="form-input"
                       value={fields.last_name}

@@ -1,0 +1,20 @@
+{
+  "python.defaultInterpreterPath": "./Sahan_backend/.venv/bin/python",
+
+  // Pylance venv resolution — points to the folder that CONTAINS the .venv dir
+  "python.analysis.venvPath": "./Sahan_backend",
+  "python.analysis.venv": ".venv",
+
+  // Explicit import search paths:
+  //   1. Django project root   → resolves local app imports (core, etc.)
+  //   2. site-packages         → resolves django, rest_framework, reportlab, etc.
+  "python.analysis.extraPaths": [
+    "./Sahan_backend",
+    "./Sahan_backend/.venv/lib/python3.14/site-packages"
+  ],
+
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.useLibraryCodeForTypes": true,
+  "python.analysis.diagnosticMode": "workspace"
+}

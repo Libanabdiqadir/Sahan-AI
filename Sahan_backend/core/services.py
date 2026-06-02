@@ -9,7 +9,7 @@ genai.configure(api_key=settings.GEMINI_API_KEY)
 
 class ResumeService:
     @staticmethod
-    def tailor_resume(user, job_description):
+    def tailor_resume(user, job_description, job_title='', company_name=''):
         model = genai.GenerativeModel(
             model_name='models/gemini-2.5-flash'
             )
@@ -34,9 +34,24 @@ class ResumeService:
                 Master Data: {master_data}
                 Job Description: {job_description}
 
+                RULES AND CONSTRAINTS.
+                1. Never invent, assume or hallucinate information that is not present in the provided Master Data or job Description.
+                2. Never provide placeholders such as: [Company Name], [Job Board], [Insert Here], [Add Company], [Add Position], [PlaceHolder].
+                3. If informaton is unavailable, omit it naturally and rewrite the sentence professionally.
+                4. Avoid generic AI phrases such as: "I am thrilled to apply", "I am excited to submit", "I would be delighted", "I am writing to express my profound interest".
+                5. Use clear, direct, professional business langauge.
+                6. if a requirement appears in the job Description but not in Master Data, do NOT claim the candidate possesses it.
+                7. The cover letter MUST NOT contain:
+                    "Sincerely"
+                    "Best Regards"
+                    "Kind Regards"
+                    "Any closing signature"
+                    "The applicants name at the end".
+
                 Output MUST be a JSON object with these EXACT keys:
+                
                 1. 'summary': A professional summary tailored to the job.
-                2. 'tech_skills': A list of relevant technical and hard skills (e.g., Python, React, SQL).
+                2. 'tech_skills': A list of relevant technical and hard skills.
                 3. 'soft_skills': A list of relevant soft skills (e.g., Leadership, Communication, Problem Solving).
                 4. 'experience': A list of objects. Each object MUST have:
                 - 'role', 'company', 'duration'
@@ -62,24 +77,30 @@ class ResumeService:
         
             return ResumeHistory.objects.create(
                 user=user,
+                job_title=job_title,
+                company_name=company_name,
                 job_description=job_description,
                 tailored_data=data,
-                status='completed'
+                status='completed',
             )
 
         except ObjectDoesNotExist:
             return ResumeHistory.objects.create(
                 user=user,
+                job_title=job_title,
+                company_name=company_name,
                 job_description=job_description,
                 status='failed',
-                tailored_data={"error": "UserProfile missing. Please update your profile in settings."}
+                tailored_data={"error": "UserProfile missing. Please update your profile in settings."},
             )
         except Exception as e:
             return ResumeHistory.objects.create(
                 user=user,
+                job_title=job_title,
+                company_name=company_name,
                 job_description=job_description,
-                status='failed',    
-                tailored_data={"error": str(e)}
+                status='failed',
+                tailored_data={"error": str(e)},
             )
 
     @staticmethod
