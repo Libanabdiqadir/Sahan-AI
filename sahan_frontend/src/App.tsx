@@ -7,6 +7,7 @@ import DashboardPage from "./pages/DashboardPage";
 import TailorPage from "./pages/TailorPage";
 import ProfilePage from "./pages/ProfilePage";
 import LandingPage from "./pages/LandingPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -59,6 +60,7 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route path="/verify-email/:uid/:token" element={<VerifyEmailPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>

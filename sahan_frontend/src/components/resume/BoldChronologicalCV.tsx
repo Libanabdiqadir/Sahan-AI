@@ -4,6 +4,7 @@ import {
   Text,
   View,
   StyleSheet,
+  Link,
 } from "@react-pdf/renderer";
 import type { UserProfile, TailoredData } from "../../types";
 
@@ -18,7 +19,7 @@ const C = {
 
 const INCH = 72;
 const PH   = INCH * 0.78;   // generous horizontal margins ≈ 56 pt
-const PV   = INCH * 0.62;   // vertical   margins ≈ 45 pt
+const PV   = INCH * 0.50;   // vertical   margins ≈ 36 pt
 
 const S = StyleSheet.create({
   // ── Page ──────────────────────────────────────────────────────────────────
@@ -55,11 +56,11 @@ const S = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexWrap: "wrap",
-    marginBottom: 12,
+    marginBottom: 8,
   },
   subtitlePiece: {
     fontFamily: "Helvetica",
-    fontSize: 11,
+    fontSize: 10,
     color: C.gray,
   },
   subtitleDot: {
@@ -72,14 +73,14 @@ const S = StyleSheet.create({
   headRule: {
     borderBottomWidth: 1.5,
     borderBottomColor: C.rule,
-    marginBottom: 16,
+    marginBottom: 12,
   },
 
   // ── Section block ─────────────────────────────────────────────────────────
-  section: { marginBottom: 13 },
+  section: { marginBottom: 10 },
   secTitle: {
     fontFamily: "Times-Bold",
-    fontSize: 12,
+    fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: 2.5,
     color: C.ink,
@@ -89,19 +90,19 @@ const S = StyleSheet.create({
   secRule: {
     borderBottomWidth: 1,
     borderBottomColor: C.rule,
-    marginBottom: 9,
+    marginBottom: 6,
   },
 
   // ── Summary ───────────────────────────────────────────────────────────────
   summaryText: {
     fontFamily: "Helvetica",
-    fontSize: 11.5,
+    fontSize: 9,
     color: C.ink,
-    lineHeight: 1.75,
+    lineHeight: 1.35,
   },
 
   // ── Experience / Education entries ────────────────────────────────────────
-  entryBlock: { marginBottom: 11 },
+  entryBlock: { marginBottom: 8 },
   entryHeadRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -110,13 +111,13 @@ const S = StyleSheet.create({
   },
   entryOrg: {
     fontFamily: "Times-Bold",
-    fontSize: 12.5,
+    fontSize: 10,
     color: C.ink,
     flex: 1,
   },
   entryMeta: {
     fontFamily: "Helvetica",
-    fontSize: 11,
+    fontSize: 9.5,
     color: C.gray,
     textAlign: "right",
   },
@@ -124,18 +125,18 @@ const S = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 5,
+    marginBottom: 3,
     marginTop: 1,
   },
   entryRole: {
     fontFamily: "Helvetica-Oblique",
-    fontSize: 12,
+    fontSize: 9.5,
     color: C.ink,
     flex: 1,
   },
   entryDate: {
     fontFamily: "Helvetica",
-    fontSize: 11,
+    fontSize: 9.5,
     color: C.gray,
   },
   bulletRow: {
@@ -146,17 +147,17 @@ const S = StyleSheet.create({
   },
   bulletMark: {
     fontFamily: "Helvetica",
-    fontSize: 11.5,
+    fontSize: 9,
     color: C.gray,
     width: 12,
-    lineHeight: 1.55,
+    lineHeight: 1.35,
   },
   bulletText: {
     flex: 1,
     fontFamily: "Helvetica",
-    fontSize: 11.5,
+    fontSize: 9,
     color: C.ink,
-    lineHeight: 1.7,
+    lineHeight: 1.35,
   },
 
   // ── Languages ─────────────────────────────────────────────────────────────
@@ -198,9 +199,9 @@ const S = StyleSheet.create({
   // ── Skills ────────────────────────────────────────────────────────────────
   skillsText: {
     fontFamily: "Helvetica",
-    fontSize: 11.5,
+    fontSize: 9,
     color: C.ink,
-    lineHeight: 1.75,
+    lineHeight: 1.35,
     textAlign: "center",
   },
 
@@ -232,33 +233,33 @@ const S = StyleSheet.create({
   },
   clGreeting: {
     fontFamily: "Helvetica",
-    fontSize: 12,
+    fontSize: 10,
     color: C.ink,
     marginBottom: 13,
   },
   clPara: {
     fontFamily: "Helvetica",
-    fontSize: 12,
+    fontSize: 9.5,
     color: C.ink,
-    lineHeight: 1.8,
+    lineHeight: 1.5,
     marginBottom: 13,
   },
   clSignoff: {
     fontFamily: "Helvetica",
-    fontSize: 12,
+    fontSize: 10,
     color: C.ink,
     marginTop: 18,
     marginBottom: 26,
   },
   clSignName: {
     fontFamily: "Times-Bold",
-    fontSize: 14,
+    fontSize: 11,
     color: C.ink,
     marginBottom: 2,
   },
   clSignRole: {
     fontFamily: "Helvetica-Oblique",
-    fontSize: 11.5,
+    fontSize: 10,
     color: C.gray,
   },
 });
@@ -284,13 +285,21 @@ function Sec({ title }: { title: string }) {
   );
 }
 
-function HeaderContactRow({ parts }: { parts: string[] }) {
+type ContactItem = { kind: "text" | "email" | "link"; val: string };
+
+function HeaderContactRow({ items }: { items: ContactItem[] }) {
   return (
     <View style={S.subtitleRow}>
-      {parts.map((c, i) => (
+      {items.map((item, i) => (
         <View key={i} style={{ flexDirection: "row", alignItems: "center" }}>
           {i > 0 && <Text style={S.subtitleDot}>  •  </Text>}
-          <Text style={S.subtitlePiece}>{c}</Text>
+          {item.kind === "link" ? (
+            <Link src={item.val} style={[S.subtitlePiece, { color: "#2563eb" }]}>LinkedIn</Link>
+          ) : item.kind === "email" ? (
+            <Link src={`mailto:${item.val}`} style={[S.subtitlePiece, { color: "#2563eb" }]}>{item.val}</Link>
+          ) : (
+            <Text style={S.subtitlePiece}>{item.val}</Text>
+          )}
         </View>
       ))}
     </View>
@@ -315,12 +324,12 @@ export function BoldChronologicalCV({
     year: "numeric", month: "long", day: "numeric",
   });
 
-  const contactParts = [
-    profile.contact_email,
-    profile.linkedin_url,
-    profile.location,
-    profile.phone_number,
-  ].filter(Boolean) as string[];
+  const contactParts: ContactItem[] = [
+    profile.contact_email ? { kind: "email", val: profile.contact_email } : null,
+    profile.linkedin_url  ? { kind: "link",  val: profile.linkedin_url } : null,
+    profile.location      ? { kind: "text",  val: profile.location } : null,
+    profile.phone_number  ? { kind: "text",  val: profile.phone_number } : null,
+  ].filter((x): x is ContactItem => x !== null);
 
   const allSkills = [
     ...(tailored.tech_skills ?? []),
@@ -338,7 +347,7 @@ export function BoldChronologicalCV({
         {/* Header */}
         <Text style={S.candidateName}>{profile.full_name}</Text>
         {!!jobTitle && <Text style={S.jobTitleLine}>{jobTitle}</Text>}
-        <HeaderContactRow parts={contactParts} />
+        <HeaderContactRow items={contactParts} />
         <View style={S.headRule} />
 
         {/* Summary */}
@@ -431,7 +440,7 @@ export function BoldChronologicalCV({
 
           {/* Same header as CV */}
           <Text style={S.candidateName}>{profile.full_name}</Text>
-          <HeaderContactRow parts={contactParts} />
+          <HeaderContactRow items={contactParts} />
           <View style={S.headRule} />
 
           {/* Date */}
@@ -485,11 +494,11 @@ export function BoldChronologicalPreview({
   const BDOT  = "#e2e8f0";
 
   const contactParts = [
-    profile.contact_email,
-    profile.linkedin_url,
-    profile.location,
-    profile.phone_number,
-  ].filter(Boolean) as string[];
+    profile.contact_email ? { kind: "email" as const, val: profile.contact_email } : null,
+    profile.linkedin_url  ? { kind: "link"  as const, val: profile.linkedin_url } : null,
+    profile.location      ? { kind: "text"  as const, val: profile.location } : null,
+    profile.phone_number  ? { kind: "text"  as const, val: profile.phone_number } : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null);
 
   const allSkills = [
     ...(tailored.tech_skills ?? []),
@@ -533,8 +542,19 @@ export function BoldChronologicalPreview({
             {jobTitle}
           </p>
         )}
-        <p style={{ fontFamily: SANS, fontSize: "11px", color: GRAY }}>
-          {contactParts.join("   •   ")}
+        <p style={{ fontFamily: SANS, fontSize: "11px", color: GRAY, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px" }}>
+          {contactParts.map((item, i) => (
+            <span key={i} style={{ display: "inline-flex", alignItems: "center" }}>
+              {i > 0 && <span style={{ margin: "0 6px" }}>•</span>}
+              {item.kind === "link" ? (
+                <a href={item.val} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "underline" }}>LinkedIn</a>
+              ) : item.kind === "email" ? (
+                <a href={`mailto:${item.val}`} style={{ color: "#2563eb" }}>{item.val}</a>
+              ) : (
+                <span>{item.val}</span>
+              )}
+            </span>
+          ))}
         </p>
       </div>
       <div style={{ borderBottom: `1.5px solid ${RULE}`, marginBottom: "18px" }} />
@@ -543,7 +563,7 @@ export function BoldChronologicalPreview({
       {tailored.summary && (
         <div style={{ marginBottom: "15px" }}>
           <SectionHead title="Summary" />
-          <p style={{ fontFamily: SANS, fontSize: "11.5px", color: INK, lineHeight: 1.75 }}>
+          <p style={{ fontFamily: SANS, fontSize: "10px", color: INK, lineHeight: 1.5 }}>
             {tailored.summary}
           </p>
         </div>
@@ -555,17 +575,17 @@ export function BoldChronologicalPreview({
           <SectionHead title="Experience" />
           {tailored.experience.map((exp, i) => (
             <div key={i} style={{ marginBottom: "13px" }}>
-              <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "12.5px", color: INK, marginBottom: "1px" }}>
+              <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "11px", color: INK, marginBottom: "1px" }}>
                 {exp.company}
               </p>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "5px" }}>
-                <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: "12px", color: INK }}>{exp.role}</span>
-                <span style={{ fontFamily: SANS, fontSize: "11px", color: GRAY, flexShrink: 0, marginLeft: "10px" }}>{exp.duration}</span>
+                <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: "10.5px", color: INK }}>{exp.role}</span>
+                <span style={{ fontFamily: SANS, fontSize: "10px", color: GRAY, flexShrink: 0, marginLeft: "10px" }}>{exp.duration}</span>
               </div>
               {exp.responsibilities?.map((r, j) => (
                 <div key={j} style={{ display: "flex", gap: "6px", marginBottom: "3px", paddingLeft: "4px" }}>
-                  <span style={{ color: GRAY, fontSize: "11.5px", lineHeight: "1.55", flexShrink: 0 }}>•</span>
-                  <span style={{ fontFamily: SANS, fontSize: "11.5px", color: INK, lineHeight: 1.7 }}>{r}</span>
+                  <span style={{ color: GRAY, fontSize: "9.5px", lineHeight: "1.4", flexShrink: 0 }}>•</span>
+                  <span style={{ fontFamily: SANS, fontSize: "10px", color: INK, lineHeight: 1.5 }}>{r}</span>
                 </div>
               ))}
             </div>
@@ -579,12 +599,12 @@ export function BoldChronologicalPreview({
           <SectionHead title="Education" />
           {tailored.education.map((edu, i) => (
             <div key={i} style={{ marginBottom: "10px" }}>
-              <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "12.5px", color: INK, marginBottom: "1px" }}>
+              <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "11px", color: INK, marginBottom: "1px" }}>
                 {edu.university}
               </p>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: "12px", color: INK }}>{edu.degree}</span>
-                <span style={{ fontFamily: SANS, fontSize: "11px", color: GRAY }}>{edu.graduation_year}</span>
+                <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: "10.5px", color: INK }}>{edu.degree}</span>
+                <span style={{ fontFamily: SANS, fontSize: "10px", color: GRAY }}>{edu.graduation_year}</span>
               </div>
             </div>
           ))}
@@ -605,7 +625,7 @@ export function BoldChronologicalPreview({
       {allSkills.length > 0 && (
         <div>
           <SectionHead title="Skills" />
-          <p style={{ fontFamily: SANS, fontSize: "11.5px", color: INK, lineHeight: 1.75, textAlign: "center" }}>
+          <p style={{ fontFamily: SANS, fontSize: "10px", color: INK, lineHeight: 1.5, textAlign: "center" }}>
             {allSkills.join("   •   ")}
           </p>
         </div>
@@ -640,11 +660,11 @@ export function BoldChronologicalCoverLetterPreview({
   });
 
   const contactParts = [
-    profile.contact_email,
-    profile.linkedin_url,
-    profile.location,
-    profile.phone_number,
-  ].filter(Boolean) as string[];
+    profile.contact_email ? { kind: "email" as const, val: profile.contact_email } : null,
+    profile.linkedin_url  ? { kind: "link"  as const, val: profile.linkedin_url } : null,
+    profile.location      ? { kind: "text"  as const, val: profile.location } : null,
+    profile.phone_number  ? { kind: "text"  as const, val: profile.phone_number } : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null);
 
   return (
     <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", fontFamily: SANS, fontSize: "10.5px", lineHeight: 1.7, color: INK, border: `1px solid ${BDOT}`, borderRadius: "8px", boxSizing: "border-box", padding: "50px 56px" }}>
@@ -654,8 +674,19 @@ export function BoldChronologicalCoverLetterPreview({
         <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "28px", color: INK, letterSpacing: "0.5px", marginBottom: "5px" }}>
           {profile.full_name}
         </h1>
-        <p style={{ fontFamily: SANS, fontSize: "9.5px", color: GRAY }}>
-          {contactParts.join("   •   ")}
+        <p style={{ fontFamily: SANS, fontSize: "9.5px", color: GRAY, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px" }}>
+          {contactParts.map((item, i) => (
+            <span key={i} style={{ display: "inline-flex", alignItems: "center" }}>
+              {i > 0 && <span style={{ margin: "0 6px" }}>•</span>}
+              {item.kind === "link" ? (
+                <a href={item.val} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "underline" }}>LinkedIn</a>
+              ) : item.kind === "email" ? (
+                <a href={`mailto:${item.val}`} style={{ color: "#2563eb" }}>{item.val}</a>
+              ) : (
+                <span>{item.val}</span>
+              )}
+            </span>
+          ))}
         </p>
       </div>
       <div style={{ borderBottom: `1.5px solid ${RULE}`, marginBottom: "22px" }} />

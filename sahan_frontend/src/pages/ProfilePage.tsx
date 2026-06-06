@@ -44,9 +44,13 @@ function SkillChip({ label, onRemove }: { label: string; onRemove: () => void })
 }
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [searchParams] = useSearchParams();
   const [localUser, setLocalUser] = useState(user);
+  const [nameDraft, setNameDraft] = useState({
+    first_name: user?.first_name || "",
+    last_name:  user?.last_name  || "",
+  });
   const [tab, setTab] = useState<Tab>(() => {
     const p = searchParams.get("tab");
     return (p === "career" || p === "vault") ? p : "info";
@@ -110,6 +114,7 @@ export default function ProfilePage() {
   const saveProfile = async () => {
     setSaving(true);
     try {
+      // Save UserProfile fields (full_name, contact info, etc.)
       const payload = {
         full_name: draft.full_name,
         contact_email: draft.contact_email,
@@ -126,6 +131,15 @@ export default function ProfilePage() {
       const updated = await profileApi.update(payload);
       setProfile(updated);
       setDraft(updated);
+
+      // Save User.first_name / last_name (shown in navbar and dashboard)
+      const nameChanged =
+        nameDraft.first_name !== (user?.first_name || "") ||
+        nameDraft.last_name  !== (user?.last_name  || "");
+      if (nameChanged) {
+        await updateUser(nameDraft);
+      }
+
       setEditMode(false);
     } catch (err: unknown) {
       const e = err as Record<string, unknown>;
@@ -416,6 +430,25 @@ export default function ProfilePage() {
               )}
             </div>
             <div className="grid grid-cols-2 gap-4">
+              {/* First / last name — saved to User model, drives navbar + dashboard greeting */}
+              {(["first_name", "last_name"] as const).map(k => (
+                <div key={k}>
+                  <label className="label-xs mr-2">{k === "first_name" ? "First Name" : "Last Name"}</label>
+                  {editMode ? (
+                    <input
+                      className="form-input"
+                      value={nameDraft[k]}
+                      onChange={e => setNameDraft(d => ({ ...d, [k]: e.target.value }))}
+                      placeholder={k === "first_name" ? "Ahmed" : "Hassan"}
+                    />
+                  ) : (
+                    <p className="font-sans text-[14px] text-slate-900 py-2">
+                      {user?.[k] || <span className="text-slate-300 italic text-[13px]">Not set</span>}
+                    </p>
+                  )}
+                </div>
+              ))}
+
               {[
                 { label: "Full Name", key: "full_name" as const, placeholder: "Your full name" },
                 { label: "Contact Email", key: "contact_email" as const, placeholder: "contact@email.com" },

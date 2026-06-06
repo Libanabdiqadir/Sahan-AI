@@ -4,6 +4,11 @@ import {
   Text,
   View,
   StyleSheet,
+  Link,
+  Svg,
+  Path,
+  Rect,
+  Circle,
 } from "@react-pdf/renderer";
 import type { UserProfile, TailoredData } from "../../types";
 
@@ -23,7 +28,7 @@ const C = {
 
 const INCH = 72;
 const PAGE_MARGIN_H = INCH * 0.55;
-const PAGE_MARGIN_V = INCH * 0.6;
+const PAGE_MARGIN_V = INCH * 0.45;
 const SIDEBAR_W = "31%";
 
 const S = StyleSheet.create({
@@ -47,7 +52,7 @@ const S = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: C.border,
   },
-  sidebarSection: { marginBottom: 16 },
+  sidebarSection: { marginBottom: 12 },
   sidebarTitle: {
     fontFamily: "Times-Bold",
     fontSize: 9,
@@ -83,7 +88,7 @@ const S = StyleSheet.create({
     width: 5, height: 5, borderRadius: 3,
     backgroundColor: C.primary,
   },
-  sidebarItemText: { fontSize: 12, color: C.muted, fontFamily: "Times-Roman", flex: 1, lineHeight: 1.5 },
+  sidebarItemText: { fontSize: 9.5, color: C.muted, fontFamily: "Times-Roman", flex: 1, lineHeight: 1.35 },
 
   // ── Main ─────────────────────────────────────────────────────
   main: {
@@ -116,7 +121,7 @@ const S = StyleSheet.create({
   },
 
   // Section
-  section: { marginBottom: 14 },
+  section: { marginBottom: 10 },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -140,13 +145,13 @@ const S = StyleSheet.create({
   // Summary
   summaryText: {
     fontFamily: "Times-Roman",
-    fontSize: 11,
+    fontSize: 9,
     color: C.muted,
-    lineHeight: 1.7,
+    lineHeight: 1.35,
   },
 
   // Experience
-  expBlock: { marginBottom: 11 },
+  expBlock: { marginBottom: 8 },
   expTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -155,12 +160,12 @@ const S = StyleSheet.create({
   },
   expCompany: {
     fontFamily: "Times-Bold",
-    fontSize: 12.5,
+    fontSize: 10.5,
     color: C.text,
   },
   expDate: {
     fontFamily: "Times-Roman",
-    fontSize: 10.5,
+    fontSize: 9,
     color: C.light,
     backgroundColor: C.chip,
     paddingTop: 2,
@@ -171,7 +176,7 @@ const S = StyleSheet.create({
   },
   expRole: {
     fontFamily: "Times-Italic",
-    fontSize: 11.5,
+    fontSize: 9.5,
     color: C.primary,
     marginBottom: 5,
   },
@@ -190,13 +195,13 @@ const S = StyleSheet.create({
   bulletText: {
     flex: 1,
     fontFamily: "Times-Roman",
-    fontSize: 11,
+    fontSize: 9,
     color: C.muted,
-    lineHeight: 1.6,
+    lineHeight: 1.35,
   },
 
   // Education
-  eduBlock: { marginBottom: 9 },
+  eduBlock: { marginBottom: 6 },
   eduTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -205,17 +210,17 @@ const S = StyleSheet.create({
   },
   eduDegree: {
     fontFamily: "Times-Bold",
-    fontSize: 12,
+    fontSize: 10.5,
     color: C.text,
   },
   eduYear: {
     fontFamily: "Times-Roman",
-    fontSize: 10.5,
+    fontSize: 9,
     color: C.light,
   },
   eduSchool: {
     fontFamily: "Times-Italic",
-    fontSize: 11,
+    fontSize: 9.5,
     color: C.muted,
   },
 
@@ -233,10 +238,10 @@ const S = StyleSheet.create({
   },
   achieveText: {
     fontFamily: "Times-Roman",
-    fontSize: 11,
+    fontSize: 9,
     color: C.muted,
     flex: 1,
-    lineHeight: 1.6,
+    lineHeight: 1.35,
   },
 
   // ── Cover Letter ──────────────────────────────────────────────
@@ -266,19 +271,19 @@ const S = StyleSheet.create({
   },
   clDate: {
     fontFamily: "Times-Roman",
-    fontSize: 10.5,
+    fontSize: 9.5,
     color: C.light,
     marginBottom: 18,
   },
   clRecipientLabel: {
     fontFamily: "Times-Bold",
-    fontSize: 11.5,
+    fontSize: 10.5,
     color: C.text,
     marginBottom: 2,
   },
   clRecipientCompany: {
     fontFamily: "Times-Roman",
-    fontSize: 11,
+    fontSize: 10,
     color: C.muted,
     marginBottom: 16,
   },
@@ -295,20 +300,20 @@ const S = StyleSheet.create({
   },
   clSubjectText: {
     fontFamily: "Times-Bold",
-    fontSize: 11,
+    fontSize: 10,
     color: C.primary,
   },
   clGreeting: {
     fontFamily: "Times-Roman",
-    fontSize: 12,
+    fontSize: 10.5,
     color: C.text,
     marginBottom: 13,
   },
   clBodyPara: {
     fontFamily: "Times-Roman",
-    fontSize: 11.5,
+    fontSize: 9.5,
     color: C.muted,
-    lineHeight: 1.8,
+    lineHeight: 1.5,
     marginBottom: 11,
   },
   clSignoffWrap: {
@@ -319,13 +324,13 @@ const S = StyleSheet.create({
   },
   clSignoff: {
     fontFamily: "Times-Roman",
-    fontSize: 11,
+    fontSize: 10,
     color: C.muted,
     marginBottom: 26,
   },
   clSignName: {
     fontFamily: "Times-Bold",
-    fontSize: 14,
+    fontSize: 11,
     color: C.text,
     marginBottom: 4,
   },
@@ -348,11 +353,53 @@ const S = StyleSheet.create({
   },
   clSidebarMetaValue: {
     fontFamily: "Times-Roman",
-    fontSize: 10.5,
+    fontSize: 9.5,
     color: C.muted,
-    lineHeight: 1.55,
+    lineHeight: 1.4,
   },
 });
+
+// ─── SVG Contact Icons ──────────────────────────────────────────────────────
+type IconKind = "email" | "phone" | "location" | "linkedin";
+
+function ContactIcon({ kind, color = C.primary, size = 9 }: { kind: IconKind; color?: string; size?: number }) {
+  if (kind === "email") {
+    return (
+      <Svg width={size * 1.3} height={size} viewBox="0 0 13 10">
+        <Path d="M0.5,0.5 L12.5,0.5 L12.5,9.5 L0.5,9.5 Z M0.5,0.5 L6.5,6 L12.5,0.5"
+          fill="none" stroke={color} strokeWidth="1" />
+      </Svg>
+    );
+  }
+  if (kind === "phone") {
+    return (
+      <Svg width={size * 0.8} height={size} viewBox="0 0 8 10">
+        <Rect x="0.5" y="0.5" width="7" height="9" rx="1.5"
+          fill="none" stroke={color} strokeWidth="1" />
+        <Rect x="2.5" y="1.5" width="3" height="0.7" rx="0.35" fill={color} />
+      </Svg>
+    );
+  }
+  if (kind === "location") {
+    return (
+      <Svg width={size * 0.8} height={size * 1.15} viewBox="0 0 8 11">
+        <Path d="M4,0.5 C2,0.5 0.5,2 0.5,4 C0.5,7 4,10.5 4,10.5 C4,10.5 7.5,7 7.5,4 C7.5,2 6,0.5 4,0.5 Z"
+          fill={color} />
+        <Circle cx="4" cy="4" r="1.4" fill="white" />
+      </Svg>
+    );
+  }
+  // linkedin
+  return (
+    <Svg width={size} height={size} viewBox="0 0 10 10">
+      <Rect x="0" y="0" width="10" height="10" rx="2" fill={color} />
+      <Circle cx="2.3" cy="2.8" r="1" fill="white" />
+      <Rect x="1.4" y="4.3" width="1.8" height="5.2" fill="white" />
+      <Path d="M4.6,4.3 L6.2,4.3 L6.2,5.1 C6.5,4.5 7.2,4.2 7.9,4.2 C9.3,4.2 9.8,5.1 9.8,6.4 L9.8,9.5 L8.2,9.5 L8.2,6.8 C8.2,6.1 7.8,5.7 7.2,5.7 C6.6,5.7 6.2,6.1 6.2,6.8 L6.2,9.5 L4.6,9.5 Z"
+        fill="white" />
+    </Svg>
+  );
+}
 
 // ─── Helper: Section Header ─────────────────────────────────────────────────
 function SectionHeader({ title }: { title: string }) {
@@ -387,12 +434,12 @@ export function ModernProfessionalCV({
     year: "numeric", month: "long", day: "numeric",
   });
 
-  const contactParts = [
-    { icon: "✉", value: profile.contact_email },
-    { icon: "✆", value: profile.phone_number },
-    { icon: "⊙", value: profile.location },
-    { icon: "in", value: profile.linkedin_url },
-  ].filter((c) => c.value);
+  const contactParts: Array<{ kind: IconKind; value: string }> = [
+    profile.contact_email ? { kind: "email",    value: profile.contact_email } : null,
+    profile.phone_number  ? { kind: "phone",    value: profile.phone_number } : null,
+    profile.location      ? { kind: "location", value: profile.location } : null,
+    profile.linkedin_url  ? { kind: "linkedin", value: profile.linkedin_url } : null,
+  ].filter((x): x is { kind: IconKind; value: string } => x !== null);
 
   return (
     <Document title={`${profile.full_name} — ${jobTitle}`}>
@@ -409,8 +456,16 @@ export function ModernProfessionalCV({
             <Text style={S.sidebarTitle}>Contact</Text>
             {contactParts.map((c, i) => (
               <View key={i} style={S.contactRow}>
-                <Text style={S.contactIcon}>{c.icon}</Text>
-                <Text style={S.contactText}>{c.value}</Text>
+                <View style={{ marginTop: 2, marginRight: 5 }}>
+                  <ContactIcon kind={c.kind} color={C.primary} size={9} />
+                </View>
+                {c.kind === "linkedin" ? (
+                  <Link src={c.value} style={[S.contactText, { color: C.primary }]}>LinkedIn</Link>
+                ) : c.kind === "email" ? (
+                  <Link src={`mailto:${c.value}`} style={[S.contactText, { color: C.primary }]}>{c.value}</Link>
+                ) : (
+                  <Text style={S.contactText}>{c.value}</Text>
+                )}
               </View>
             ))}
           </View>
@@ -588,7 +643,18 @@ export function ModernProfessionalCV({
             <View style={S.clSidebarMeta}>
               <Text style={S.clSidebarMetaLabel}>Contact</Text>
               {contactParts.map((c, i) => (
-                <Text key={i} style={[S.clSidebarMetaValue, { marginBottom: 3 }]}>{c.icon}  {c.value}</Text>
+                <View key={i} style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}>
+                  <View style={{ marginTop: 1, marginRight: 5 }}>
+                    <ContactIcon kind={c.kind} color={C.primary} size={8} />
+                  </View>
+                  {c.kind === "linkedin" ? (
+                    <Link src={c.value} style={[S.clSidebarMetaValue, { color: C.primary }]}>LinkedIn</Link>
+                  ) : c.kind === "email" ? (
+                    <Link src={`mailto:${c.value}`} style={[S.clSidebarMetaValue, { color: C.primary }]}>{c.value}</Link>
+                  ) : (
+                    <Text style={S.clSidebarMetaValue}>{c.value}</Text>
+                  )}
+                </View>
               ))}
             </View>
             {/* Skills summary — vertical dot list */}
@@ -692,7 +758,13 @@ export function ModernProfessionalPreview({
           {contacts.map((c, i) => (
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "6px", marginBottom: "7px" }}>
               <span style={{ fontSize: "10px", color: BLUE, width: "14px", flexShrink: 0 }}>{c.icon}</span>
-              <span style={{ fontSize: "10.5px", color: MUTED, wordBreak: "break-all", lineHeight: "1.55" }}>{c.value}</span>
+              {c.icon === "in" ? (
+                <a href={c.value!} target="_blank" rel="noopener noreferrer" style={{ fontSize: "10.5px", color: BLUE, lineHeight: "1.55", textDecoration: "underline" }}>LinkedIn</a>
+              ) : c.icon === "✉" ? (
+                <a href={`mailto:${c.value}`} style={{ fontSize: "10.5px", color: BLUE, lineHeight: "1.55" }}>{c.value}</a>
+              ) : (
+                <span style={{ fontSize: "10.5px", color: MUTED, wordBreak: "break-all", lineHeight: "1.55" }}>{c.value}</span>
+              )}
             </div>
           ))}
         </div>
@@ -704,7 +776,7 @@ export function ModernProfessionalPreview({
             {tailored.tech_skills.map((s, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                 <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: BLUE, flexShrink: 0 }} />
-                <span style={{ fontSize: "12px", color: MUTED }}>{s}</span>
+                <span style={{ fontSize: "10.5px", color: MUTED }}>{s}</span>
               </div>
             ))}
           </div>
@@ -717,7 +789,7 @@ export function ModernProfessionalPreview({
             {tailored.soft_skills.map((s, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                 <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#2e7d32", flexShrink: 0 }} />
-                <span style={{ fontSize: "12px", color: "#2e7d32" }}>{s}</span>
+                <span style={{ fontSize: "10.5px", color: "#2e7d32" }}>{s}</span>
               </div>
             ))}
           </div>
@@ -730,7 +802,7 @@ export function ModernProfessionalPreview({
             {tailored.languages.map((l, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "9px" }}>
                 <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: BLUE, flexShrink: 0 }} />
-                <span style={{ fontSize: "12px", color: MUTED }}>{l}</span>
+                <span style={{ fontSize: "10.5px", color: MUTED }}>{l}</span>
               </div>
             ))}
           </div>
@@ -766,7 +838,7 @@ export function ModernProfessionalPreview({
               <span style={{ fontWeight: "700", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.8px", color: BLUE }}>Professional Summary</span>
               <div style={{ flex: 1, borderBottom: `1px solid ${BORDER}` }} />
             </div>
-            <p style={{ fontSize: "11px", color: MUTED, lineHeight: "1.7" }}>{tailored.summary}</p>
+            <p style={{ fontSize: "10px", color: MUTED, lineHeight: "1.5" }}>{tailored.summary}</p>
           </div>
         )}
 
@@ -780,14 +852,14 @@ export function ModernProfessionalPreview({
             {tailored.experience.map((exp, i) => (
               <div key={i} style={{ marginBottom: "12px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2px" }}>
-                  <span style={{ fontWeight: "700", fontSize: "12.5px", color: "#1e2939" }}>{exp.company}</span>
-                  <span style={{ fontSize: "10.5px", color: LIGHT, background: CHIP_BG, padding: "2px 8px", borderRadius: "10px" }}>{exp.duration}</span>
+                  <span style={{ fontWeight: "700", fontSize: "11.5px", color: "#1e2939" }}>{exp.company}</span>
+                  <span style={{ fontSize: "9.5px", color: LIGHT, background: CHIP_BG, padding: "2px 8px", borderRadius: "10px" }}>{exp.duration}</span>
                 </div>
-                <p style={{ fontStyle: "italic", fontSize: "11.5px", color: BLUE, marginBottom: "6px" }}>{exp.role}</p>
+                <p style={{ fontStyle: "italic", fontSize: "10.5px", color: BLUE, marginBottom: "6px" }}>{exp.role}</p>
                 {exp.responsibilities?.map((r, j) => (
                   <div key={j} style={{ display: "flex", marginBottom: "3px" }}>
                     <span style={{ color: BLUE, marginRight: "6px", fontSize: "14px", lineHeight: "1.3" }}>•</span>
-                    <span style={{ fontSize: "11px", color: MUTED, lineHeight: "1.6" }}>{r}</span>
+                    <span style={{ fontSize: "10px", color: MUTED, lineHeight: "1.5" }}>{r}</span>
                   </div>
                 ))}
               </div>
@@ -837,10 +909,10 @@ export function ModernProfessionalPreview({
             {tailored.education.map((edu, i) => (
               <div key={i} style={{ marginBottom: "10px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <span style={{ fontWeight: "700", fontSize: "12px", color: "#1e2939" }}>{edu.degree}</span>
-                  <span style={{ fontSize: "10.5px", color: LIGHT }}>{edu.graduation_year}</span>
+                  <span style={{ fontWeight: "700", fontSize: "11px", color: "#1e2939" }}>{edu.degree}</span>
+                  <span style={{ fontSize: "9.5px", color: LIGHT }}>{edu.graduation_year}</span>
                 </div>
-                <p style={{ fontStyle: "italic", fontSize: "11px", color: MUTED }}>{edu.university}</p>
+                <p style={{ fontStyle: "italic", fontSize: "10px", color: MUTED }}>{edu.university}</p>
               </div>
             ))}
           </div>
@@ -895,7 +967,16 @@ export function ModernProfessionalCoverLetterPreview({
         <div style={{ marginBottom: "18px" }}>
           <p style={{ fontWeight: "700", fontSize: "8px", textTransform: "uppercase", letterSpacing: "1.5px", color: BLUE, marginBottom: "8px" }}>Contact</p>
           {contacts.map((c, i) => (
-            <p key={i} style={{ fontSize: "9px", color: MUTED, marginBottom: "4px" }}>{c.icon}  {c.value}</p>
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "4px" }}>
+              <span style={{ fontSize: "9px", color: MUTED }}>{c.icon}</span>
+              {c.icon === "in" ? (
+                <a href={c.value!} target="_blank" rel="noopener noreferrer" style={{ fontSize: "9px", color: BLUE, textDecoration: "underline" }}>LinkedIn</a>
+              ) : c.icon === "✉" ? (
+                <a href={`mailto:${c.value}`} style={{ fontSize: "9px", color: BLUE }}>{c.value}</a>
+              ) : (
+                <span style={{ fontSize: "9px", color: MUTED }}>{c.value}</span>
+              )}
+            </div>
           ))}
         </div>
         {/* Key skills — vertical dot list */}

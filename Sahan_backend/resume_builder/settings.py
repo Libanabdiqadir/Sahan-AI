@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 import os
 import environ
 
@@ -44,10 +45,28 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'django.contrib.sites',
+    'corsheaders',
     'core',
+
+    # Rest Framework and Token Auth
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders',
+    'djoser',
+
+    # dj-rest-auth base endpoints
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+
+    #django-allauth base and social login
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    # Registering social account provider
+    'allauth.socialaccount.providers.google',
+
 ]
 
 MIDDLEWARE = [
@@ -60,6 +79,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'resume_builder.urls'
@@ -147,9 +167,77 @@ CORS_ALLOWED_ORIGINS = [
 
 DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
-    'SERIALIZERS': {},
+    'SERIALIZERS': {
+        'user_create': 'core.serializer.UserCreateSerializer',
+        'user_create_password_retype': 'core.serializer.UserCreateSerializer',
+        'current_user': 'core.serializer.UserSerializer',
+    },
+    'EMAIL': {
+        'activation': 'core.email.ActivationEmail',
+    },
     'LOGIN_FIELD': 'email',
+    'SEND_ACTIVATION_EMAIL': True,
+    'ACTIVATION_URL': 'verify-email/{uid}/{token}',
+    # EMAIL_FRONTEND_* is what djoser's BaseEmailMessage actually uses when
+    # building the activation URL in the email body.  The plain 'DOMAIN' key
+    # is only used for the URL path template above, NOT for the host portion.
+    'EMAIL_FRONTEND_DOMAIN':   env('FRONTEND_DOMAIN',   default='localhost:5173'),
+    'EMAIL_FRONTEND_PROTOCOL': env('FRONTEND_PROTOCOL', default='http'),
+    'EMAIL_FRONTEND_SITE_NAME': 'Sahan AI',
+    'DOMAIN':    env('FRONTEND_DOMAIN',   default='localhost:5173'),
+    'SITE_NAME': 'Sahan AI',
 }
+
+# ─── Email ───────────────────────────────────────────────────────────────────
+# Development default: print emails to the console so no SMTP is needed locally.
+# Production: set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+# and supply EMAIL_HOST / EMAIL_HOST_USER / EMAIL_HOST_PASSWORD in .env.
+EMAIL_BACKEND    = env('EMAIL_BACKEND',    default='django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@sahanai.com')
+EMAIL_HOST       = env('EMAIL_HOST',       default='')
+EMAIL_PORT       = env.int('EMAIL_PORT',   default=587)
+EMAIL_USE_TLS    = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_HOST_USER  = env('EMAIL_HOST_USER',  default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+#SITE_ID connects Django's multi-site framework to the database
+SITE_ID = 1
+
+# Configure Authentication Backends to fallback on django-allauth
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# SocialAccount configurations (Ensures usernames are not required)
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    }
+}
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': None,
+    'JWT_AUTH_HTTPONLY': False,
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME':  timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS':  True,
+    'ALGORITHM': 'HS256',
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'UPDATE_LAST_LOGIN': True,
+}

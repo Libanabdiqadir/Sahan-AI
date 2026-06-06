@@ -14,7 +14,11 @@ V_MARGIN = 0.45 * inch
 CONTENT_W = PAGE_W - 2 * H_MARGIN
 SIDEBAR_W = CONTENT_W * 0.30
 MAIN_W = CONTENT_W * 0.70
-KIF_H = 28 * inch
+
+# Realistic body height: page minus estimated header (~50 pts) minus both margins.
+# mode='shrink' scales content that still overflows rather than spilling onto page 2.
+HEADER_EST = 50
+KIF_H = PAGE_H - HEADER_EST - 2 * V_MARGIN   # ≈ 727 pts
 
 NAVY = '#1e3a5f'
 STEEL = '#2563eb'
@@ -40,29 +44,27 @@ def _styles():
             textTransform='uppercase', letterSpacing=0.8,
         ),
         s_item=ParagraphStyle(
-            'mpSItem', fontName='Helvetica', fontSize=9,
-            textColor=colors.HexColor(DARK), leading=15, spaceAfter=4,
+            'mpSItem', fontName='Helvetica', fontSize=8.5,
+            textColor=colors.HexColor(DARK), leading=12, spaceAfter=3,
         ),
         section=ParagraphStyle(
             'mpSection', fontName='Helvetica-Bold', fontSize=8,
             textColor=colors.HexColor(STEEL), textTransform='uppercase',
             letterSpacing=1.2, spaceBefore=8, spaceAfter=2,
+            keepWithNext=True,
         ),
         body=ParagraphStyle(
-            'mpBody', fontName='Helvetica', fontSize=9,
-            leading=13, spaceAfter=3, textColor=colors.HexColor(DARK),
+            'mpBody', fontName='Helvetica', fontSize=8.5,
+            leading=12, spaceAfter=3, textColor=colors.HexColor(DARK),
         ),
         bold=ParagraphStyle(
-            'mpBold', fontName='Helvetica-Bold', fontSize=9,
+            'mpBold', fontName='Helvetica-Bold', fontSize=8.5,
             spaceAfter=1, textColor=colors.HexColor(DARK),
+            keepWithNext=True,
         ),
         small=ParagraphStyle(
             'mpSmall', fontName='Helvetica', fontSize=8,
             textColor=colors.HexColor(MUTED), spaceAfter=2,
-        ),
-        italic=ParagraphStyle(
-            'mpItalic', fontName='Helvetica-Oblique', fontSize=9,
-            leading=13, textColor=colors.HexColor(MUTED), spaceAfter=4,
         ),
     )
 
@@ -78,14 +80,18 @@ def _section(title, s):
 def _build_sidebar(user_data, tailored_data, s):
     items = []
 
-    for val in filter(None, [
-        user_data.get('contact_email'),
-        user_data.get('phone_number'),
-        user_data.get('location'),
-        user_data.get('linkedin_url'),
-    ]):
-        items.append(Paragraph(val, s['contact']))
-    items.append(Spacer(1, 10))
+    # Contact items — LinkedIn rendered as a clickable link, not a raw URL
+    if user_data.get('contact_email'):
+        email = user_data['contact_email']
+        items.append(Paragraph(f'<a href="mailto:{email}" color="{STEEL}">{email}</a>', s['contact']))
+    if user_data.get('phone_number'):
+        items.append(Paragraph(user_data['phone_number'], s['contact']))
+    if user_data.get('location'):
+        items.append(Paragraph(user_data['location'], s['contact']))
+    if user_data.get('linkedin_url'):
+        linkedin_url = user_data['linkedin_url']
+        items.append(Paragraph(f'<a href="{linkedin_url}" color="{STEEL}">LinkedIn</a>', s['contact']))
+    items.append(Spacer(1, 8))
 
     for heading, key in [
         ('Technical Skills', 'tech_skills'),
@@ -97,7 +103,7 @@ def _build_sidebar(user_data, tailored_data, s):
             items.append(Paragraph(heading, s['s_label']))
             for entry in entries:
                 items.append(Paragraph(f'• {entry}', s['s_item']))
-            items.append(Spacer(1, 6))
+            items.append(Spacer(1, 4))
 
     certs = tailored_data.get('certifications') or []
     if certs:
@@ -111,17 +117,17 @@ def _build_sidebar(user_data, tailored_data, s):
                 items.append(Paragraph(issuer, s['small']))
             if date:
                 items.append(Paragraph(date, s['small']))
-            items.append(Spacer(1, 5))
+            items.append(Spacer(1, 4))
 
     return items
 
 
-def _build_main(user_data, tailored_data, s):
+def _build_main(tailored_data, s):
     items = []
 
     if tailored_data.get('summary'):
         items.extend(_section('Professional Summary', s))
-        items.append(Paragraph(tailored_data['summary'], s['italic']))
+        items.append(Paragraph(tailored_data['summary'], s['body']))  # plain, not italic
         items.append(Spacer(1, 4))
 
     exp_list = tailored_data.get('experience') or []
@@ -166,7 +172,9 @@ def _build_main(user_data, tailored_data, s):
             if tech:
                 items.append(Paragraph(tech, s['small']))
             if link:
-                items.append(Paragraph(f'<i>{link}</i>', s['small']))
+                items.append(Paragraph(
+                    f'<a href="{link}" color="{STEEL}">{link}</a>', s['small'],
+                ))
             if desc:
                 items.append(Paragraph(f'• {desc}', s['body']))
             for h in proj.get('highlights', []):
@@ -186,10 +194,17 @@ def render_pdf(buffer, user_data, tailored_data):
     story = []
 
     story.append(Paragraph(user_data.get('full_name', ''), s['name']))
-    contact_parts = [x for x in [
-        user_data.get('contact_email'), user_data.get('phone_number'),
-        user_data.get('location'), user_data.get('linkedin_url'),
-    ] if x]
+    contact_parts = []
+    if user_data.get('contact_email'):
+        email = user_data['contact_email']
+        contact_parts.append(f'<a href="mailto:{email}" color="{STEEL}">{email}</a>')
+    if user_data.get('phone_number'):
+        contact_parts.append(user_data['phone_number'])
+    if user_data.get('location'):
+        contact_parts.append(user_data['location'])
+    if user_data.get('linkedin_url'):
+        linkedin_url = user_data['linkedin_url']
+        contact_parts.append(f'<a href="{linkedin_url}" color="{STEEL}">LinkedIn</a>')
     if contact_parts:
         story.append(Paragraph('  ·  '.join(contact_parts), s['contact']))
     story.append(HRFlowable(
@@ -199,12 +214,12 @@ def render_pdf(buffer, user_data, tailored_data):
     sidebar_kif = KeepInFrame(
         SIDEBAR_W - 14, KIF_H,
         _build_sidebar(user_data, tailored_data, s),
-        mode='overflow',
+        mode='shrink',                               # was 'overflow'
     )
     main_kif = KeepInFrame(
         MAIN_W - 10, KIF_H,
-        _build_main(user_data, tailored_data, s),
-        mode='overflow',
+        _build_main(tailored_data, s),
+        mode='shrink',                               # was 'overflow'
     )
 
     body = Table([[sidebar_kif, main_kif]], colWidths=[SIDEBAR_W, MAIN_W])

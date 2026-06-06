@@ -4,6 +4,11 @@ import {
   Text,
   View,
   StyleSheet,
+  Link,
+  Svg,
+  Path,
+  Rect,
+  Circle,
 } from "@react-pdf/renderer";
 import type { UserProfile, TailoredData } from "../../types";
 
@@ -24,7 +29,7 @@ const C = {
 };
 
 const PH = 40;  // main panel horizontal padding
-const PV = 40;  // vertical padding
+const PV = 30;  // vertical padding
 
 const S = StyleSheet.create({
   // ── Page ─────────────────────────────────────────────────────────────
@@ -81,7 +86,7 @@ const S = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 14,
   },
-  sideSection: { marginBottom: 16 },
+  sideSection: { marginBottom: 12 },
   sideTitle: {
     fontFamily: "Helvetica-Bold",
     fontSize: 8.5,
@@ -155,10 +160,10 @@ const S = StyleSheet.create({
   },
   sideItemText: {
     fontFamily: "Helvetica",
-    fontSize: 12,
+    fontSize: 9.5,
     color: C.muted,
     flex: 1,
-    lineHeight: 1.5,
+    lineHeight: 1.35,
   },
 
   // ── Main panel (71%) ──────────────────────────────────────────────────
@@ -169,7 +174,7 @@ const S = StyleSheet.create({
     paddingLeft: 22,
     paddingRight: PH,
   },
-  section: { marginBottom: 13 },
+  section: { marginBottom: 10 },
   sectionHead: {
     flexDirection: "row",
     alignItems: "center",
@@ -193,13 +198,13 @@ const S = StyleSheet.create({
   // Summary
   summaryText: {
     fontFamily: "Helvetica",
-    fontSize: 11,
+    fontSize: 9,
     color: C.muted,
-    lineHeight: 1.7,
+    lineHeight: 1.35,
   },
 
   // Experience
-  expBlock: { marginBottom: 11 },
+  expBlock: { marginBottom: 8 },
   expTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -208,12 +213,12 @@ const S = StyleSheet.create({
   },
   expCompany: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 12.5,
+    fontSize: 10.5,
     color: C.body,
   },
   expBadge: {
     fontFamily: "Helvetica",
-    fontSize: 9.5,
+    fontSize: 8.5,
     color: C.subtle,
     backgroundColor: C.chipBg,
     paddingTop: 2,    paddingBottom: 2,
@@ -222,7 +227,7 @@ const S = StyleSheet.create({
   },
   expRole: {
     fontFamily: "Helvetica-Oblique",
-    fontSize: 11,
+    fontSize: 9.5,
     color: C.mid,
     marginBottom: 5,
   },
@@ -242,13 +247,13 @@ const S = StyleSheet.create({
   bulletText: {
     flex: 1,
     fontFamily: "Helvetica",
-    fontSize: 11,
+    fontSize: 9,
     color: C.muted,
-    lineHeight: 1.65,
+    lineHeight: 1.35,
   },
 
   // Education
-  eduBlock: { marginBottom: 9 },
+  eduBlock: { marginBottom: 6 },
   eduTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -257,17 +262,17 @@ const S = StyleSheet.create({
   },
   eduDegree: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 12,
+    fontSize: 10.5,
     color: C.body,
   },
   eduYear: {
     fontFamily: "Helvetica",
-    fontSize: 10.5,
+    fontSize: 9,
     color: C.subtle,
   },
   eduSchool: {
     fontFamily: "Helvetica-Oblique",
-    fontSize: 11,
+    fontSize: 9.5,
     color: C.muted,
   },
 
@@ -303,9 +308,9 @@ const S = StyleSheet.create({
   },
   clMetaValue: {
     fontFamily: "Helvetica",
-    fontSize: 10.5,
+    fontSize: 9.5,
     color: C.muted,
-    lineHeight: 1.55,
+    lineHeight: 1.4,
   },
   clDivider: {
     borderBottomWidth: 0.5,
@@ -314,19 +319,19 @@ const S = StyleSheet.create({
   },
   clDate: {
     fontFamily: "Helvetica",
-    fontSize: 10.5,
+    fontSize: 9.5,
     color: C.subtle,
     marginBottom: 16,
   },
   clRecipient: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 12,
+    fontSize: 11,
     color: C.body,
     marginBottom: 2,
   },
   clCompany: {
     fontFamily: "Helvetica",
-    fontSize: 11,
+    fontSize: 10,
     color: C.muted,
     marginBottom: 15,
   },
@@ -341,20 +346,20 @@ const S = StyleSheet.create({
   },
   clSubjectText: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 11,
+    fontSize: 10,
     color: C.accent,
   },
   clGreeting: {
     fontFamily: "Helvetica",
-    fontSize: 12,
+    fontSize: 10.5,
     color: C.body,
     marginBottom: 12,
   },
   clBodyPara: {
     fontFamily: "Helvetica",
-    fontSize: 11.5,
+    fontSize: 9.5,
     color: C.muted,
-    lineHeight: 1.78,
+    lineHeight: 1.5,
     marginBottom: 11,
   },
   clSignoffWrap: {
@@ -365,13 +370,13 @@ const S = StyleSheet.create({
   },
   clSignoff: {
     fontFamily: "Helvetica",
-    fontSize: 11,
+    fontSize: 10,
     color: C.muted,
     marginBottom: 22,
   },
   clSignName: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 13,
+    fontSize: 11,
     color: C.body,
     marginBottom: 4,
   },
@@ -381,6 +386,48 @@ const S = StyleSheet.create({
     color: C.subtle,
   },
 });
+
+// ─── SVG Contact Icons ───────────────────────────────────────────────────────
+type IconKind = "email" | "phone" | "location" | "linkedin";
+
+function ContactIcon({ kind, color = C.mid, size = 9 }: { kind: IconKind; color?: string; size?: number }) {
+  if (kind === "email") {
+    return (
+      <Svg width={size * 1.3} height={size} viewBox="0 0 13 10">
+        <Path d="M0.5,0.5 L12.5,0.5 L12.5,9.5 L0.5,9.5 Z M0.5,0.5 L6.5,6 L12.5,0.5"
+          fill="none" stroke={color} strokeWidth="1" />
+      </Svg>
+    );
+  }
+  if (kind === "phone") {
+    return (
+      <Svg width={size * 0.8} height={size} viewBox="0 0 8 10">
+        <Rect x="0.5" y="0.5" width="7" height="9" rx="1.5"
+          fill="none" stroke={color} strokeWidth="1" />
+        <Rect x="2.5" y="1.5" width="3" height="0.7" rx="0.35" fill={color} />
+      </Svg>
+    );
+  }
+  if (kind === "location") {
+    return (
+      <Svg width={size * 0.8} height={size * 1.15} viewBox="0 0 8 11">
+        <Path d="M4,0.5 C2,0.5 0.5,2 0.5,4 C0.5,7 4,10.5 4,10.5 C4,10.5 7.5,7 7.5,4 C7.5,2 6,0.5 4,0.5 Z"
+          fill={color} />
+        <Circle cx="4" cy="4" r="1.4" fill="white" />
+      </Svg>
+    );
+  }
+  // linkedin
+  return (
+    <Svg width={size} height={size} viewBox="0 0 10 10">
+      <Rect x="0" y="0" width="10" height="10" rx="2" fill={color} />
+      <Circle cx="2.3" cy="2.8" r="1" fill="white" />
+      <Rect x="1.4" y="4.3" width="1.8" height="5.2" fill="white" />
+      <Path d="M4.6,4.3 L6.2,4.3 L6.2,5.1 C6.5,4.5 7.2,4.2 7.9,4.2 C9.3,4.2 9.8,5.1 9.8,6.4 L9.8,9.5 L8.2,9.5 L8.2,6.8 C8.2,6.1 7.8,5.7 7.2,5.7 C6.6,5.7 6.2,6.1 6.2,6.8 L6.2,9.5 L4.6,9.5 Z"
+        fill="white" />
+    </Svg>
+  );
+}
 
 // ─── Internal Section Header ────────────────────────────────────────────────────
 function SH({ title }: { title: string }) {
@@ -411,12 +458,12 @@ export function ModernMinimalistCV({ profile, tailored, jobTitle, companyName }:
     year: "numeric", month: "long", day: "numeric",
   });
 
-  const contacts = [
-    { icon: "✉", value: profile.contact_email },
-    { icon: "✆", value: profile.phone_number },
-    { icon: "⊙", value: profile.location },
-    { icon: "in", value: profile.linkedin_url },
-  ].filter((c) => c.value);
+  const contacts: Array<{ kind: IconKind; value: string }> = [
+    profile.contact_email ? { kind: "email",    value: profile.contact_email } : null,
+    profile.phone_number  ? { kind: "phone",    value: profile.phone_number } : null,
+    profile.location      ? { kind: "location", value: profile.location } : null,
+    profile.linkedin_url  ? { kind: "linkedin", value: profile.linkedin_url } : null,
+  ].filter((x): x is { kind: IconKind; value: string } => x !== null);
 
   return (
     <Document title={`${profile.full_name} — ${jobTitle}`}>
@@ -443,8 +490,16 @@ export function ModernMinimalistCV({ profile, tailored, jobTitle, companyName }:
               <Text style={S.sideTitle}>Contact</Text>
               {contacts.map((c, i) => (
                 <View key={i} style={S.contactRow}>
-                  <Text style={S.contactIcon}>{c.icon}</Text>
-                  <Text style={S.contactText}>{c.value}</Text>
+                  <View style={{ marginTop: 2, marginRight: 5 }}>
+                    <ContactIcon kind={c.kind} color={C.accent} size={9} />
+                  </View>
+                  {c.kind === "linkedin" ? (
+                    <Link src={c.value} style={[S.contactText, { color: C.accent }]}>LinkedIn</Link>
+                  ) : c.kind === "email" ? (
+                    <Link src={`mailto:${c.value}`} style={[S.contactText, { color: C.accent }]}>{c.value}</Link>
+                  ) : (
+                    <Text style={S.contactText}>{c.value}</Text>
+                  )}
                 </View>
               ))}
             </View>
@@ -614,9 +669,18 @@ export function ModernMinimalistCV({ profile, tailored, jobTitle, companyName }:
               <View style={S.clMetaBlock}>
                 <Text style={S.clMetaLabel}>Contact</Text>
                 {contacts.map((c, i) => (
-                  <Text key={i} style={[S.clMetaValue, { marginBottom: 3 }]}>
-                    {c.icon}  {c.value}
-                  </Text>
+                  <View key={i} style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}>
+                    <View style={{ marginTop: 1, marginRight: 5 }}>
+                      <ContactIcon kind={c.kind} color={C.mid} size={8} />
+                    </View>
+                    {c.kind === "linkedin" ? (
+                      <Link src={c.value} style={[S.clMetaValue, { color: C.mid }]}>LinkedIn</Link>
+                    ) : c.kind === "email" ? (
+                      <Link src={`mailto:${c.value}`} style={[S.clMetaValue, { color: C.mid }]}>{c.value}</Link>
+                    ) : (
+                      <Text style={S.clMetaValue}>{c.value}</Text>
+                    )}
+                  </View>
                 ))}
               </View>
               {tailored.tech_skills?.length > 0 && (
@@ -729,7 +793,13 @@ export function ModernMinimalistPreview({
             {contacts.map((c, i) => (
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "6px", marginBottom: "6px" }}>
                 <span style={{ fontSize: "9.5px", color: ACCENT, width: "12px", flexShrink: 0 }}>{c.icon}</span>
-                <span style={{ fontFamily: FONT, fontSize: "10px", color: MUTED, wordBreak: "break-all", lineHeight: "1.55" }}>{c.value}</span>
+                {c.icon === "in" ? (
+                  <a href={c.value} target="_blank" rel="noopener noreferrer" style={{ fontFamily: FONT, fontSize: "10px", color: ACCENT, lineHeight: "1.55", textDecoration: "underline" }}>LinkedIn</a>
+                ) : c.icon === "✉" ? (
+                  <a href={`mailto:${c.value}`} style={{ fontFamily: FONT, fontSize: "10px", color: ACCENT, lineHeight: "1.55" }}>{c.value}</a>
+                ) : (
+                  <span style={{ fontFamily: FONT, fontSize: "10px", color: MUTED, wordBreak: "break-all", lineHeight: "1.55" }}>{c.value}</span>
+                )}
               </div>
             ))}
           </div>
@@ -743,7 +813,7 @@ export function ModernMinimalistPreview({
               {tailored.tech_skills.map((s, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                   <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: ACCENT, flexShrink: 0 }} />
-                  <span style={{ fontFamily: FONT, fontSize: "12px", color: MUTED }}>{s}</span>
+                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: MUTED }}>{s}</span>
                 </div>
               ))}
             </div>
@@ -758,7 +828,7 @@ export function ModernMinimalistPreview({
               {tailored.soft_skills.map((s, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                   <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: SOFT_TXT, flexShrink: 0 }} />
-                  <span style={{ fontFamily: FONT, fontSize: "12px", color: SOFT_TXT }}>{s}</span>
+                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: SOFT_TXT }}>{s}</span>
                 </div>
               ))}
             </div>
@@ -773,7 +843,7 @@ export function ModernMinimalistPreview({
               {tailored.languages.map((l, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
                   <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: MID, flexShrink: 0 }} />
-                  <span style={{ fontFamily: FONT, fontSize: "12px", color: MUTED }}>{l}</span>
+                  <span style={{ fontFamily: FONT, fontSize: "10.5px", color: MUTED }}>{l}</span>
                 </div>
               ))}
             </div>
@@ -809,7 +879,7 @@ export function ModernMinimalistPreview({
                 </span>
                 <div style={{ flex: 1, borderBottom: `0.5px solid ${BORDER}` }} />
               </div>
-              <p style={{ fontFamily: FONT, fontSize: "11px", color: MUTED, lineHeight: 1.7 }}>
+              <p style={{ fontFamily: FONT, fontSize: "10px", color: MUTED, lineHeight: 1.5 }}>
                 {tailored.summary}
               </p>
             </div>
@@ -827,18 +897,18 @@ export function ModernMinimalistPreview({
               {tailored.experience.map((exp, i) => (
                 <div key={i} style={{ marginBottom: "12px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2px" }}>
-                    <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "12.5px", color: BODY }}>{exp.company}</span>
-                    <span style={{ fontFamily: FONT, fontSize: "9.5px", color: SUBTLE, background: CHIP_BG, padding: "2px 8px", borderRadius: "3px", flexShrink: 0, marginLeft: "8px" }}>
+                    <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "11.5px", color: BODY }}>{exp.company}</span>
+                    <span style={{ fontFamily: FONT, fontSize: "9px", color: SUBTLE, background: CHIP_BG, padding: "2px 8px", borderRadius: "3px", flexShrink: 0, marginLeft: "8px" }}>
                       {exp.duration}
                     </span>
                   </div>
-                  <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "11px", color: MID, marginBottom: "5px" }}>
+                  <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "10px", color: MID, marginBottom: "5px" }}>
                     {exp.role}
                   </p>
                   {exp.responsibilities?.map((r, j) => (
                     <div key={j} style={{ display: "flex", marginBottom: "3px" }}>
                       <span style={{ color: MID, marginRight: "6px", fontSize: "14px", lineHeight: "1.35", flexShrink: 0 }}>·</span>
-                      <span style={{ fontFamily: FONT, fontSize: "11px", color: MUTED, lineHeight: 1.65 }}>{r}</span>
+                      <span style={{ fontFamily: FONT, fontSize: "10px", color: MUTED, lineHeight: 1.5 }}>{r}</span>
                     </div>
                   ))}
                 </div>
@@ -894,10 +964,10 @@ export function ModernMinimalistPreview({
               {tailored.education.map((edu, i) => (
                 <div key={i} style={{ marginBottom: "10px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1px" }}>
-                    <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "12px", color: BODY }}>{edu.degree}</span>
-                    <span style={{ fontFamily: FONT, fontSize: "10.5px", color: SUBTLE }}>{edu.graduation_year}</span>
+                    <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: "11px", color: BODY }}>{edu.degree}</span>
+                    <span style={{ fontFamily: FONT, fontSize: "9.5px", color: SUBTLE }}>{edu.graduation_year}</span>
                   </div>
-                  <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "11px", color: MUTED }}>{edu.university}</p>
+                  <p style={{ fontFamily: FONT, fontStyle: "italic", fontSize: "10px", color: MUTED }}>{edu.university}</p>
                 </div>
               ))}
             </div>
@@ -999,7 +1069,13 @@ export function ModernMinimalistCoverLetterPreview({
             {contacts.map((c, i) => (
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "6px", marginBottom: "5px" }}>
                 <span style={{ fontSize: "8.5px", color: ACCENT, width: "12px", flexShrink: 0 }}>{c.icon}</span>
-                <span style={{ fontFamily: FONT, fontSize: "8.5px", color: MUTED, wordBreak: "break-all" }}>{c.value}</span>
+                {c.icon === "in" ? (
+                  <a href={c.value} target="_blank" rel="noopener noreferrer" style={{ fontFamily: FONT, fontSize: "8.5px", color: ACCENT, textDecoration: "underline" }}>LinkedIn</a>
+                ) : c.icon === "✉" ? (
+                  <a href={`mailto:${c.value}`} style={{ fontFamily: FONT, fontSize: "8.5px", color: ACCENT }}>{c.value}</a>
+                ) : (
+                  <span style={{ fontFamily: FONT, fontSize: "8.5px", color: MUTED, wordBreak: "break-all" }}>{c.value}</span>
+                )}
               </div>
             ))}
           </div>

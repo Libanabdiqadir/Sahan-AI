@@ -6,8 +6,10 @@ from .views import (
   ResumeHistoryViewSet,
   DocumentViewSet,
   upload_profile_picture,
-  generate_cv_pdf, 
-  generate_cover_letter_pdf
+  generate_cv_pdf,
+  generate_cover_letter_pdf,
+  google_auth_check,
+  google_register,
 )
 
 router = DefaultRouter()
@@ -24,4 +26,8 @@ urlpatterns = [
 
     path('generate-cv-pdf/', generate_cv_pdf),
     path('generate-cover-letter-pdf/', generate_cover_letter_pdf),
+
+    path('accounts/', include('allauth.urls')),
+    path('auth/google/check/',    google_auth_check, name='google_auth_check'),
+    path('auth/google/register/', google_register,   name='google_register'),
 ]

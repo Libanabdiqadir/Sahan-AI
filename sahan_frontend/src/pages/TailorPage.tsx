@@ -5,6 +5,7 @@ import {
   CheckCircle2, FileText, Mail, ChevronDown, ChevronUp, X,
 } from "lucide-react";
 import { resumeApi, profileApi } from "../services/api";
+import { LimitModal } from "../components/LimitModal";
 import type { UserProfile, ResumeHistory, ProjectEntry, CertificationEntry } from "../types";
 import { HarvardCV } from "../components/resume/HarvardCV";
 import { ExecutiveCV } from "../components/resume/ExecutiveCV";
@@ -543,6 +544,7 @@ export default function TailorPage() {
   const [result, setResult] = useState<ResumeHistory | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [limitInfo, setLimitInfo] = useState<{ plan: string; limit: number } | null>(null);
   const [coverOpen, setCoverOpen] = useState(false);
   const [jobTitle, setJobTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -590,9 +592,12 @@ export default function TailorPage() {
       setResult(resume);
     } catch (err: unknown) {
       const e = err as Record<string, unknown>;
-      const msg = (e.error as string) || (e.detail as string) || "AI generation failed. Please try again.";
-      if (msg.includes("limit")) setError("Monthly limit reached. Upgrade to Pro for unlimited resumes.");
-      else setError(msg);
+      if (e.code === "limit_reached") {
+        setLimitInfo({ plan: (e.plan as string) || "free", limit: (e.limit as number) || 2 });
+      } else {
+        const msg = (e.error as string) || (e.detail as string) || "AI generation failed. Please try again.";
+        setError(msg);
+      }
     } finally { setLoading(false); }
   };
 
@@ -655,6 +660,13 @@ export default function TailorPage() {
   ];
 
   return (
+    <>
+    <LimitModal
+      isOpen={!!limitInfo}
+      plan={limitInfo?.plan ?? "free"}
+      limit={limitInfo?.limit ?? 2}
+      onClose={() => setLimitInfo(null)}
+    />
     <div className="flex h-[calc(100vh-60px)] overflow-hidden">
       {/* Sidebar */}
       <aside className="w-[320px] shrink-0 bg-white border-r border-stone-200 overflow-y-auto p-5">
@@ -1009,5 +1021,6 @@ export default function TailorPage() {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 }

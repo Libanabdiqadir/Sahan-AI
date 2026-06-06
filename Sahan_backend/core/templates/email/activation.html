@@ -1,0 +1,15 @@
+{% load i18n %}
+{% block subject %}Confirm your Sahan AI account{% endblock subject %}
+
+{% block text_body %}
+Hi there,
+
+Thanks for signing up for Sahan AI! Please verify your email address by visiting the link below.
+
+Verification link:
+{{ protocol }}://{{ domain }}/{{ url }}
+
+This link expires in 24 hours. If you did not create an account you can safely ignore this email.
+
+— The Sahan AI team
+{% endblock text_body %}

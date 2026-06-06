@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { authApi, tokenStorage } from "../services/api";
-import type { User, LoginCredentials, RegisterCredentials } from "../types";
+import type { AuthTokens, User, LoginCredentials, RegisterCredentials } from "../types";
 
 interface AuthState {
   user: User | null;
@@ -16,28 +16,33 @@ interface AuthState {
 }
 
 interface AuthContextValue extends AuthState {
-  login: (creds: LoginCredentials) => Promise<void>;
-  register: (creds: RegisterCredentials) => Promise<void>;
-  logout: () => void;
+  login:          (creds: LoginCredentials)    => Promise<void>;
+  register:       (creds: RegisterCredentials) => Promise<void>;
+  loginWithTokens:(tokens: AuthTokens)         => Promise<void>;
+  updateUser:     (payload: { first_name: string; last_name: string }) => Promise<void>;
+  logout:         ()                           => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({
-    user: null,
-    isLoading: true,
+    user:            null,
+    isLoading:       true,
     isAuthenticated: false,
   });
 
   const fetchUser = useCallback(async () => {
-    const token = tokenStorage.get();
-    if (!token) {
+    // If neither an in-memory access token nor a stored refresh token exists,
+    // the user is definitely not authenticated — skip the network round-trip.
+    if (!tokenStorage.get() && !tokenStorage.getRefresh()) {
       setState({ user: null, isLoading: false, isAuthenticated: false });
       return;
     }
+    // apiFetch handles the 401 → refresh flow automatically, so we just call me().
     try {
       const user = await authApi.me();
+      console.log("[useAuth.fetchUser] storing in state →", { first_name: user.first_name, last_name: user.last_name });
       setState({ user, isLoading: false, isAuthenticated: true });
     } catch {
       tokenStorage.clear();
@@ -45,18 +50,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+  useEffect(() => { fetchUser(); }, [fetchUser]);
 
   const login = async (creds: LoginCredentials) => {
     await authApi.login(creds);
     await fetchUser();
   };
 
-  const register = async (creds: RegisterCredentials) => {
+  const register = async (creds: RegisterCredentials): Promise<void> => {
+    console.log("[useAuth.register] creds passed to API →", { ...creds, password: "***", re_password: "***" });
     await authApi.register(creds);
-    await authApi.login({ email: creds.email, password: creds.password });
+    // Do NOT auto-login — the account is inactive until the user clicks the
+    // verification link in their email. The caller shows the "check inbox" UI.
+  };
+
+  const updateUser = async (payload: { first_name: string; last_name: string }) => {
+    if (!state.user) return;
+    await authApi.updateName(state.user.id, payload);
+    await fetchUser();
+  };
+
+  // Used by the Google OAuth flow after tokens are already stored in tokenStorage.
+  const loginWithTokens = async (tokens: AuthTokens) => {
+    tokenStorage.set(tokens);
     await fetchUser();
   };
 
@@ -66,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout }}>
+    <AuthContext.Provider value={{ ...state, login, register, loginWithTokens, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

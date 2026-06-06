@@ -14,7 +14,11 @@ V_MARGIN = 0.50 * inch
 CONTENT_W = PAGE_W - 2 * H_MARGIN
 SIDEBAR_W = CONTENT_W * 0.30
 MAIN_W = CONTENT_W * 0.70
-KIF_H = 28 * inch
+
+# Realistic body height: page minus estimated header (~40 pts) minus both margins.
+# mode='shrink' scales content that still overflows rather than spilling onto page 2.
+HEADER_EST = 40
+KIF_H = PAGE_H - HEADER_EST - 2 * V_MARGIN   # ≈ 729 pts
 
 CHARCOAL = '#1f2937'
 ACCENT = '#374151'
@@ -22,6 +26,7 @@ MUTED = '#6b7280'
 LIGHT = '#9ca3af'
 DIVIDER = '#e5e7eb'
 SEPARATOR = '#d1d5db'
+LINK_CLR = '#334155'
 
 
 def _styles():
@@ -36,33 +41,31 @@ def _styles():
         ),
         s_label=ParagraphStyle(
             'mmSLabel', fontName='Helvetica-Bold', fontSize=8,
-            textColor=colors.HexColor(CHARCOAL), spaceBefore=12, spaceAfter=5,
+            textColor=colors.HexColor(CHARCOAL), spaceBefore=10, spaceAfter=4,
             textTransform='uppercase', letterSpacing=1.0,
         ),
         s_item=ParagraphStyle(
-            'mmSItem', fontName='Helvetica', fontSize=9,
-            textColor=colors.HexColor(ACCENT), leading=15, spaceAfter=4,
+            'mmSItem', fontName='Helvetica', fontSize=8.5,
+            textColor=colors.HexColor(ACCENT), leading=12, spaceAfter=3,
         ),
         section=ParagraphStyle(
             'mmSection', fontName='Helvetica-Bold', fontSize=8.5,
             textColor=colors.HexColor(CHARCOAL), textTransform='uppercase',
-            letterSpacing=1.2, spaceBefore=10, spaceAfter=3,
+            letterSpacing=1.2, spaceBefore=8, spaceAfter=2,
+            keepWithNext=True,
         ),
         body=ParagraphStyle(
-            'mmBody', fontName='Helvetica', fontSize=9,
-            leading=13, spaceAfter=3, textColor=colors.HexColor(ACCENT),
+            'mmBody', fontName='Helvetica', fontSize=8.5,
+            leading=12, spaceAfter=3, textColor=colors.HexColor(ACCENT),
         ),
         bold=ParagraphStyle(
-            'mmBold', fontName='Helvetica-Bold', fontSize=9,
+            'mmBold', fontName='Helvetica-Bold', fontSize=8.5,
             spaceAfter=1, textColor=colors.HexColor(CHARCOAL),
+            keepWithNext=True,
         ),
         small=ParagraphStyle(
             'mmSmall', fontName='Helvetica', fontSize=8,
             textColor=colors.HexColor(MUTED), spaceAfter=2,
-        ),
-        italic=ParagraphStyle(
-            'mmItalic', fontName='Helvetica-Oblique', fontSize=9,
-            leading=13, textColor=colors.HexColor(MUTED), spaceAfter=4,
         ),
     )
 
@@ -81,14 +84,24 @@ def _section(title, s):
 def _build_sidebar(user_data, tailored_data, s):
     items = []
 
-    for val in filter(None, [
-        user_data.get('contact_email'),
-        user_data.get('phone_number'),
-        user_data.get('location'),
-        user_data.get('linkedin_url'),
-    ]):
-        items.append(Paragraph(val, s['contact_header']))
-    items.append(Spacer(1, 12))
+    # Contact items — LinkedIn rendered as a clickable link, not a raw URL
+    if user_data.get('contact_email'):
+        email = user_data['contact_email']
+        items.append(Paragraph(
+            f'<a href="mailto:{email}" color="{LINK_CLR}">{email}</a>',
+            s['contact_header'],
+        ))
+    if user_data.get('phone_number'):
+        items.append(Paragraph(user_data['phone_number'], s['contact_header']))
+    if user_data.get('location'):
+        items.append(Paragraph(user_data['location'], s['contact_header']))
+    if user_data.get('linkedin_url'):
+        linkedin_url = user_data['linkedin_url']
+        items.append(Paragraph(
+            f'<a href="{linkedin_url}" color="{LINK_CLR}">LinkedIn</a>',
+            s['contact_header'],
+        ))
+    items.append(Spacer(1, 10))
 
     for heading, key in [
         ('Skills', 'tech_skills'),
@@ -100,7 +113,7 @@ def _build_sidebar(user_data, tailored_data, s):
             items.append(Paragraph(heading, s['s_label']))
             for entry in entries:
                 items.append(Paragraph(f'• {entry}', s['s_item']))
-            items.append(Spacer(1, 6))
+            items.append(Spacer(1, 4))
 
     certs = tailored_data.get('certifications') or []
     if certs:
@@ -114,17 +127,17 @@ def _build_sidebar(user_data, tailored_data, s):
                 items.append(Paragraph(issuer, s['small']))
             if date:
                 items.append(Paragraph(date, s['small']))
-            items.append(Spacer(1, 5))
+            items.append(Spacer(1, 4))
 
     return items
 
 
-def _build_main(user_data, tailored_data, s):
+def _build_main(tailored_data, s):
     items = []
 
     if tailored_data.get('summary'):
         items.extend(_section('Summary', s))
-        items.append(Paragraph(tailored_data['summary'], s['italic']))
+        items.append(Paragraph(tailored_data['summary'], s['body']))  # plain, not italic
         items.append(Spacer(1, 4))
 
     exp_list = tailored_data.get('experience') or []
@@ -138,7 +151,7 @@ def _build_main(user_data, tailored_data, s):
             ))
             for r in exp.get('responsibilities', []):
                 items.append(Paragraph(f'• {r}', s['body']))
-            items.append(Spacer(1, 5))
+            items.append(Spacer(1, 4))
 
     edu_list = tailored_data.get('education') or []
     if edu_list:
@@ -149,7 +162,7 @@ def _build_main(user_data, tailored_data, s):
                 f"{edu.get('university', '')}  ·  {edu.get('graduation_year', '')}",
                 s['small'],
             ))
-            items.append(Spacer(1, 4))
+            items.append(Spacer(1, 3))
 
     proj_list = tailored_data.get('projects') or []
     if proj_list:
@@ -169,12 +182,14 @@ def _build_main(user_data, tailored_data, s):
             if tech:
                 items.append(Paragraph(f'<i>{tech}</i>', s['small']))
             if link:
-                items.append(Paragraph(link, s['small']))
+                items.append(Paragraph(
+                    f'<a href="{link}" color="{LINK_CLR}">{link}</a>', s['small'],
+                ))
             if desc:
                 items.append(Paragraph(f'• {desc}', s['body']))
             for h in proj.get('highlights', []):
                 items.append(Paragraph(f'• {h}', s['body']))
-            items.append(Spacer(1, 5))
+            items.append(Spacer(1, 4))
 
     return items
 
@@ -195,18 +210,17 @@ def render_pdf(buffer, user_data, tailored_data):
     sidebar_kif = KeepInFrame(
         SIDEBAR_W - 14, KIF_H,
         _build_sidebar(user_data, tailored_data, s),
-        mode='overflow',
+        mode='shrink',                               # was 'overflow'
     )
     main_kif = KeepInFrame(
         MAIN_W - 10, KIF_H,
-        _build_main(user_data, tailored_data, s),
-        mode='overflow',
+        _build_main(tailored_data, s),
+        mode='shrink',                               # was 'overflow'
     )
 
     body = Table([[sidebar_kif, main_kif]], colWidths=[SIDEBAR_W, MAIN_W])
     body.setStyle(TableStyle([
         ('VALIGN',       (0, 0), (-1, -1), 'TOP'),
-        # thin vertical separator line between columns
         ('LINEAFTER',    (0, 0), (0,  -1), 0.5, colors.HexColor(SEPARATOR)),
         ('LEFTPADDING',  (0, 0), (0,  -1), 0),
         ('RIGHTPADDING', (0, 0), (0,  -1), 12),

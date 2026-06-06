@@ -2,7 +2,43 @@ import json
 import google.generativeai as genai
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
+from rest_framework.exceptions import PermissionDenied
 from .models import ResumeHistory, Document, UserProfile
+
+# ─── Subscription limits (change these numbers to adjust caps) ────────────────
+PLAN_LIMITS = {
+    'free':  2,    # resumes per calendar month
+    'Pro':   50,
+    'elite': 9999, # effectively unlimited
+}
+
+def check_subscription_limit(user) -> None:
+    """
+    Count the user's resumes created in the current calendar month and raise
+    PermissionDenied with code='limit_reached' if the plan cap is met.
+    Raises nothing if the user is within their allowance.
+    """
+    now = timezone.now()
+    count = ResumeHistory.objects.filter(
+        user=user,
+        created_at__year=now.year,
+        created_at__month=now.month,
+    ).count()
+
+    subscription = getattr(user, 'subscriptions', None)
+    plan = subscription.plan if subscription else 'free'
+    limit = PLAN_LIMITS.get(plan, PLAN_LIMITS['free'])
+
+    if count >= limit:
+        raise PermissionDenied(detail={
+            'error': f"You have used all {limit} resume{'s' if limit != 1 else ''} "
+                     f"allowed on the {plan} plan this month.",
+            'code':  'limit_reached',
+            'plan':  plan,
+            'limit': limit,
+            'count': count,
+        })
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
@@ -16,15 +52,6 @@ class ResumeService:
         
         try:
             profile = UserProfile.objects.get(user=user)
-
-            subscription = getattr(user, 'subscriptions', None)
-            if subscription:
-                if subscription.plan.lower() == 'free' and subscription.resume_this_month >= 2:
-                    return {
-                        "error": "Limit reached. Please upgrade to Pro for unlimited tailoring!",
-                        "status": "limit_reached"
-                    }
-                
             master_data = profile.get_master_data()
             
             prompt = f"""
@@ -94,10 +121,6 @@ class ResumeService:
             cleaned_text = response.text.strip().removeprefix('```json').removesuffix('```')
             data = json.loads(cleaned_text)
 
-            if subscription:
-                subscription.resume_this_month += 1
-                subscription.save()
-        
             return ResumeHistory.objects.create(
                 user=user,
                 job_title=job_title,

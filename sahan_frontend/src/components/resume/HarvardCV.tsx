@@ -4,6 +4,7 @@ import {
   Text,
   View,
   StyleSheet,
+  Link,
 } from "@react-pdf/renderer";
 import type { UserProfile, TailoredData } from "../../types";
 
@@ -15,11 +16,11 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
     fontSize: 10.5,
     color: "#1a1a2e",
-    paddingTop: INCH * 0.65,
-    paddingBottom: INCH * 0.65,
-    paddingLeft: INCH,
-    paddingRight: INCH,
-    lineHeight: 1.45,
+    paddingTop: INCH * 0.28,
+    paddingBottom: INCH * 0.28,
+    paddingLeft: INCH * 0.55,
+    paddingRight: INCH * 0.55,
+    lineHeight: 1.3,
   },
   name: {
     fontSize: 18,
@@ -27,59 +28,100 @@ const styles = StyleSheet.create({
     textAlign: "center",
     textTransform: "uppercase",
     letterSpacing: 2,
-    marginBottom: 4,
+    marginBottom: 5,
   },
-  contactLine: {
+  // Unified contact-row styles — no textAlign/marginBottom that break inline baseline
+  contactRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
+    marginTop: 2,
+    marginBottom: 5,
+  },
+  contactItem: {
     fontSize: 10,
     fontFamily: "Times-Roman",
-    textAlign: "center",
     color: "#4b5563",
-    marginBottom: 6,
+    lineHeight: 1,
+  },
+  contactItemLink: {
+    fontSize: 10,
+    fontFamily: "Times-Roman",
+    color: "#2563eb",
+    lineHeight: 1,
+  },
+  contactSep: {
+    fontSize: 9,
+    fontFamily: "Times-Roman",
+    color: "#9ca3af",
+    marginLeft: 5,
+    marginRight: 5,
+    lineHeight: 1,
+  },
+  // Cover-letter sign-off
+  clSignoff: {
+    fontSize: 10,
+    fontFamily: "Times-Roman",
+    color: "#4b5563",
+    marginTop: 18,
+    marginBottom: 12,
+  },
+  clSignName: {
+    fontSize: 11,
+    fontFamily: "Times-Bold",
+    color: "#1a1a2e",
+    marginBottom: 2,
+  },
+  clSignRole: {
+    fontSize: 9.5,
+    fontFamily: "Times-Italic",
+    color: "#6b7280",
   },
   headerDivider: {
     borderBottomWidth: 1,
     borderBottomColor: "#1a1a2e",
-    marginBottom: 6,
+    marginBottom: 2,
   },
   section: {
-    marginBottom: 8,
+    marginBottom: 2,
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 9,
     fontFamily: "Times-Bold",
     textTransform: "uppercase",
     letterSpacing: 1.5,
     borderBottomWidth: 0.5,
     borderBottomColor: "#d1d5db",
     paddingBottom: 2,
-    marginBottom: 5,
+    marginBottom: 3,
   },
   summary: {
-    fontSize: 11,
-    fontFamily: "Times-Italic",
+    fontSize: 9,
+    fontFamily: "Times-Roman",
     color: "#374151",
-    lineHeight: 1.55,
+    lineHeight: 1.35,
   },
   expHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 2,
+    marginBottom: 1,
   },
   expTitle: {
-    fontSize: 11.5,
+    fontSize: 10,
     fontFamily: "Times-Bold",
   },
   expDate: {
-    fontSize: 10,
+    fontSize: 9,
     fontFamily: "Times-Roman",
     color: "#6b7280",
   },
   expCompany: {
-    fontSize: 11,
+    fontSize: 9.5,
     fontFamily: "Times-Italic",
     color: "#374151",
-    marginBottom: 3,
+    marginBottom: 1,
   },
   bullet: {
     flexDirection: "row",
@@ -93,23 +135,24 @@ const styles = StyleSheet.create({
   },
   bulletText: {
     flex: 1,
-    fontSize: 11,
+    fontSize: 9,
     fontFamily: "Times-Roman",
-    lineHeight: 1.55,
+    lineHeight: 1.35,
   },
   expBlock: {
-    marginBottom: 7,
+    marginBottom: 3,
   },
   eduRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 3,
   },
   eduDegree: {
-    fontSize: 11.5,
+    fontSize: 10,
     fontFamily: "Times-Bold",
   },
   eduSchool: {
-    fontSize: 11,
+    fontSize: 9.5,
     fontFamily: "Times-Italic",
     color: "#374151",
   },
@@ -121,33 +164,35 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   skillCategory: {
-    fontSize: 10.5,
+    fontSize: 9,
     fontFamily: "Times-Bold",
     marginBottom: 2,
   },
   skillText: {
-    fontSize: 10.5,
+    fontSize: 9,
     fontFamily: "Times-Roman",
     color: "#374151",
-    lineHeight: 1.6,
+    lineHeight: 1.35,
   },
   coverLetterBody: {
-    fontSize: 11.5,
+    fontSize: 9.5,
     fontFamily: "Times-Roman",
-    lineHeight: 1.7,
+    lineHeight: 1.45,
     color: "#1a1a2e",
   },
   coverLetterParagraph: {
     marginBottom: 9,
   },
-  projBlock: { marginBottom: 7 },
-  projHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 2 },
-  projTitle: { fontSize: 11.5, fontFamily: "Times-Bold" },
-  projRole: { fontSize: 11, fontFamily: "Times-Italic", color: "#374151", marginBottom: 2 },
-  projLink: { fontSize: 10, fontFamily: "Times-Roman", color: "#6b7280", marginBottom: 2 },
-  certRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 5 },
-  certName: { fontSize: 11.5, fontFamily: "Times-Bold" },
-  certSub: { fontSize: 10, fontFamily: "Times-Italic", color: "#6b7280" },
+  projBlock: { marginBottom: 3 },
+  projHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 1 },
+  projTitle: { fontSize: 10, fontFamily: "Times-Bold" },
+  projRole: { fontSize: 9.5, fontFamily: "Times-Italic", color: "#374151", marginBottom: 1 },
+  projLink: { fontSize: 9, fontFamily: "Times-Roman", color: "#6b7280", marginBottom: 1 },
+  certRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 2 },
+  certName: { fontSize: 10, fontFamily: "Times-Bold" },
+  certSub: { fontSize: 9, fontFamily: "Times-Italic", color: "#6b7280" },
+  // kept for any legacy callers
+  clickableLink: { fontSize: 10, fontFamily: "Times-Roman", color: "#2563eb", lineHeight: 1 },
 });
 
 interface HarvardCVProps {
@@ -157,18 +202,61 @@ interface HarvardCVProps {
   companyName: string;
 }
 
+// ─── Shared palette & helpers (browser previews) ────────────────────────────
+const H = {
+  dark:   "#1a1a2e",
+  body:   "#374151",
+  muted:  "#4b5563",
+  light:  "#6b7280",
+  border: "#d1d5db",
+  accent: "#2563eb",
+  serif:  '"Georgia", "Times New Roman", Times, serif',
+};
+
+function HSectionTitle({ title }: { title: string }) {
+  return (
+    <div style={{ marginBottom: "4px" }}>
+      <p style={{ fontFamily: H.serif, fontWeight: 700, fontSize: "8.5px", textTransform: "uppercase" as const, letterSpacing: "1.5px", color: H.dark, marginBottom: "2px" }}>
+        {title}
+      </p>
+      <div style={{ borderBottom: `0.5px solid ${H.border}` }} />
+    </div>
+  );
+}
+
+type HContactItem = { kind: "email" | "text" | "link"; val: string };
+
+function HContactRow({ items }: { items: HContactItem[] }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexWrap: "wrap" as const, marginTop: "2px", marginBottom: "5px" }}>
+      {items.map((item, i) => (
+        <span key={i} style={{ display: "inline-flex", alignItems: "center", fontSize: "9.5px", color: H.muted }}>
+          {i > 0 && <span style={{ margin: "0 5px", color: "#9ca3af" }}>·</span>}
+          {item.kind === "link" ? (
+            <a href={item.val} target="_blank" rel="noopener noreferrer" style={{ color: H.accent, textDecoration: "none" }}>LinkedIn</a>
+          ) : item.kind === "email" ? (
+            <a href={`mailto:${item.val}`} style={{ color: H.accent, textDecoration: "none" }}>{item.val}</a>
+          ) : (
+            <span>{item.val}</span>
+          )}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardCVProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
 
-  const contactParts = [
-    profile.contact_email,
-    profile.phone_number,
-    profile.location,
-    profile.linkedin_url,
-  ].filter(Boolean);
+  const contactItems = [
+    profile.contact_email ? { kind: "email" as const, val: profile.contact_email } : null,
+    profile.phone_number  ? { kind: "text"  as const, val: profile.phone_number } : null,
+    profile.location      ? { kind: "text"  as const, val: profile.location } : null,
+    profile.linkedin_url  ? { kind: "link"  as const, val: profile.linkedin_url } : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null);
 
   return (
     <Document title={`${profile.full_name} — ${jobTitle} @ ${companyName}`}>
@@ -176,7 +264,20 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
       <Page size="LETTER" style={styles.page}>
         {/* Header */}
         <Text style={styles.name}>{profile.full_name}</Text>
-        <Text style={styles.contactLine}>{contactParts.join("  ·  ")}</Text>
+        <View style={styles.contactRow}>
+          {contactItems.map((item, i) => (
+            <View key={i} style={{ flexDirection: "row", alignItems: "center" }}>
+              {i > 0 && <Text style={styles.contactSep}>·</Text>}
+              {item.kind === "link" ? (
+                <Link src={item.val} style={styles.contactItemLink}>LinkedIn</Link>
+              ) : item.kind === "email" ? (
+                <Link src={`mailto:${item.val}`} style={styles.contactItemLink}>{item.val}</Link>
+              ) : (
+                <Text style={styles.contactItem}>{item.val}</Text>
+              )}
+            </View>
+          ))}
+        </View>
         <View style={styles.headerDivider} />
 
         {/* Summary */}
@@ -254,8 +355,8 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
           </View>
         )}
 
-        {/* Skills */}
-        <View style={styles.section}>
+        {/* Skills — wrap={false} prevents the 2-column grid from splitting across pages */}
+        <View style={styles.section} wrap={false}>
           <Text style={styles.sectionTitle}>Skills & Languages</Text>
           <View style={styles.skillsGrid}>
             {tailored.tech_skills?.length > 0 && (
@@ -300,7 +401,20 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
       {tailored.cover_letter && (
         <Page size="LETTER" style={styles.page}>
           <Text style={styles.name}>{profile.full_name}</Text>
-          <Text style={styles.contactLine}>{contactParts.join("  ·  ")}</Text>
+          <View style={styles.contactRow}>
+            {contactItems.map((item, i) => (
+              <View key={i} style={{ flexDirection: "row", alignItems: "center" }}>
+                {i > 0 && <Text style={styles.contactSep}>·</Text>}
+                {item.kind === "link" ? (
+                  <Link src={item.val} style={styles.contactItemLink}>LinkedIn</Link>
+                ) : item.kind === "email" ? (
+                  <Link src={`mailto:${item.val}`} style={styles.contactItemLink}>{item.val}</Link>
+                ) : (
+                  <Text style={styles.contactItem}>{item.val}</Text>
+                )}
+              </View>
+            ))}
+          </View>
           <View style={styles.headerDivider} />
           <View style={{ marginBottom: 20 }}>
             <Text style={styles.sectionTitle}>Cover Letter</Text>
@@ -313,8 +427,227 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
               {para.trim()}
             </Text>
           ))}
+          {/* Sign-off */}
+          <Text style={styles.clSignoff}>Sincerely,</Text>
+          <Text style={styles.clSignName}>{profile.full_name}</Text>
+          {!!jobTitle && <Text style={styles.clSignRole}>{jobTitle}</Text>}
         </Page>
       )}
     </Document>
+  );
+}
+
+// ─── Browser CV Preview ─────────────────────────────────────────────────────────
+export function HarvardPreview({
+  profile,
+  tailored,
+  jobTitle,
+}: {
+  profile: UserProfile;
+  tailored: TailoredData;
+  jobTitle: string;
+}) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+
+  const contactItems: HContactItem[] = [
+    profile.contact_email ? { kind: "email", val: profile.contact_email } : null,
+    profile.phone_number  ? { kind: "text",  val: profile.phone_number } : null,
+    profile.location      ? { kind: "text",  val: profile.location } : null,
+    profile.linkedin_url  ? { kind: "link",  val: profile.linkedin_url } : null,
+  ].filter((x): x is HContactItem => x !== null);
+
+  return (
+    <div style={{ background: "white", width: "216mm", minHeight: "279mm", margin: "0 auto", fontFamily: H.serif, fontSize: "10.5px", lineHeight: 1.3, color: H.dark, border: "1px solid #e8e6e0", borderRadius: "8px", overflow: "hidden", boxSizing: "border-box", padding: "20px 40px" }}>
+
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: "5px" }}>
+        <h1 style={{ fontFamily: H.serif, fontWeight: 700, fontSize: "18px", textTransform: "uppercase", letterSpacing: "2px", color: H.dark, marginBottom: "5px" }}>
+          {profile.full_name}
+        </h1>
+        <HContactRow items={contactItems} />
+        <div style={{ borderBottom: `1px solid ${H.dark}`, marginBottom: "6px" }} />
+      </div>
+
+      {/* Summary */}
+      {tailored.summary && (
+        <div style={{ marginBottom: "8px" }}>
+          <HSectionTitle title="Professional Summary" />
+          <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{tailored.summary}</p>
+        </div>
+      )}
+
+      {/* Experience */}
+      {tailored.experience?.length > 0 && (
+        <div style={{ marginBottom: "8px" }}>
+          <HSectionTitle title="Professional Experience" />
+          {tailored.experience.map((exp, i) => (
+            <div key={i} style={{ marginBottom: "6px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1px" }}>
+                <span style={{ fontWeight: 700, fontSize: "10px", color: H.dark }}>{exp.role}</span>
+                <span style={{ fontSize: "9px", color: H.light }}>{exp.duration}</span>
+              </div>
+              <p style={{ fontStyle: "italic", fontSize: "9.5px", color: H.body, marginBottom: "2px" }}>{exp.company}</p>
+              {exp.responsibilities?.map((r, j) => (
+                <div key={j} style={{ display: "flex", gap: "4px", marginBottom: "2px", paddingLeft: "10px" }}>
+                  <span style={{ flexShrink: 0 }}>•</span>
+                  <span style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{r}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Projects */}
+      {projects.length > 0 && (
+        <div style={{ marginBottom: "8px" }}>
+          <HSectionTitle title="Projects" />
+          {projects.map((p, i) => (
+            <div key={i} style={{ marginBottom: "6px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1px" }}>
+                <span style={{ fontWeight: 700, fontSize: "10px", color: H.dark }}>{p.name || p.title || ""}</span>
+                <span style={{ fontSize: "9px", color: H.light }}>{p.dates || p.duration || ""}</span>
+              </div>
+              {!!p.role_title && <p style={{ fontStyle: "italic", fontSize: "9.5px", color: H.body, marginBottom: "1px" }}>{p.role_title}</p>}
+              {!!(p.link || p.url) && <p style={{ fontSize: "9px", color: H.light, marginBottom: "1px" }}>{p.link || p.url}</p>}
+              {!!p.description && (
+                <div style={{ display: "flex", gap: "4px", marginBottom: "2px", paddingLeft: "10px" }}>
+                  <span style={{ flexShrink: 0 }}>•</span>
+                  <span style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{p.description}</span>
+                </div>
+              )}
+              {(p.highlights || []).map((h: string, j: number) => (
+                <div key={j} style={{ display: "flex", gap: "4px", marginBottom: "2px", paddingLeft: "10px" }}>
+                  <span style={{ flexShrink: 0 }}>•</span>
+                  <span style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{h}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Education */}
+      {tailored.education?.length > 0 && (
+        <div style={{ marginBottom: "8px" }}>
+          <HSectionTitle title="Education" />
+          {tailored.education.map((edu, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: "10px", color: H.dark }}>{edu.degree}</p>
+                <p style={{ fontStyle: "italic", fontSize: "9.5px", color: H.body }}>{edu.university}</p>
+              </div>
+              <span style={{ fontSize: "9px", color: H.light }}>{edu.graduation_year}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Skills & Languages */}
+      <div style={{ marginBottom: "8px" }}>
+        <HSectionTitle title="Skills & Languages" />
+        <div style={{ display: "flex", gap: "14px" }}>
+          {tailored.tech_skills?.length > 0 && (
+            <div style={{ flex: 1 }}>
+              <p style={{ fontWeight: 700, fontSize: "9px", color: H.dark, marginBottom: "2px" }}>Technical Skills</p>
+              <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{tailored.tech_skills.join(", ")}</p>
+            </div>
+          )}
+          <div style={{ flex: 1 }}>
+            {tailored.soft_skills?.length > 0 && (
+              <>
+                <p style={{ fontWeight: 700, fontSize: "9px", color: H.dark, marginBottom: "2px" }}>Soft Skills</p>
+                <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35, marginBottom: "4px" }}>{tailored.soft_skills.join(", ")}</p>
+              </>
+            )}
+            {tailored.languages?.length > 0 && (
+              <>
+                <p style={{ fontWeight: 700, fontSize: "9px", color: H.dark, marginBottom: "2px" }}>Languages</p>
+                <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{tailored.languages.join(", ")}</p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Certifications */}
+      {certifications.length > 0 && (
+        <div>
+          <HSectionTitle title="Certifications" />
+          {certifications.map((c, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+              <span style={{ fontWeight: 700, fontSize: "10px", color: H.dark }}>{c.name || ""}</span>
+              <span style={{ fontStyle: "italic", fontSize: "9px", color: H.light }}>
+                {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Browser Cover Letter Preview ───────────────────────────────────────────────
+export function HarvardCoverLetterPreview({
+  profile,
+  tailored,
+  jobTitle,
+  companyName,
+}: {
+  profile: UserProfile;
+  tailored: TailoredData;
+  jobTitle: string;
+  companyName: string;
+}) {
+  const contactItems: HContactItem[] = [
+    profile.contact_email ? { kind: "email", val: profile.contact_email } : null,
+    profile.phone_number  ? { kind: "text",  val: profile.phone_number } : null,
+    profile.location      ? { kind: "text",  val: profile.location } : null,
+    profile.linkedin_url  ? { kind: "link",  val: profile.linkedin_url } : null,
+  ].filter((x): x is HContactItem => x !== null);
+
+  const today = new Date().toLocaleDateString("en-US", {
+    year: "numeric", month: "long", day: "numeric",
+  });
+
+  return (
+    <div style={{ background: "white", width: "216mm", minHeight: "279mm", margin: "0 auto", fontFamily: H.serif, fontSize: "10.5px", lineHeight: 1.3, color: H.dark, border: "1px solid #e8e6e0", borderRadius: "8px", overflow: "hidden", boxSizing: "border-box", padding: "20px 40px" }}>
+
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: "5px" }}>
+        <h1 style={{ fontFamily: H.serif, fontWeight: 700, fontSize: "18px", textTransform: "uppercase", letterSpacing: "2px", color: H.dark, marginBottom: "5px" }}>
+          {profile.full_name}
+        </h1>
+        <HContactRow items={contactItems} />
+        <div style={{ borderBottom: `1px solid ${H.dark}`, marginBottom: "10px" }} />
+      </div>
+
+      {/* Cover Letter label */}
+      <div style={{ marginBottom: "14px" }}>
+        <p style={{ fontWeight: 700, fontSize: "8.5px", textTransform: "uppercase", letterSpacing: "1.5px", color: H.dark, marginBottom: "2px" }}>Cover Letter</p>
+        <div style={{ borderBottom: `0.5px solid ${H.border}`, marginBottom: "5px" }} />
+        <p style={{ fontSize: "9px", color: H.light }}>{companyName} — {jobTitle}</p>
+      </div>
+
+      {/* Date */}
+      <p style={{ fontSize: "9.5px", color: H.light, marginBottom: "14px" }}>{today}</p>
+
+      {/* Greeting */}
+      <p style={{ fontSize: "9.5px", color: H.dark, marginBottom: "13px" }}>Dear Hiring Manager,</p>
+
+      {/* Body */}
+      {tailored.cover_letter?.split("\n\n").map((para, i) => (
+        <p key={i} style={{ fontSize: "9.5px", color: H.dark, lineHeight: 1.45, marginBottom: "9px" }}>{para.trim()}</p>
+      ))}
+
+      {/* Sign-off */}
+      <p style={{ fontSize: "10px", color: H.muted, marginTop: "18px", marginBottom: "12px" }}>Sincerely,</p>
+      <p style={{ fontWeight: 700, fontSize: "11px", color: H.dark, marginBottom: "2px" }}>{profile.full_name}</p>
+      {!!jobTitle && <p style={{ fontStyle: "italic", fontSize: "9.5px", color: H.light }}>{jobTitle}</p>}
+    </div>
   );
 }

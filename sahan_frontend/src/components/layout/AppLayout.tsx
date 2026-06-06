@@ -60,7 +60,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
         <div className="flex items-center gap-3">
           <span className="font-sans text-[13px] text-slate-500">
-            {user?.email}
+            {[user?.first_name, user?.last_name].filter(Boolean).join(" ") || "User"}
           </span>
           <button
             onClick={handleLogout}

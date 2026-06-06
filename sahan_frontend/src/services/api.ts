@@ -8,45 +8,71 @@ import type {
   TailoredData,
 } from "../types";
 
-const BASE_URL = `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}`;
+const BASE_URL = `${import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"}`;
 
 // ─── Token Management ─────────────────────────────────────────────────────────
+// Access token lives in memory so it is never written to localStorage and cannot
+// be stolen by XSS. It is lost on page reload, but refreshAccessToken() recovers
+// it silently using the refresh token (which stays in localStorage for persistence).
+let _accessToken: string | null = null;
+
 export const tokenStorage = {
-  get: () => localStorage.getItem("sahan_access"),
-  getRefresh: () => localStorage.getItem("sahan_refresh"),
+  get:        ()               => _accessToken,
+  getRefresh: ()               => localStorage.getItem("sahan_refresh"),
+  setAccess:  (t: string)      => { _accessToken = t; },
   set: (tokens: AuthTokens) => {
-    localStorage.setItem("sahan_access", tokens.access);
+    _accessToken = tokens.access;
     localStorage.setItem("sahan_refresh", tokens.refresh);
   },
   clear: () => {
-    localStorage.removeItem("sahan_access");
+    _accessToken = null;
     localStorage.removeItem("sahan_refresh");
   },
 };
 
+// ─── Profile Picture Upload (multipart — cannot use apiFetch) ────────────────
 export const userApi = {
   updateProfilePicture: async (file: File): Promise<{ profile_picture: string }> => {
     const token = tokenStorage.get();
     if (!token) throw new Error("Not authenticated");
-
     const formData = new FormData();
     formData.append("profile_picture", file);
-
-    const res = await fetch(`${BASE_URL}/upload-picture/`, {  // ← new endpoint
+    const res = await fetch(`${BASE_URL}/upload-picture/`, {
       method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: "Upload failed" }));
-      throw err;
-    }
+    if (!res.ok) throw await res.json().catch(() => ({ detail: "Upload failed" }));
     return res.json();
   },
 };
+
+// ─── Error parsing ───────────────────────────────────────────────────────────
+// Extracts the most relevant human-readable message from any DRF / djoser
+// error shape: {detail}, {non_field_errors}, or any field-level array.
+export function parseApiError(
+  err: unknown,
+  fallback = "Something went wrong. Please try again."
+): string {
+  if (!err || typeof err !== "object") return fallback;
+  const e = err as Record<string, unknown>;
+
+  // {detail: "..."} or {detail: ["..."]}
+  if (typeof e.detail === "string") return e.detail;
+  if (Array.isArray(e.detail) && typeof e.detail[0] === "string") return e.detail[0];
+
+  // {non_field_errors: ["..."]}
+  const nfe = e.non_field_errors;
+  if (Array.isArray(nfe) && typeof nfe[0] === "string") return nfe[0];
+
+  // Any field-level error, e.g. {email: [...], password: [...]}
+  for (const value of Object.values(e)) {
+    if (Array.isArray(value) && typeof value[0] === "string") return value[0];
+    if (typeof value === "string") return value;
+  }
+
+  return fallback;
+}
 
 // ─── Core Fetch Wrapper ───────────────────────────────────────────────────────
 async function apiFetch<T>(
@@ -71,21 +97,34 @@ async function apiFetch<T>(
     if (refreshed) {
       headers["Authorization"] = `Bearer ${tokenStorage.get()}`;
       const retried = await fetch(`${BASE_URL}${path}`, { ...options, headers });
-      if (!retried.ok) throw await retried.json();
-      return retried.json() as Promise<T>;
-    } else {
-      tokenStorage.clear();
-      window.location.href = "/login";
+      if (!retried.ok) {
+        const b = await retried.text().catch(() => "");
+        let p: unknown; try { p = JSON.parse(b); } catch { p = null; }
+        throw p ?? { detail: "Server error — please try again." };
+      }
+      const t = await retried.text().catch(() => "");
+      if (!t) return undefined as T;
+      try { return JSON.parse(t) as T; } catch { return undefined as T; }
     }
+    tokenStorage.clear();
+    window.location.href = "/login";
+    throw new Error("Session expired");
   }
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: "Request failed" }));
-    throw err;
+    // Try to parse a structured JSON error; fall back to a user-friendly message
+    // if the server returned HTML (e.g. a 500 debug page) or an empty body.
+    const body = await res.text().catch(() => "");
+    let parsed: unknown;
+    try { parsed = JSON.parse(body); } catch { parsed = null; }
+    throw parsed ?? { detail: "Server error — please try again." };
   }
 
+  // Gracefully handle 204 and any 2xx with an empty or non-JSON body.
   if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  const text = await res.text().catch(() => "");
+  if (!text) return undefined as T;
+  try { return JSON.parse(text) as T; } catch { return undefined as T; }
 }
 
 async function refreshAccessToken(): Promise<boolean> {
@@ -99,7 +138,7 @@ async function refreshAccessToken(): Promise<boolean> {
     });
     if (!res.ok) return false;
     const data = await res.json();
-    localStorage.setItem("sahan_access", data.access);
+    tokenStorage.setAccess(data.access);
     return true;
   } catch {
     return false;
@@ -108,33 +147,77 @@ async function refreshAccessToken(): Promise<boolean> {
 
 // ─── Auth API ────────────────────────────────────────────────────────────────
 export const authApi = {
-  login: async (creds: LoginCredentials): Promise<AuthTokens> => {
+  login: async (creds: LoginCredentials): Promise<void> => {
     const tokens = await apiFetch<AuthTokens>("/auth/jwt/create/", {
       method: "POST",
       body: JSON.stringify(creds),
     }, false);
     tokenStorage.set(tokens);
-    return tokens;
   },
 
-  register: async (creds: RegisterCredentials): Promise<User> => {
-    return apiFetch<User>("/auth/users/", {
+  register: async (creds: RegisterCredentials): Promise<User> =>
+    apiFetch<User>("/auth/users/", {
       method: "POST",
       body: JSON.stringify(creds),
+    }, false),
+
+  logout: () => tokenStorage.clear(),
+
+  me: async (): Promise<User> => {
+    const user = await apiFetch<User>("/auth/users/me/");
+    console.log("[authApi.me] raw response →", user);
+    return user;
+  },
+
+  updateName: (id: number, payload: { first_name: string; last_name: string }): Promise<User> =>
+    apiFetch<User>(`/users/${id}/`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
+
+  // ── Email verification ─────────────────────────────────────────────────────
+  activate: (uid: string, token: string): Promise<void> =>
+    apiFetch<void>("/auth/users/activation/", {
+      method: "POST",
+      body: JSON.stringify({ uid, token }),
+    }, false),
+
+  resendActivation: (email: string): Promise<void> =>
+    apiFetch<void>("/auth/users/resend_activation/", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }, false),
+
+  // ── Google OAuth two-step flow ─────────────────────────────────────────────
+  // Step 1: verify Google token. Returns JWTs for known users, or
+  //         { new_user: true, email } for first-time Google sign-ins.
+  googleCheck: (accessToken: string) =>
+    apiFetch<
+      | { access: string; refresh: string; new_user?: undefined }
+      | { new_user: true; email: string; access?: undefined }
+    >("/auth/google/check/", {
+      method: "POST",
+      body: JSON.stringify({ access_token: accessToken }),
+    }, false),
+
+  // Step 2 (new users only): create account with name + password, get JWTs.
+  googleRegister: async (payload: {
+    access_token: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+  }): Promise<void> => {
+    const tokens = await apiFetch<AuthTokens>("/auth/google/register/", {
+      method: "POST",
+      body: JSON.stringify(payload),
     }, false);
+    tokenStorage.set(tokens);
   },
-
-  logout: () => {
-    tokenStorage.clear();
-  },
-
-  me: (): Promise<User> => apiFetch<User>("/auth/users/me/"),
 };
 
 // ─── Profile API ──────────────────────────────────────────────────────────────
 export const profileApi = {
   get: (): Promise<UserProfile> => apiFetch<UserProfile>("/profiles/me/"),
-
   update: (data: Partial<UserProfile>): Promise<UserProfile> =>
     apiFetch<UserProfile>("/profiles/me/", {
       method: "PATCH",
@@ -145,9 +228,7 @@ export const profileApi = {
 // ─── Resume API ───────────────────────────────────────────────────────────────
 export const resumeApi = {
   list: (): Promise<ResumeHistory[]> => apiFetch<ResumeHistory[]>("/resumes/"),
-
-  get: (id: number): Promise<ResumeHistory> =>
-    apiFetch<ResumeHistory>(`/resumes/${id}/`),
+  get:  (id: number): Promise<ResumeHistory> => apiFetch<ResumeHistory>(`/resumes/${id}/`),
 
   tailor: (payload: {
     job_description: string;
@@ -163,54 +244,48 @@ export const resumeApi = {
     apiFetch<void>(`/resumes/${id}/`, { method: "DELETE" }),
 };
 
-export const pdfApi = {
-  downloadCV: async (payload: {
-    profile: UserProfile;
-    tailored: TailoredData;
-    job_title: string;
-    company_name: string;
-  }) => {
-    const token = tokenStorage.get();
-    const res = await fetch(`${BASE_URL}/generate-cv-pdf/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error('PDF generation failed');
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${payload.profile.full_name?.replace(/\s/g, '_')}_Harvard_CV.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
-  },
+// ─── PDF API ──────────────────────────────────────────────────────────────────
+async function downloadBlob(endpoint: string, payload: object, filename: string) {
+  const token = tokenStorage.get();
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("PDF generation failed");
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
-  downloadCoverLetter: async (payload: {
+export const pdfApi = {
+  downloadCV: (payload: {
     profile: UserProfile;
     tailored: TailoredData;
     job_title: string;
     company_name: string;
-  }) => {
-    const token = tokenStorage.get();
-    const res = await fetch(`${BASE_URL}/generate-cover-letter-pdf/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error('PDF generation failed');
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${payload.profile.full_name?.replace(/\s/g, '_')}_Cover_Letter.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
-  },
+  }) =>
+    downloadBlob(
+      "/generate-cv-pdf/",
+      payload,
+      `${payload.profile.full_name?.replace(/\s/g, "_") ?? "CV"}_CV.pdf`
+    ),
+
+  downloadCoverLetter: (payload: {
+    profile: UserProfile;
+    tailored: TailoredData;
+    job_title: string;
+    company_name: string;
+  }) =>
+    downloadBlob(
+      "/generate-cover-letter-pdf/",
+      payload,
+      `${payload.profile.full_name?.replace(/\s/g, "_") ?? "Cover_Letter"}_Cover_Letter.pdf`
+    ),
 };

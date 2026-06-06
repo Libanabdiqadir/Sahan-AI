@@ -4,6 +4,7 @@ import {
   Text,
   View,
   StyleSheet,
+  Link,
 } from "@react-pdf/renderer";
 import type { UserProfile, TailoredData } from "../../types";
 
@@ -25,8 +26,8 @@ const styles = StyleSheet.create({
   // ── Header Banner ──────────────────────────────────────────────
   header: {
     backgroundColor: NAVY,
-    paddingTop: 24,
-    paddingBottom: 18,
+    paddingTop: 18,
+    paddingBottom: 12,
     paddingLeft: 32,
     paddingRight: 32,
   },
@@ -65,8 +66,8 @@ const styles = StyleSheet.create({
   sidebar: {
     width: "33%",
     backgroundColor: LIGHT_BG,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: 14,
+    paddingBottom: 14,
     paddingLeft: 16,
     paddingRight: 14,
     borderRightWidth: 2.5,
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sidebarSection: {
-    marginBottom: 15,
+    marginBottom: 11,
   },
   skillRow: {
     flexDirection: "row",
@@ -106,19 +107,19 @@ const styles = StyleSheet.create({
   },
   skillLabel: {
     fontFamily: "Times-Roman",
-    fontSize: 11.5,
+    fontSize: 9.5,
     color: BODY_TEXT,
     flex: 1,
   },
   eduDegree: {
     fontFamily: "Times-Bold",
-    fontSize: 11,
+    fontSize: 9.5,
     color: NAVY,
     marginBottom: 1,
   },
   eduSchool: {
     fontFamily: "Times-Italic",
-    fontSize: 10.5,
+    fontSize: 9,
     color: "#4a5568",
     marginBottom: 1,
   },
@@ -132,8 +133,8 @@ const styles = StyleSheet.create({
   // ── Right main content ─────────────────────────────────────────
   main: {
     flex: 1,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: 14,
+    paddingBottom: 14,
     paddingLeft: 22,
     paddingRight: 28,
   },
@@ -149,20 +150,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   mainSection: {
-    marginBottom: 14,
+    marginBottom: 10,
   },
 
   // ── Summary ────────────────────────────────────────────────────
   summaryText: {
-    fontFamily: "Times-Italic",
-    fontSize: 11.5,
+    fontFamily: "Times-Roman",
+    fontSize: 9,
     color: "#4a5568",
-    lineHeight: 1.65,
+    lineHeight: 1.35,
   },
 
   // ── Experience ─────────────────────────────────────────────────
   expBlock: {
-    marginBottom: 11,
+    marginBottom: 8,
     paddingLeft: 10,
     borderLeftWidth: 2.5,
     borderLeftColor: GOLD,
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
   },
   expRole: {
     fontFamily: "Times-Bold",
-    fontSize: 12,
+    fontSize: 10,
     color: NAVY,
     flex: 1,
   },
@@ -211,10 +212,10 @@ const styles = StyleSheet.create({
   },
   bulletText: {
     fontFamily: "Times-Roman",
-    fontSize: 11.5,
+    fontSize: 9,
     color: BODY_TEXT,
     flex: 1,
-    lineHeight: 1.6,
+    lineHeight: 1.35,
   },
 
   // ── Cover letter page ──────────────────────────────────────────
@@ -279,8 +280,8 @@ const styles = StyleSheet.create({
   },
   coverBody: {
     fontFamily: "Times-Roman",
-    fontSize: 11.5,
-    lineHeight: 1.75,
+    fontSize: 9.5,
+    lineHeight: 1.45,
     marginBottom: 12,
   },
   coverSignoff: {
@@ -311,6 +312,7 @@ const styles = StyleSheet.create({
   projTitle: { fontFamily: "Times-Bold", fontSize: 12, color: NAVY, flex: 1 },
   projRole: { fontFamily: "Times-Bold", fontSize: 11, color: GOLD, marginBottom: 2 },
   projLink: { fontFamily: "Times-Italic", fontSize: 10, color: MUTED, marginBottom: 4 },
+  clickableLink: { fontFamily: "Times-Roman", fontSize: 10, color: "#93c5fd" },
 });
 
 interface ExecutiveCVProps {
@@ -326,12 +328,12 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
 
-  const contactParts = [
-    profile.contact_email,
-    profile.phone_number,
-    profile.location,
-    profile.linkedin_url,
-  ].filter(Boolean);
+  const contactItems = [
+    profile.contact_email ? { kind: "email" as const, val: profile.contact_email } : null,
+    profile.phone_number  ? { kind: "text"  as const, val: profile.phone_number } : null,
+    profile.location      ? { kind: "text"  as const, val: profile.location } : null,
+    profile.linkedin_url  ? { kind: "link"  as const, val: profile.linkedin_url } : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null);
 
   const today = new Date().toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
@@ -346,8 +348,14 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
           <Text style={styles.headerName}>{profile.full_name}</Text>
           <View style={styles.headerGoldBar} />
           <View style={styles.headerContactRow}>
-            {contactParts.map((c, i) => (
-              <Text key={i} style={styles.headerContactItem}>{c}</Text>
+            {contactItems.map((item, i) => (
+              item.kind === "link" ? (
+                <Link key={i} src={item.val} style={styles.clickableLink}>LinkedIn</Link>
+              ) : item.kind === "email" ? (
+                <Link key={i} src={`mailto:${item.val}`} style={[styles.headerContactItem, { color: "#93c5fd" }]}>{item.val}</Link>
+              ) : (
+                <Text key={i} style={styles.headerContactItem}>{item.val}</Text>
+              )
             ))}
           </View>
         </View>
@@ -493,7 +501,20 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
       {tailored.cover_letter && (
         <Page size="A4" style={styles.coverPage}>
           <Text style={styles.coverName}>{profile.full_name}</Text>
-          <Text style={styles.coverContact}>{contactParts.join("  |  ")}</Text>
+          <View style={{ flexDirection: "row", justifyContent: "center", flexWrap: "wrap", gap: 6, marginBottom: 6 }}>
+            {contactItems.map((item, i) => (
+              <View key={i} style={{ flexDirection: "row", alignItems: "center" }}>
+                {i > 0 && <Text style={styles.coverContact}>  |  </Text>}
+                {item.kind === "link" ? (
+                  <Link src={item.val} style={{ fontFamily: "Times-Roman", fontSize: 10.5, color: NAVY }}>LinkedIn</Link>
+                ) : item.kind === "email" ? (
+                  <Link src={`mailto:${item.val}`} style={styles.coverContact}>{item.val}</Link>
+                ) : (
+                  <Text style={styles.coverContact}>{item.val}</Text>
+                )}
+              </View>
+            ))}
+          </View>
           <View style={styles.coverGoldBar} />
           <View style={styles.coverDivider} />
 

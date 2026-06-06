@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets
-from rest_framework.decorators import action, api_view, authentication_classes, permission_classes, parser_classes
+from rest_framework.decorators import action, api_view, permission_classes, parser_classes
 from rest_framework.response import Response
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
-from .services import ResumeService
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import status
+import requests as google_requests
+from .services import ResumeService, check_subscription_limit
 from .models import UserProfile, ResumeHistory, Document
 from .serializer import (
   UserSerializer,
@@ -14,8 +16,6 @@ from .serializer import (
   UserProfileSerializer,
   ResumeHistorySerializer,
 )
-from rest_framework.authtoken.models import Token
-from rest_framework import status
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
@@ -83,8 +83,9 @@ class ResumeHistoryViewSet(viewsets.ModelViewSet):
         return ResumeHistory.objects.filter(user=self.request.user)
 
     @action(detail=False, methods=['POST'])
-    @authentication_classes([TokenAuthentication])
     def tailor(self, request):
+        check_subscription_limit(request.user)   # raises 403 if monthly cap reached
+
         job_description = request.data.get('job_description')
         job_title = request.data.get('job_title', '')
         company_name = request.data.get('company_name', '')
@@ -226,3 +227,92 @@ def generate_cover_letter_pdf(request):
 
     doc.build(story)
     return response
+
+
+def _verify_google_token(access_token: str) -> dict | None:
+    """Fetch user info from Google. Returns info dict or None on failure."""
+    try:
+        resp = google_requests.get(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"},
+            timeout=5,
+        )
+        resp.raise_for_status()
+        info = resp.json()
+        if info.get("email") and info.get("email_verified"):
+            return info
+    except Exception:
+        pass
+    return None
+
+
+def _issue_jwt(user) -> dict:
+    refresh = RefreshToken.for_user(user)
+    return {"access": str(refresh.access_token), "refresh": str(refresh)}
+
+
+@api_view(["POST"])
+def google_auth_check(request):
+    """
+    Step 1 of the Google OAuth flow.
+    - Existing account → returns JWT tokens immediately.
+    - New account → returns {new_user: true, email} so the frontend can
+      collect first_name / last_name / password before creating the account.
+    """
+    access_token = request.data.get("access_token")
+    if not access_token:
+        return Response({"error": "access_token is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    info = _verify_google_token(access_token)
+    if not info:
+        return Response({"error": "Could not verify Google token"}, status=status.HTTP_400_BAD_REQUEST)
+
+    email = info["email"]
+    User = get_user_model()
+    try:
+        user = User.objects.get(email=email)
+        return Response(_issue_jwt(user))
+    except User.DoesNotExist:
+        return Response({"new_user": True, "email": email})
+
+
+@api_view(["POST"])
+def google_register(request):
+    """
+    Step 2 — only called for brand-new Google users.
+    Re-verifies the Google token (proves they own the email), then creates
+    the account with the name and password they chose.
+    """
+    access_token = request.data.get("access_token")
+    first_name   = request.data.get("first_name", "").strip()
+    last_name    = request.data.get("last_name",  "").strip()
+    password     = request.data.get("password",   "")
+
+    if not all([access_token, first_name, last_name, password]):
+        return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
+    if len(password) < 8:
+        return Response({"error": "Password must be at least 8 characters"}, status=status.HTTP_400_BAD_REQUEST)
+
+    info = _verify_google_token(access_token)
+    if not info:
+        return Response(
+            {"error": "Google session expired — please click 'Sign in with Google' again"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    email = info["email"]
+    User = get_user_model()
+    if User.objects.filter(email=email).exists():
+        return Response(
+            {"error": "An account with this email already exists. Please sign in."},
+            status=status.HTTP_409_CONFLICT,
+        )
+
+    user = User.objects.create_user(
+        email=email,
+        password=password,
+        first_name=first_name,
+        last_name=last_name,
+    )
+    return Response(_issue_jwt(user), status=status.HTTP_201_CREATED)
+
