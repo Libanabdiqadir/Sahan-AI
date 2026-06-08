@@ -24,6 +24,7 @@ export interface User {
   first_name: string;
   last_name: string;
   profile_picture: string | null;
+  is_staff: boolean;
 }
 
 // ─── Profile  ────────────────────────────────────
@@ -80,7 +81,7 @@ export interface UserProfile {
 }
 
 // ─── Resume ───────────────────────────────────
-export type ResumeStatus = "pending" | "completed" | "failed";
+export type ResumeStatus = "processing" | "completed" | "failed";
 
 export interface TailoredData {
   summary: string;
@@ -127,6 +128,9 @@ export interface ResumeHistory {
   documents: Document[];
 }
 
+// ─── Template ─────────────────────────────────────────────────────────────────
+export type Template = "harvard" | "executive" | "modern" | "minimalist" | "boldChronological";
+
 // ─── Subscription ──────────────────────────
 export type PlanType = "free" | "pro" | "elite";
 
@@ -144,4 +148,61 @@ export interface ApiError {
   error?: string;
   status?: string;
   [key: string]: unknown;
+}
+
+// ─── Admin User Management ────────────────────────────────────────────────────
+export type PlanChoice = 'free' | 'Pro' | 'elite';
+
+export interface AdminUser {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_active: boolean;
+  is_staff: boolean;
+  date_joined: string;
+  plan: PlanChoice;
+  resume_count: number;
+}
+
+// ─── Admin Analytics ──────────────────────────────────────────────────────────
+export interface TrafficStats {
+  today: number;
+  yesterday: number;
+  this_week: number;
+  last_week: number;
+  this_month: number;
+  last_month: number;
+  this_year: number;
+}
+
+export interface UserStats {
+  total: number;
+  online: number;
+  free: number;
+  pro: number;
+  elite: number;
+}
+
+export interface ProUserEntry {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  date_joined: string;
+}
+
+export interface RecentGeneration {
+  user__email: string;
+  job_title: string;
+  company_name: string;
+  status: ResumeStatus;
+  created_at: string;
+}
+
+export interface AnalyticsData {
+  traffic: TrafficStats;
+  users: UserStats;
+  pro_users: ProUserEntry[];
+  recent_generations: RecentGeneration[];
 }

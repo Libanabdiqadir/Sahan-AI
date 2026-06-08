@@ -1,6 +1,9 @@
 import type {
+  AdminUser,
+  AnalyticsData,
   AuthTokens,
   LoginCredentials,
+  PlanChoice,
   RegisterCredentials,
   User,
   UserProfile,
@@ -263,6 +266,44 @@ async function downloadBlob(endpoint: string, payload: object, filename: string)
   a.click();
   URL.revokeObjectURL(url);
 }
+
+// ─── Admin / Analytics API ────────────────────────────────────────────────────
+export const adminApi = {
+  /** Record today's visit (idempotent — safe to call on every app mount). */
+  trackVisit: (): Promise<void> =>
+    apiFetch<void>('/analytics/track/', { method: 'POST' }),
+
+  /** Fetch the full analytics payload. 404s for non-staff users. */
+  getAnalytics: (): Promise<AnalyticsData> =>
+    apiFetch<AnalyticsData>('/analytics/'),
+
+  // ── User management (staff only) ────────────────────────────────────────────
+
+  /** List every user with their subscription plan and resume count. */
+  listUsers: (): Promise<AdminUser[]> =>
+    apiFetch<AdminUser[]>('/admin/users/'),
+
+  /**
+   * Toggle is_active for a user.
+   * Returns the updated AdminUser so the caller can replace the row in state.
+   */
+  toggleBan: (id: number): Promise<AdminUser> =>
+    apiFetch<AdminUser>(`/admin/users/${id}/toggle_ban/`, { method: 'POST' }),
+
+  /** Hard-delete a user account. Returns void on 204. */
+  deleteUser: (id: number): Promise<void> =>
+    apiFetch<void>(`/admin/users/${id}/delete/`, { method: 'DELETE' }),
+
+  /**
+   * Change a user's subscription plan.
+   * Returns the updated AdminUser so the caller can replace the row in state.
+   */
+  updateSubscription: (id: number, plan: PlanChoice): Promise<AdminUser> =>
+    apiFetch<AdminUser>(`/admin/users/${id}/update_subscription/`, {
+      method: 'PATCH',
+      body: JSON.stringify({ plan }),
+    }),
+};
 
 export const pdfApi = {
   downloadCV: (payload: {

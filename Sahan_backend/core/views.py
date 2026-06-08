@@ -1,21 +1,30 @@
-from django.shortcuts import render
+import logging
+from datetime import timedelta
+
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets
-from rest_framework.decorators import action, api_view, permission_classes, parser_classes
-from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.permissions import IsAuthenticated
+from django.db.models import Count, Q
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework import status, viewsets
+from rest_framework.decorators import action, api_view, parser_classes, permission_classes
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import status
 import requests as google_requests
-from .services import ResumeService, check_subscription_limit
-from .models import UserProfile, ResumeHistory, Document
+from rest_framework.response import Response
+
+from .models import Document, ResumeHistory, SiteVisit, UserProfile, UserSubscription
+from .services import ResumeService, get_subscription_status, reserve_generation_slot
 from .serializer import (
+  AdminUserSerializer,
   UserSerializer,
   DocumentSerializer,
   UserProfileSerializer,
   ResumeHistorySerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
@@ -84,28 +93,66 @@ class ResumeHistoryViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['POST'])
     def tailor(self, request):
-        check_subscription_limit(request.user)   # raises 403 if monthly cap reached
-
-        job_description = request.data.get('job_description')
-        job_title = request.data.get('job_title', '')
-        company_name = request.data.get('company_name', '')
+        # ── Step 1: validate input BEFORE touching quota ──────────────────────
+        job_description = request.data.get('job_description', '').strip()
+        job_title       = request.data.get('job_title', '').strip()
+        company_name    = request.data.get('company_name', '').strip()
+        # Client should send a UUID per button-click to de-duplicate rapid submissions
+        idempotency_key = request.data.get('idempotency_key', '').strip()[:64]
 
         if not job_description:
-            return Response({'error': 'Job description is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Job description is required'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        resume = ResumeService.tailor_resume(
-            request.user, job_description,
-            job_title=job_title, company_name=company_name,
+        # ── Step 2: atomically reserve a quota slot ───────────────────────────
+        # SELECT FOR UPDATE on UserSubscription serialises concurrent requests.
+        # Raises PermissionDenied (403) with code='limit_reached' if over quota.
+        # Returns is_new=False if idempotency_key matches a recent in-flight request.
+        resume, is_new = reserve_generation_slot(
+            request.user, job_title, company_name, job_description, idempotency_key,
         )
+
+        if not is_new:
+            # Duplicate request — return the existing record without re-running AI
+            serializer = self.get_serializer(resume)
+            return Response(serializer.data)
+
+        # ── Step 3: run AI generation ─────────────────────────────────────────
+        # tailor_resume updates the reserved record in-place.
+        # On any failure it sets status='failed', which does NOT count as quota.
+        resume = ResumeService.tailor_resume(resume)
+
         serializer = self.get_serializer(resume)
-        return Response(serializer.data)
+        if resume.status == 'failed':
+            return Response(
+                {
+                    'error': resume.error_message or 'Generation failed. Please try again.',
+                    'resume': serializer.data,
+                },
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class DocumentViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Document.objects.filter(user=self.request.user)
+        return Document.objects.filter(resume_history__user=self.request.user)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def subscription_status(request):
+    """
+    Returns the authenticated user's current plan, monthly quota, and usage.
+    Frontend uses this to show the remaining-generations counter and gate the
+    Generate button before the user even clicks it.
+    """
+    return Response(get_subscription_status(request.user))
 
 
 @api_view(['PATCH'])
@@ -315,4 +362,210 @@ def google_register(request):
         last_name=last_name,
     )
     return Response(_issue_jwt(user), status=status.HTTP_201_CREATED)
+
+
+# ─── Visit Tracking ───────────────────────────────────────────────────────────
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def track_visit(request):
+    """
+    Called by the frontend on app mount (once per authenticated session).
+    Creates at most one SiteVisit record per user per calendar day, so
+    calling it multiple times in a day is safely idempotent.
+    """
+    today = timezone.now().date()
+    SiteVisit.objects.get_or_create(user=request.user, date=today)
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ─── Analytics Dashboard ──────────────────────────────────────────────────────
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def analytics_dashboard(request):
+    """
+    Staff-only analytics endpoint.
+    Returns 404 (not 403) to non-staff so the endpoint is not discoverable.
+    """
+    if not request.user.is_staff:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    User = get_user_model()
+    now  = timezone.now()
+    today = now.date()
+
+    # ── Date boundaries ───────────────────────────────────────────────────────
+    yesterday      = today - timedelta(days=1)
+    week_start     = today - timedelta(days=today.weekday())          # Monday
+    last_week_end  = week_start - timedelta(days=1)
+    last_week_start = last_week_end - timedelta(days=6)
+    month_start    = today.replace(day=1)
+    last_month_end = month_start - timedelta(days=1)
+    last_month_start = last_month_end.replace(day=1)
+    year_start     = today.replace(month=1, day=1)
+
+    # ── Traffic (unique authenticated visitors per period) ────────────────────
+    def visit_count(start, end=None):
+        qs = SiteVisit.objects.filter(date__gte=start)
+        if end:
+            qs = qs.filter(date__lte=end)
+        return qs.count()
+
+    traffic = {
+        'today':      visit_count(today),
+        'yesterday':  visit_count(yesterday, yesterday),
+        'this_week':  visit_count(week_start, today),
+        'last_week':  visit_count(last_week_start, last_week_end),
+        'this_month': visit_count(month_start, today),
+        'last_month': visit_count(last_month_start, last_month_end),
+        'this_year':  visit_count(year_start, today),
+    }
+
+    # ── User stats ────────────────────────────────────────────────────────────
+    online_cutoff = now - timedelta(minutes=30)
+    users = {
+        'total':  User.objects.count(),
+        'online': User.objects.filter(last_login__gte=online_cutoff).count(),
+        'free':   UserSubscription.objects.filter(plan='free').count(),
+        'pro':    UserSubscription.objects.filter(plan='Pro').count(),
+        'elite':  UserSubscription.objects.filter(plan='elite').count(),
+    }
+
+    # ── Pro users list ────────────────────────────────────────────────────────
+    pro_users = list(
+        User.objects
+        .filter(subscriptions__plan='Pro')
+        .order_by('-date_joined')
+        .values('id', 'email', 'first_name', 'last_name', 'date_joined')
+    )
+
+    # ── Recent resume generations (last 20) ───────────────────────────────────
+    from .models import ResumeHistory as RH
+    recent = list(
+        RH.objects
+        .select_related('user')
+        .order_by('-created_at')[:20]
+        .values('user__email', 'job_title', 'company_name', 'status', 'created_at')
+    )
+
+    return Response({
+        'traffic':    traffic,
+        'users':      users,
+        'pro_users':  pro_users,
+        'recent_generations': recent,
+    })
+
+
+# ─── Admin User Management ViewSet ───────────────────────────────────────────
+
+class AdminUserViewSet(viewsets.GenericViewSet):
+    """
+    Staff-only ViewSet for user management.
+    All actions require IsAdminUser (is_staff=True).
+    Every mutation is logged to the server terminal for auditability.
+
+    Routes (all under /api/admin/users/):
+      GET    /                           → list all users
+      POST   /<pk>/toggle_ban/           → flip is_active
+      DELETE /<pk>/delete/               → hard-delete the account
+      PATCH  /<pk>/update_subscription/  → change plan
+    """
+    permission_classes = [IsAdminUser]
+    serializer_class   = AdminUserSerializer
+
+    def _base_queryset(self):
+        """
+        Single query that fetches users with subscription (select_related)
+        and annotates the completed-resume count so the serializer never
+        issues per-row queries.
+        """
+        User = get_user_model()
+        return (
+            User.objects
+            .select_related('subscriptions')
+            .annotate(completed_resume_count=Count(
+                'resumes', filter=Q(resumes__status='completed')
+            ))
+            .order_by('-date_joined')
+        )
+
+    def list(self, request):
+        serializer = self.get_serializer(self._base_queryset(), many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['POST'], url_path='toggle_ban')
+    def toggle_ban(self, request, pk=None):
+        User = get_user_model()
+        user = get_object_or_404(User, pk=pk)
+
+        if user.is_superuser:
+            return Response(
+                {'error': 'Superuser accounts cannot be banned.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if user == request.user:
+            return Response(
+                {'error': 'You cannot ban your own account.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.is_active = not user.is_active
+        user.save(update_fields=['is_active'])
+
+        action_word = 'BANNED' if not user.is_active else 'UNBANNED'
+        logger.info('[ADMIN] %s %s user %s (id=%d)', request.user.email, action_word, user.email, user.id)
+
+        # Re-fetch with annotation so serializer has resume_count without extra query
+        user = self._base_queryset().get(pk=user.pk)
+        return Response(self.get_serializer(user).data)
+
+    @action(detail=True, methods=['DELETE'], url_path='delete')
+    def delete_user(self, request, pk=None):
+        User = get_user_model()
+        user = get_object_or_404(User, pk=pk)
+
+        if user.is_superuser:
+            return Response(
+                {'error': 'Superuser accounts cannot be deleted via this endpoint.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if user == request.user:
+            return Response(
+                {'error': 'You cannot delete your own account.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        email, user_id = user.email, user.id
+        user.delete()
+        logger.info('[ADMIN] %s DELETED user %s (id=%d)', request.user.email, email, user_id)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['PATCH'], url_path='update_subscription')
+    def update_subscription(self, request, pk=None):
+        valid_plans = [c[0] for c in UserSubscription.PLAN_CHOICES]
+        plan = request.data.get('plan', '').strip()
+
+        if plan not in valid_plans:
+            return Response(
+                {'error': f"Invalid plan. Choose from: {', '.join(valid_plans)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        User = get_user_model()
+        user = get_object_or_404(User, pk=pk)
+        sub, _ = UserSubscription.objects.get_or_create(user=user, defaults={'plan': 'free'})
+
+        old_plan = sub.plan
+        sub.plan = plan
+        sub.save(update_fields=['plan', 'updated_at'])
+
+        logger.info(
+            '[ADMIN] %s changed plan for %s: %s → %s',
+            request.user.email, user.email, old_plan, plan,
+        )
+
+        user = self._base_queryset().get(pk=user.pk)
+        return Response(self.get_serializer(user).data)
 

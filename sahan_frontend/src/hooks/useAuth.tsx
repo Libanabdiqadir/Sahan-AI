@@ -6,7 +6,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { authApi, tokenStorage } from "../services/api";
+import { adminApi, authApi, tokenStorage } from "../services/api";
 import type { AuthTokens, User, LoginCredentials, RegisterCredentials } from "../types";
 
 interface AuthState {
@@ -44,6 +44,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const user = await authApi.me();
       console.log("[useAuth.fetchUser] storing in state →", { first_name: user.first_name, last_name: user.last_name });
       setState({ user, isLoading: false, isAuthenticated: true });
+      // Fire-and-forget: record today's unique visit, ignore failures silently
+      adminApi.trackVisit().catch(() => {});
     } catch {
       tokenStorage.clear();
       setState({ user: null, isLoading: false, isAuthenticated: false });

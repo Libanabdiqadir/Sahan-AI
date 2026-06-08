@@ -3,7 +3,7 @@ from djoser.serializers import (
     UserCreateSerializer as BaseUserCreateSerializer,
     UserCreatePasswordRetypeSerializer as BasePasswordRetypeSerializer,
 )
-from .models import User, ResumeHistory, UserProfile, Document
+from .models import User, ResumeHistory, UserProfile, Document, UserSubscription
 
 # Well-known disposable / throwaway email providers.
 # Extend this list or swap in a package (e.g. disposable-email-domains) as needed.
@@ -41,7 +41,40 @@ _DISPOSABLE_DOMAINS = frozenset({
 class UserSerializer(serializers.ModelSerializer):
   class Meta:
     model = User
-    fields = ['id', 'email', 'profile_picture', 'first_name', 'last_name']
+    fields = ['id', 'email', 'profile_picture', 'first_name', 'last_name', 'is_staff']
+    read_only_fields = ['is_staff']
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+  """
+  Read-only representation of a user for the staff admin dashboard.
+  Includes the subscription plan and completed-resume count.
+  Works whether the queryset carries a 'completed_resume_count' annotation
+  (fast, used for list) or not (falls back to a single query, used for
+  individual-record responses after toggle_ban / update_subscription).
+  """
+  plan         = serializers.SerializerMethodField()
+  resume_count = serializers.SerializerMethodField()
+
+  class Meta:
+    model  = User
+    fields = [
+      'id', 'email', 'first_name', 'last_name',
+      'is_active', 'is_staff', 'date_joined',
+      'plan', 'resume_count',
+    ]
+    read_only_fields = fields
+
+  def get_plan(self, obj):
+    try:
+      return obj.subscriptions.plan
+    except (UserSubscription.DoesNotExist, AttributeError):
+      return 'free'
+
+  def get_resume_count(self, obj):
+    if hasattr(obj, 'completed_resume_count'):
+      return obj.completed_resume_count
+    return obj.resumes.filter(status='completed').count()
 
 
 class UserCreateSerializer(BasePasswordRetypeSerializer):

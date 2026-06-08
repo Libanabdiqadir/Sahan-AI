@@ -5,18 +5,22 @@ import {
   Sparkles,
   User,
   LogOut,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import sahanLogo from "../../assets/sahan_ai_logo.png";
 
 const NAV_ITEMS = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/tailor", label: "Tailor Resume", icon: Sparkles },
-  { path: "/profile", label: "Profile", icon: User },
+  { path: "/tailor",    label: "Tailor Resume", icon: Sparkles },
+  { path: "/profile",   label: "Profile",       icon: User },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
+  const navItems = user?.is_staff
+    ? [...NAV_ITEMS, { path: "/admin", label: "Admin", icon: ShieldCheck }]
+    : NAV_ITEMS;
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -34,7 +38,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </Link>
 
         <nav className="flex items-center gap-6">
-          {NAV_ITEMS.map(({ path, label, icon: Icon }) => {
+          {navItems.map(({ path, label, icon: Icon }) => {
             const active = location.pathname === path;
             return (
               <Link

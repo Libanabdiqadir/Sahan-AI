@@ -94,25 +94,55 @@ class UserProfile(models.Model):
 class ResumeHistory(models.Model):
 
   STATUS_CHOICES = [
-    ('pending', 'Processing AI'),
-    ('completed', 'Success'),
-    ('failed', 'Failed'),
+    ('processing', 'Processing'),   # AI generation in flight
+    ('completed', 'Completed'),     # successfully generated and saved
+    ('failed', 'Failed'),           # any failure — does NOT count against quota
   ]
 
   user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='resumes')
   company_name = models.CharField(max_length=255, blank=True)
   job_title = models.CharField(max_length=255)
-  job_description = models.TextField(help_text="The master list of all career data.")
+  job_description = models.TextField(help_text="The job description the resume was tailored for.")
 
   tailored_data = models.JSONField(default=dict)
   cover_letter_text = models.TextField(blank=True)
 
-  status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+  status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing')
+
+  # Audit fields
+  error_message = models.TextField(blank=True)
+  completed_at = models.DateTimeField(null=True, blank=True)
+
+  # Idempotency key supplied by the client to de-duplicate rapid clicks
+  idempotency_key = models.CharField(max_length=64, blank=True, db_index=True)
+
   created_at = models.DateTimeField(auto_now_add=True)
 
   class Meta:
     ordering = ['-created_at']
     verbose_name_plural = 'Resume Histories'
+    indexes = [
+      # Fast quota queries: filter by user + status + month
+      models.Index(fields=['user', 'status', 'created_at'], name='resume_user_status_date_idx'),
+      # Fast idempotency look-up
+      models.Index(fields=['user', 'idempotency_key'], name='resume_user_idem_idx'),
+    ]
+
+class SiteVisit(models.Model):
+  """One record per authenticated user per calendar day. Used for traffic analytics."""
+  user = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE,
+    related_name='visits',
+  )
+  date = models.DateField(db_index=True)
+
+  class Meta:
+    unique_together = [('user', 'date')]
+
+  def __str__(self):
+    return f"{self.user.email} — {self.date}"
+
 
 class Document (models.Model):
   resume_history = models.ForeignKey(ResumeHistory, on_delete=models.CASCADE, related_name='documents')
@@ -134,10 +164,11 @@ class UserSubscription(models.Model):
   stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
   stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True)
   plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default='free')
-  is_active = models.BooleanField(default=False)
+  # True for paid plans with an active Stripe subscription; free plan is always considered active
+  is_active = models.BooleanField(default=True)
 
-  resume_this_month = models.IntegerField(default=0)
-  last_reset_date = models.DateTimeField(auto_now_add=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
 
   def __str__(self):
-    return f"{self.user.username} - {self.plan}"
+    return f"{self.user.email} - {self.plan}"
