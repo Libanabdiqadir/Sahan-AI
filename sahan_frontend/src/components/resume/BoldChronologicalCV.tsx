@@ -241,15 +241,15 @@ const S = StyleSheet.create({
     fontFamily: "Helvetica",
     fontSize: 9.5,
     color: C.ink,
-    lineHeight: 1.5,
-    marginBottom: 13,
+    lineHeight: 1.45,
+    marginBottom: 10,
   },
   clSignoff: {
     fontFamily: "Helvetica",
     fontSize: 10,
     color: C.ink,
-    marginTop: 18,
-    marginBottom: 26,
+    marginTop: 12,
+    marginBottom: 6,
   },
   clSignName: {
     fontFamily: "Times-Bold",
@@ -331,13 +331,18 @@ export function BoldChronologicalCV({
     profile.phone_number  ? { kind: "text",  val: profile.phone_number } : null,
   ].filter((x): x is ContactItem => x !== null);
 
-  const allSkills = [
-    ...(tailored.tech_skills ?? []),
-    ...(tailored.soft_skills ?? []),
-  ];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const experience: any[] = tailored.experience?.length ? tailored.experience : (profile.work_experience ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const education: any[] = tailored.education?.length ? tailored.education : (profile.education_history ?? []);
+  const techSkills: string[] = tailored.tech_skills?.length ? tailored.tech_skills : (profile.master_data?.tech_skills ?? []);
+  const softSkills: string[] = tailored.soft_skills?.length ? tailored.soft_skills : (profile.master_data?.soft_skills ?? []);
+  const languages: string[] = tailored.languages?.length ? tailored.languages : (profile.languages ?? []);
+
+  const allSkills = [...techSkills, ...softSkills];
 
   return (
-    <Document title={`${profile.full_name} — ${jobTitle}`}>
+    <Document title={`${profile.full_name} — ${jobTitle}`} hyphenationCallback={(w) => [w]}>
 
       {/* ═══════════════════════════════════════════════════════════════
           CV PAGE
@@ -346,7 +351,6 @@ export function BoldChronologicalCV({
 
         {/* Header */}
         <Text style={S.candidateName}>{profile.full_name}</Text>
-        {!!jobTitle && <Text style={S.jobTitleLine}>{jobTitle}</Text>}
         <HeaderContactRow items={contactParts} />
         <View style={S.headRule} />
 
@@ -358,54 +362,58 @@ export function BoldChronologicalCV({
           </View>
         )}
 
-        {/* Experience */}
-        {tailored.experience?.length > 0 && (
+        {/* Experience — each entry is atomic (wrap={false}); section title travels with first entry */}
+        {experience.length > 0 && (
           <View style={S.section}>
-            <Sec title="Experience" />
-            {tailored.experience.map((exp, i) => (
-              <View key={i} style={S.entryBlock}>
-                <View style={S.entryHeadRow}>
-                  <Text style={S.entryOrg}>{exp.company}</Text>
-                </View>
-                <View style={S.entrySubRow}>
-                  <Text style={S.entryRole}>{exp.role}</Text>
-                  <Text style={S.entryDate}>{exp.duration}</Text>
-                </View>
-                {exp.responsibilities?.map((r, j) => (
-                  <View key={j} style={S.bulletRow}>
-                    <Text style={S.bulletMark}>•</Text>
-                    <Text style={S.bulletText}>{r}</Text>
+            {experience.map((exp, i) => (
+              <View key={i} wrap={false}>
+                {i === 0 && <Sec title="Experience" />}
+                <View style={S.entryBlock}>
+                  <View style={S.entryHeadRow}>
+                    <Text style={S.entryOrg}>{exp.company}</Text>
                   </View>
-                ))}
+                  <View style={S.entrySubRow}>
+                    <Text style={S.entryRole}>{exp.role}</Text>
+                    <Text style={S.entryDate}>{exp.duration}</Text>
+                  </View>
+                  {exp.responsibilities?.map((r, j) => (
+                    <View key={j} style={S.bulletRow}>
+                      <Text style={S.bulletMark}>•</Text>
+                      <Text style={S.bulletText}>{r}</Text>
+                    </View>
+                  ))}
+                </View>
               </View>
             ))}
           </View>
         )}
 
         {/* Education */}
-        {tailored.education?.length > 0 && (
+        {education.length > 0 && (
           <View style={S.section}>
-            <Sec title="Education" />
-            {tailored.education.map((edu, i) => (
-              <View key={i} style={S.entryBlock}>
-                <View style={S.entryHeadRow}>
-                  <Text style={S.entryOrg}>{edu.university}</Text>
-                </View>
-                <View style={S.entrySubRow}>
-                  <Text style={S.entryRole}>{edu.degree}</Text>
-                  <Text style={S.entryDate}>{edu.graduation_year}</Text>
+            {education.map((edu, i) => (
+              <View key={i} wrap={false}>
+                {i === 0 && <Sec title="Education" />}
+                <View style={S.entryBlock}>
+                  <View style={S.entryHeadRow}>
+                    <Text style={S.entryOrg}>{edu.university}</Text>
+                  </View>
+                  <View style={S.entrySubRow}>
+                    <Text style={S.entryRole}>{edu.degree}</Text>
+                    <Text style={S.entryDate}>{edu.graduation_year}</Text>
+                  </View>
                 </View>
               </View>
             ))}
           </View>
         )}
 
-        {/* Languages */}
-        {tailored.languages?.length > 0 && (
-          <View style={S.section}>
+        {/* Languages — small section, keep together */}
+        {languages.length > 0 && (
+          <View style={S.section} wrap={false}>
             <Sec title="Languages" />
             <View style={S.langRow}>
-              {tailored.languages.map((lang, i) => {
+              {languages.map((lang, i) => {
                 const filled   = dotsFor(lang);
                 const cleanName = lang.replace(/\s*[\(\[].*?[\)\]]/g, "").replace(/\s*[-–].*$/, "").trim();
                 return (
@@ -423,9 +431,9 @@ export function BoldChronologicalCV({
           </View>
         )}
 
-        {/* Skills */}
+        {/* Skills — small section, keep together */}
         {allSkills.length > 0 && (
-          <View style={S.section}>
+          <View style={S.section} wrap={false}>
             <Sec title="Skills" />
             <Text style={S.skillsText}>{allSkills.join("   •   ")}</Text>
           </View>
@@ -464,10 +472,12 @@ export function BoldChronologicalCV({
             <Text key={i} style={S.clPara}>{para.trim()}</Text>
           ))}
 
-          {/* Sign-off */}
-          <Text style={S.clSignoff}>Sincerely,</Text>
-          <Text style={S.clSignName}>{profile.full_name}</Text>
-          {!!jobTitle && <Text style={S.clSignRole}>{jobTitle}</Text>}
+          {/* Sign-off — kept atomic so it never orphans on its own page */}
+          <View wrap={false}>
+            <Text style={S.clSignoff}>Sincerely,</Text>
+            <Text style={S.clSignName}>{profile.full_name}</Text>
+            {!!jobTitle && <Text style={S.clSignRole}>{jobTitle}</Text>}
+          </View>
         </Page>
       )}
     </Document>
@@ -480,11 +490,10 @@ export function BoldChronologicalCV({
 export function BoldChronologicalPreview({
   profile,
   tailored,
-  jobTitle,
 }: {
   profile: UserProfile;
   tailored: TailoredData;
-  jobTitle: string;
+  jobTitle?: string;
 }) {
   const SERIF = '"Georgia", "Palatino Linotype", Palatino, serif';
   const SANS  = '"Helvetica Neue", Helvetica, Arial, sans-serif';
@@ -500,10 +509,15 @@ export function BoldChronologicalPreview({
     profile.phone_number  ? { kind: "text"  as const, val: profile.phone_number } : null,
   ].filter((x): x is NonNullable<typeof x> => x !== null);
 
-  const allSkills = [
-    ...(tailored.tech_skills ?? []),
-    ...(tailored.soft_skills ?? []),
-  ];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const experience: any[] = tailored.experience?.length ? tailored.experience : (profile.work_experience ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const education: any[] = tailored.education?.length ? tailored.education : (profile.education_history ?? []);
+  const techSkills: string[] = tailored.tech_skills?.length ? tailored.tech_skills : (profile.master_data?.tech_skills ?? []);
+  const softSkills: string[] = tailored.soft_skills?.length ? tailored.soft_skills : (profile.master_data?.soft_skills ?? []);
+  const languages: string[] = tailored.languages?.length ? tailored.languages : (profile.languages ?? []);
+
+  const allSkills = [...techSkills, ...softSkills];
 
   const SectionHead = ({ title }: { title: string }) => (
     <div style={{ textAlign: "center", marginBottom: "12px" }}>
@@ -537,11 +551,6 @@ export function BoldChronologicalPreview({
         <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "29px", color: INK, letterSpacing: "0.5px", marginBottom: "5px" }}>
           {profile.full_name}
         </h1>
-        {jobTitle && (
-          <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: "12.5px", color: INK, marginBottom: "5px" }}>
-            {jobTitle}
-          </p>
-        )}
         <p style={{ fontFamily: SANS, fontSize: "11px", color: GRAY, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px" }}>
           {contactParts.map((item, i) => (
             <span key={i} style={{ display: "inline-flex", alignItems: "center" }}>
@@ -570,10 +579,10 @@ export function BoldChronologicalPreview({
       )}
 
       {/* Experience */}
-      {tailored.experience?.length > 0 && (
+      {experience.length > 0 && (
         <div style={{ marginBottom: "15px" }}>
           <SectionHead title="Experience" />
-          {tailored.experience.map((exp, i) => (
+          {experience.map((exp, i) => (
             <div key={i} style={{ marginBottom: "13px" }}>
               <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "11px", color: INK, marginBottom: "1px" }}>
                 {exp.company}
@@ -594,10 +603,10 @@ export function BoldChronologicalPreview({
       )}
 
       {/* Education */}
-      {tailored.education?.length > 0 && (
+      {education.length > 0 && (
         <div style={{ marginBottom: "15px" }}>
           <SectionHead title="Education" />
-          {tailored.education.map((edu, i) => (
+          {education.map((edu, i) => (
             <div key={i} style={{ marginBottom: "10px" }}>
               <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "11px", color: INK, marginBottom: "1px" }}>
                 {edu.university}
@@ -612,11 +621,11 @@ export function BoldChronologicalPreview({
       )}
 
       {/* Languages */}
-      {tailored.languages?.length > 0 && (
+      {languages.length > 0 && (
         <div style={{ marginBottom: "15px" }}>
           <SectionHead title="Languages" />
           <div style={{ display: "flex", flexWrap: "wrap", gap: "22px", justifyContent: "center" }}>
-            {tailored.languages.map((lang, i) => <LangDots key={i} lang={lang} />)}
+            {languages.map((lang, i) => <LangDots key={i} lang={lang} />)}
           </div>
         </div>
       )}

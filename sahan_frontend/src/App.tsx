@@ -7,6 +7,7 @@ import DashboardPage from "./pages/DashboardPage";
 import TailorPage from "./pages/TailorPage";
 import ProfilePage from "./pages/ProfilePage";
 import LandingPage from "./pages/LandingPage";
+import ContactPage from "./pages/ContactPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import AdminDashboard from "./pages/AdminDashboard";
 
@@ -81,6 +82,7 @@ function AppRoutes() {
             </StaffRoute>
           }
         />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/verify-email/:uid/:token" element={<VerifyEmailPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

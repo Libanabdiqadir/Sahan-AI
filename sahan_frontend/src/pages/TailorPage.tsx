@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { SlidersHorizontal } from "lucide-react";
 import { profileApi } from "../services/api";
 import { LimitModal } from "../components/LimitModal";
 import { useTailorForm } from "../hooks/useTailorForm";
@@ -9,14 +10,18 @@ import { ProfileSidebar } from "../components/tailor/ProfileSidebar";
 import { TailorForm } from "../components/tailor/TailorForm";
 import { ResumePreviewCard, ResumeErrorCard } from "../components/tailor/ResumePreviewCard";
 import { TemplatePickerModal } from "../components/tailor/TemplatePickerModal";
+import { GenerationChoiceModal } from "../components/tailor/GenerationChoiceModal";
 import { QuickAddProjectModal, QuickAddCertModal } from "../components/tailor/QuickAddModals";
-import type { UserProfile, Template } from "../types";
+import type { UserProfile, Template, GenerationMode } from "../types";
 
 export default function TailorPage() {
-  const [profile, setProfile]     = useState<UserProfile | null>(null);
-  const [template, setTemplate]   = useState<Template>("modern");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [coverOpen, setCoverOpen] = useState(false);
+  const [profile, setProfile]             = useState<UserProfile | null>(null);
+  const [template, setTemplate]           = useState<Template>("modern");
+  const [modalOpen, setModalOpen]         = useState(false);
+  const [coverOpen, setCoverOpen]         = useState(false);
+  const [choiceOpen, setChoiceOpen]       = useState(false);
+  const [selectedMode, setSelectedMode]   = useState<GenerationMode>("both");
+  const [sidebarOpen, setSidebarOpen]     = useState(false);
 
   const form     = useTailorForm();
   const quickAdd = useQuickAddProfile(profile, p => setProfile(p));
@@ -43,14 +48,38 @@ export default function TailorPage() {
         onClose={() => form.setLimitInfo(null)}
       />
 
+      <GenerationChoiceModal
+        isOpen={choiceOpen}
+        selected={selectedMode}
+        onSelectMode={setSelectedMode}
+        onClose={() => setChoiceOpen(false)}
+        onConfirm={mode => {
+          setSelectedMode(mode);
+          setChoiceOpen(false);
+          // Generation is triggered only by the main Generate button
+        }}
+      />
+
       <div className="flex h-[calc(100vh-60px)] overflow-hidden">
         <ProfileSidebar
           profile={profile}
           onAddProject={() => quickAdd.setProjectModalOpen(true)}
           onAddCert={() => quickAdd.setCertModalOpen(true)}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
 
-        <main className="flex-1 overflow-y-auto bg-stone-50 p-6">
+        <main className="flex-1 overflow-y-auto bg-stone-50 p-4 sm:p-6">
+          {/* Mobile: Profile panel toggle */}
+          <div className="md:hidden mb-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="flex items-center gap-2 font-sans text-[13px] font-semibold text-slate-600 bg-white border border-stone-200 px-4 py-2.5 rounded-xl hover:border-blue-300 hover:text-blue-600 transition-colors"
+            >
+              <SlidersHorizontal size={14} />
+              View Master Profile
+            </button>
+          </div>
           <TailorForm
             jobTitle={form.jobTitle}
             setJobTitle={form.setJobTitle}
@@ -61,8 +90,13 @@ export default function TailorPage() {
             loading={form.loading}
             error={form.error}
             template={template}
+            selectedMode={selectedMode}
             onOpenTemplateModal={() => setModalOpen(true)}
-            handleTailor={form.handleTailor}
+            onGenerate={async () => {
+              await form.handleTailor(selectedMode);
+              setSelectedMode("both");
+            }}
+            onOpenChoiceModal={() => setChoiceOpen(true)}
           />
 
           <AnimatePresence>
@@ -80,6 +114,7 @@ export default function TailorPage() {
                 onDownloadCoverLetter={download.handleDownloadCoverLetter}
                 cvLoading={download.cvLoading}
                 clLoading={download.clLoading}
+                generationMode={form.generationMode}
               />
             )}
             {form.result && tailored?.error && (

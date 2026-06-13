@@ -36,13 +36,13 @@ export function LimitModal({ isOpen, plan, limit, onClose }: Props) {
             animate={{ opacity: 1, scale: 1,    y: 0  }}
             exit={   { opacity: 0, scale: 0.92, y: 24 }}
             transition={{ type: "spring", stiffness: 320, damping: 26 }}
-            className="relative w-full max-w-[420px] bg-white border border-stone-200 rounded-2xl shadow-2xl font-serif overflow-hidden"
+            className="relative w-full max-w-[min(420px,90vw)] bg-white border border-stone-200 rounded-2xl shadow-2xl font-serif overflow-hidden"
             onClick={e => e.stopPropagation()}
           >
             {/* Accent bar */}
             <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 via-orange-400 to-red-400" />
 
-            <div className="px-8 py-7">
+            <div className="px-5 py-5 sm:px-8 sm:py-7">
               {/* Close */}
               <button
                 onClick={onClose}
@@ -58,14 +58,21 @@ export function LimitModal({ isOpen, plan, limit, onClose }: Props) {
                   Usage limit reached
                 </p>
                 <h2 className="text-[20px] font-bold text-slate-900 tracking-tight leading-snug">
-                  Monthly Limit Reached!
+                  Billing Cycle Limit Reached
                 </h2>
                 <p className="font-sans text-[13px] text-slate-500 mt-1.5 leading-relaxed">
                   You've used all <span className="font-semibold text-slate-700">{limit}</span>{" "}
-                  resume{limit !== 1 ? "s" : ""} included in your{" "}
-                  <span className="font-semibold capitalize text-slate-700">{plan}</span> plan this month.
-                  Upgrade to <span className="font-semibold text-blue-600">Pro</span> for{" "}
-                  <span className="font-semibold">50 resumes/month</span>.
+                  generation{limit !== 1 ? "s" : ""} included in your{" "}
+                  <span className="font-semibold capitalize text-slate-700">{plan}</span> plan this billing period.{" "}
+                  {plan.toLowerCase() === "free" && (
+                    <>
+                      Upgrade to{" "}
+                      <span className="font-semibold text-blue-600">Pro — $4/month</span>{" "}
+                      for{" "}
+                      <span className="font-semibold">50 resumes &amp; cover letters per 30-day cycle</span>.{" "}
+                      Unused generations do not roll over.
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -108,7 +115,7 @@ export function LimitModal({ isOpen, plan, limit, onClose }: Props) {
               </a>
 
               <p className="mt-3 text-center font-sans text-[11px] text-slate-400">
-                Your limit resets on the 1st of each month.
+                Limit resets every 30 days from your subscription date. Unused generations do not roll over.
               </p>
             </div>
           </motion.div>

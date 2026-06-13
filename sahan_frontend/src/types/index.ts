@@ -47,6 +47,7 @@ export interface ProjectEntry {
   description: string;
   link: string;
   dates: string;
+  highlights?: string[];
 }
 
 export interface CertificationEntry {
@@ -124,12 +125,16 @@ export interface ResumeHistory {
   tailored_data: TailoredData;
   cover_letter_text: string;
   status: ResumeStatus;
+  error_message?: string;
   created_at: string;
   documents: Document[];
 }
 
 // ─── Template ─────────────────────────────────────────────────────────────────
 export type Template = "harvard" | "executive" | "modern" | "minimalist" | "boldChronological";
+
+// ─── Generation Mode ──────────────────────────────────────────────────────────
+export type GenerationMode = "cv_only" | "cover_letter_only" | "both";
 
 // ─── Subscription ──────────────────────────
 export type PlanType = "free" | "pro" | "elite";

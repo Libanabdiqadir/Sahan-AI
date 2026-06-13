@@ -29,7 +29,7 @@ export function useProfileData() {
   const [showEduForm, setShowEduForm] = useState(false);
   const [newEdu, setNewEdu] = useState<EducationEntry>({ degree: "", university: "", graduation_year: "" });
   const [showProjectForm, setShowProjectForm] = useState(false);
-  const [newProject, setNewProject] = useState<ProjectEntry>({ title: "", role_title: "", description: "", link: "", dates: "" });
+  const [newProject, setNewProject] = useState<ProjectEntry>({ title: "", role_title: "", description: "", link: "", dates: "", highlights: [] });
   const [showCertForm, setShowCertForm] = useState(false);
   const [newCert, setNewCert] = useState<CertificationEntry>({ name: "", issuer: "", issue_date: "", expiration_date: "", credential_id: "", credential_url: "" });
 
@@ -152,7 +152,7 @@ export function useProfileData() {
       return updated;
     });
     setProfile(prev => prev ? { ...prev, projects: [...(prev.projects ?? []), newProject] } : prev);
-    setNewProject({ title: "", role_title: "", description: "", link: "", dates: "" });
+    setNewProject({ title: "", role_title: "", description: "", link: "", dates: "", highlights: [] });
     setShowProjectForm(false);
   };
 

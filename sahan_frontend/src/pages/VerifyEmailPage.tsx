@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, Loader2, RefreshCw } from "lucide-react";
 import { authApi } from "../services/api";
-import sahanLogo from "../assets/sahan_ai_logo.png";
+import sahanLogo from "../assets/sahan-logo.png";
 
 type State = "loading" | "success" | "already-active" | "expired" | "invalid";
 

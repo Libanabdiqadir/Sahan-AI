@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import sahanLogo from "../assets/sahan_ai_logo.png";
+import sahanLogo from "../assets/sahan-logo.png";
 
 // ─── Animation ──────────────────────────────────────────────────────────────────
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -18,10 +18,10 @@ const fadeUp = (delay = 0) => ({
 function ResumeMockup() {
   const skills     = ["React", "TypeScript", "Node.js", "Python", "AWS"];
   const softSkills = ["Leadership", "Strategy", "Agile"];
-  const langs      = ["English", "Arabic", "French"];
+  const langs      = ["Somali", "English", "French"];
   const jobs       = [
-    { company: "Stripe",  role: "Senior Product Designer",  date: "2022 – Present" },
-    { company: "Airbnb",  role: "Product Designer",         date: "2020 – 2022"    },
+    { company: "Dahabshiil",  role: "Senior Product Designer",  date: "2022 – Present" },
+    { company: "Telesom",  role: "Product Designer",         date: "2020 – 2022"    },
   ];
 
   return (
@@ -54,7 +54,7 @@ function ResumeMockup() {
 
           {/* Full-width header */}
           <div className="px-5 pt-3.5 pb-3 border-b border-slate-100 shrink-0">
-            <p className="font-bold text-[13px] text-slate-800 tracking-tight">Alexandra Johnson</p>
+            <p className="font-bold text-[13px] text-slate-800 tracking-tight">Ahmed Abdirahman</p>
             <p className="text-[10px] italic text-slate-400 mt-0.5">Senior Product Designer</p>
           </div>
 
@@ -67,9 +67,9 @@ function ResumeMockup() {
               <div>
                 <p className="text-[6.5px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-200 pb-1 mb-1.5">Contact</p>
                 <div className="space-y-1 text-[7.5px] text-slate-400 leading-snug">
-                  <p>alex@email.com</p>
-                  <p>San Francisco, CA</p>
-                  <p>linkedin.com/in/alex</p>
+                  <p>ahmed@email.com</p>
+                  <p>Hargeisa, Somaliland</p>
+                  <p>linkedin.com/in/ahmed</p>
                 </div>
               </div>
 
@@ -149,7 +149,7 @@ function ResumeMockup() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-[9px] font-bold text-slate-700">B.S. Computer Science</p>
-                    <p className="text-[7.5px] italic text-slate-400">UC Berkeley</p>
+                    <p className="text-[7.5px] italic text-slate-400">Amoud University</p>
                   </div>
                   <span className="text-[7px] text-slate-300">2020</span>
                 </div>
@@ -241,19 +241,27 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 h-[60px] flex items-center justify-between">
 
           {/* Brand */}
-          <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2.5 cursor-pointer"
+            aria-label="Back to top"
+          >
             <img src={sahanLogo} alt="Sahan AI" className="h-8 w-auto" />
             <span className="font-bold text-[15px] text-slate-900 tracking-tight">Sahan AI</span>
-          </div>
+          </button>
 
           {/* Nav links */}
           <nav className="hidden md:flex items-center gap-8">
-            {["Features", "Templates"].map((item) => (
+            {["Features", "Templates", "Pricing"].map((item) => (
               <a key={item} href={`#${item.toLowerCase()}`}
                 className="text-[13px] text-slate-500 hover:text-slate-900 transition-colors">
                 {item}
               </a>
             ))}
+            <Link to="/contact"
+              className="text-[13px] text-slate-500 hover:text-slate-900 transition-colors">
+              Contact
+            </Link>
           </nav>
 
           {/* Auth CTAs */}
@@ -272,8 +280,8 @@ export default function LandingPage() {
 
       {/* ── Hero ────────────────────────────────────────────────────────── */}
       <section id="features" className="pt-[60px]">
-        <div className="max-w-6xl mx-auto px-6 py-24 lg:py-32">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+        <div className="max-w-6xl mx-auto px-6 py-16 sm:py-24 lg:py-32">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
 
             {/* Left: copy */}
             <div className="max-w-xl">
@@ -283,13 +291,13 @@ export default function LandingPage() {
                 className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-3.5 py-1.5 mb-7">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span className="text-[11.5px] font-semibold text-slate-500 tracking-wide">
-                  Powered by Gemini 2.5 Flash
+                  From Potential to Opportunity, Powered by AI.
                 </span>
               </motion.div>
 
               {/* H1 */}
               <motion.h1 {...fadeUp(0.07)}
-                className="text-[46px] lg:text-[54px] font-bold text-slate-900 leading-[1.08] tracking-tight mb-6">
+                className="text-[30px] sm:text-[38px] md:text-[46px] lg:text-[54px] font-bold text-slate-900 leading-[1.08] tracking-tight mb-6">
                 Your resume,<br />
                 <span className="text-slate-400">tailored for</span><br />
                 every opportunity.
@@ -297,7 +305,7 @@ export default function LandingPage() {
 
               {/* Sub-headline */}
               <motion.p {...fadeUp(0.13)}
-                className="text-[17px] text-slate-500 leading-relaxed mb-9">
+                className="text-[15px] sm:text-[17px] text-slate-500 leading-relaxed mb-9">
                 Paste a job description. Sahan AI reads it, matches your career profile,
                 and generates a polished CV and cover letter in seconds — ready to download as PDF.
               </motion.p>
@@ -316,13 +324,13 @@ export default function LandingPage() {
               </motion.ul>
 
               {/* CTAs */}
-              <motion.div {...fadeUp(0.24)} className="flex flex-wrap items-center gap-5">
+              <motion.div {...fadeUp(0.24)} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
                 <Link to="/login"
-                  className="inline-flex items-center gap-2 bg-slate-900 hover:bg-blue-600 text-white font-semibold text-[14px] px-6 py-3 rounded-xl transition-colors">
+                  className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-blue-600 text-white font-semibold text-[14px] px-6 py-3 rounded-xl transition-colors">
                   Get started free <ArrowRight size={14} />
                 </Link>
                 <Link to="/login"
-                  className="text-[13.5px] font-medium text-slate-400 hover:text-slate-700 transition-colors">
+                  className="text-[13.5px] font-medium text-slate-400 hover:text-slate-700 transition-colors text-center sm:text-left">
                   Already have an account →
                 </Link>
               </motion.div>
@@ -338,7 +346,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 28, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.75, ease: EASE, delay: 0.14 }}
-              className="hidden lg:flex justify-end pb-8 pr-4"
+              className="hidden md:flex justify-end pb-8 pr-4"
             >
               <div className="w-full max-w-[480px]">
                 <ResumeMockup />
@@ -354,7 +362,7 @@ export default function LandingPage() {
           <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-7">
             Trusted by professionals landing roles at
           </p>
-          <div className="flex flex-wrap justify-center items-center gap-10">
+          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-10">
             {["Google", "Stripe", "Airbnb", "Notion", "Linear", "Vercel"].map((co) => (
               <span key={co}
                 className="text-[16px] font-semibold text-slate-300 hover:text-slate-500 transition-colors cursor-default">
@@ -375,7 +383,7 @@ export default function LandingPage() {
           className="text-center mb-16"
         >
           <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-3">How it works</p>
-          <h2 className="text-[34px] font-bold text-slate-900 tracking-tight">Three steps to your next interview.</h2>
+          <h2 className="text-[24px] sm:text-[34px] font-bold text-slate-900 tracking-tight">Three steps to your next interview.</h2>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -440,6 +448,89 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Pricing ─────────────────────────────────────────────────────── */}
+      <section id="pricing" className="max-w-6xl mx-auto px-6 py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className="text-center mb-14"
+        >
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Pricing</p>
+          <h2 className="text-[24px] sm:text-[34px] font-bold text-slate-900 tracking-tight">Simple, honest pricing.</h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          {/* Free */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: EASE }}
+            className="p-8 rounded-2xl border border-slate-200 bg-white"
+          >
+            <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-2">Free</p>
+            <div className="flex items-end gap-1 mb-1">
+              <span className="text-[42px] font-bold text-slate-900 leading-none">$0</span>
+            </div>
+            <p className="text-[12.5px] text-slate-400 mb-6">Forever free, no card required.</p>
+            <ul className="space-y-3 mb-8">
+              {[
+                "2 AI-tailored resumes per 30 days",
+                "All PDF templates",
+                "Cover letter included",
+              ].map((f) => (
+                <li key={f} className="flex items-center gap-2.5 text-[13px] text-slate-600">
+                  <CheckCircle2 size={13} className="text-slate-300 shrink-0" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link to="/login"
+              className="block text-center border border-slate-200 hover:border-slate-400 text-slate-700 font-semibold text-[13.5px] px-5 py-2.5 rounded-xl transition-colors">
+              Get started free
+            </Link>
+          </motion.div>
+
+          {/* Pro */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: EASE, delay: 0.07 }}
+            className="relative p-8 rounded-2xl border-2 border-slate-900 bg-slate-900 text-white overflow-hidden"
+          >
+            <div className="absolute top-4 right-4 text-[10px] font-bold bg-white text-slate-900 px-2.5 py-1 rounded-full tracking-wide">
+              MOST POPULAR
+            </div>
+            <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pro</p>
+            <div className="flex items-end gap-1 mb-1">
+              <span className="text-[42px] font-bold text-white leading-none">$4</span>
+              <span className="text-slate-400 mb-1.5 text-[14px]">/month</span>
+            </div>
+            <p className="text-[12.5px] text-slate-400 mb-6">Billed monthly. Cancel anytime.</p>
+            <ul className="space-y-3 mb-8">
+              {[
+                "50 resumes & cover letters per 30-day cycle",
+                "All PDF templates",
+                "Priority generation queue",
+                "Unused generations do not roll over",
+              ].map((f) => (
+                <li key={f} className="flex items-center gap-2.5 text-[13px] text-slate-300">
+                  <CheckCircle2 size={13} className="text-blue-400 shrink-0" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link to="/login"
+              className="block text-center bg-white hover:bg-slate-100 text-slate-900 font-bold text-[13.5px] px-5 py-2.5 rounded-xl transition-colors">
+              Upgrade to Pro
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── Final CTA ───────────────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-6 py-24">
         <motion.div
@@ -447,9 +538,9 @@ export default function LandingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: EASE }}
-          className="bg-slate-900 rounded-3xl px-10 py-16 text-center"
+          className="bg-slate-900 rounded-3xl px-6 sm:px-10 py-12 sm:py-16 text-center"
         >
-          <h2 className="text-[32px] font-bold text-white tracking-tight mb-3">
+          <h2 className="text-[24px] sm:text-[32px] font-bold text-white tracking-tight mb-3">
             Ready to land your next role?
           </h2>
           <p className="text-[15px] text-slate-400 mb-9 max-w-md mx-auto leading-relaxed">
@@ -469,9 +560,15 @@ export default function LandingPage() {
             <img src={sahanLogo} alt="Sahan AI" className="h-5 w-auto opacity-40" />
             <span className="font-bold text-[13px] text-slate-400">Sahan AI</span>
           </div>
-          <p className="text-[11.5px] text-slate-300">
-            © {new Date().getFullYear()} Sahan AI · AI-Powered Resume Tailoring
-          </p>
+          <div className="flex items-center gap-6">
+            <Link to="/contact"
+              className="text-[12px] text-slate-400 hover:text-slate-600 transition-colors font-medium">
+              Contact Us
+            </Link>
+            <p className="text-[11.5px] text-slate-300">
+              © {new Date().getFullYear()} Sahan AI · AI-Powered Resume Tailoring
+            </p>
+          </div>
         </div>
       </footer>
     </div>

@@ -2,10 +2,13 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Loader2, User, Briefcase, FileText } from "lucide-react";
 import { useProfileData } from "../hooks/useProfileData";
+import { useSubscription } from "../hooks/useSubscription";
 import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { PersonalInfoTab } from "../components/profile/PersonalInfoTab";
 import { CareerDataTab } from "../components/profile/CareerDataTab";
 import { ResumeVaultTab } from "../components/profile/ResumeVaultTab";
+import { LimitModal } from "../components/LimitModal";
+import { AlreadyProModal } from "../components/AlreadyProModal";
 
 type Tab = "info" | "career" | "vault";
 
@@ -22,7 +25,19 @@ export default function ProfilePage() {
     return (p === "career" || p === "vault") ? p : "info";
   });
 
-  const data = useProfileData();
+  const data         = useProfileData();
+  const subscription = useSubscription();
+
+  const [upgradeOpen,    setUpgradeOpen]    = useState(false);
+  const [alreadyProOpen, setAlreadyProOpen] = useState(false);
+
+  const isPro = (subscription?.plan ?? "free").toLowerCase() !== "free";
+
+  const handleUpgradeClick = () => {
+    if (isPro) setAlreadyProOpen(true);
+    else        setUpgradeOpen(true);
+  };
+
   const initials =
     `${data.user?.first_name?.[0] || ""}${data.user?.last_name?.[0] || ""}` ||
     data.user?.email?.[0]?.toUpperCase() ||
@@ -37,7 +52,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-[900px] mx-auto px-6 py-10">
+    <div className="max-w-[900px] mx-auto px-4 sm:px-6 py-6 sm:py-10">
       <ProfileHeader
         user={data.user}
         localUser={data.localUser}
@@ -45,15 +60,17 @@ export default function ProfilePage() {
         initials={initials}
         uploadingPic={data.uploadingPic}
         onProfilePictureChange={data.handleProfilePictureChange}
+        subscription={subscription}
+        onUpgradeClick={handleUpgradeClick}
       />
 
-      {/* Tab bar */}
-      <div className="flex border-b border-stone-200 mb-6">
+      {/* Tab bar — scrollable on narrow screens */}
+      <div className="flex border-b border-stone-200 mb-6 overflow-x-auto scrollbar-none">
         {TABS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => setTab(id)}
-            className={`flex items-center gap-2 font-sans text-[13px] font-medium px-5 py-3 border-b-2 -mb-px transition-all ${
+            className={`flex items-center gap-2 font-sans text-[13px] font-medium px-4 sm:px-5 py-3 border-b-2 -mb-px transition-all whitespace-nowrap shrink-0 ${
               tab === id
                 ? "text-slate-900 border-blue-600 font-semibold"
                 : "text-slate-400 border-transparent hover:text-slate-700"
@@ -126,6 +143,22 @@ export default function ProfilePage() {
       )}
 
       {tab === "vault" && <ResumeVaultTab profile={data.profile} />}
+
+      {/* Free-user: payment details modal */}
+      <LimitModal
+        isOpen={upgradeOpen}
+        plan={subscription?.plan ?? "free"}
+        limit={subscription?.limit ?? 2}
+        onClose={() => setUpgradeOpen(false)}
+      />
+
+      {/* Pro/Elite-user: already-subscribed confirmation modal */}
+      <AlreadyProModal
+        isOpen={alreadyProOpen}
+        plan={subscription?.plan ?? "free"}
+        limit={subscription?.limit ?? 2}
+        onClose={() => setAlreadyProOpen(false)}
+      />
     </div>
   );
 }

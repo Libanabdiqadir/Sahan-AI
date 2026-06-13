@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
     borderBottomColor: GOLD,
     paddingBottom: 3,
     marginBottom: 10,
+    breakAfter: "avoid",
   },
   mainSection: {
     marginBottom: 10,
@@ -167,6 +168,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     borderLeftWidth: 2.5,
     borderLeftColor: GOLD,
+    breakInside: "avoid",
   },
   expHeaderRow: {
     flexDirection: "row",
@@ -301,12 +303,15 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: MUTED,
   },
-  certBlock: { marginBottom: 9 },
+  certBlock: { marginBottom: 9, breakInside: "avoid" },
   certName: { fontFamily: "Times-Bold", fontSize: 11, color: NAVY, marginBottom: 2 },
   certSub: { fontFamily: "Times-Italic", fontSize: 10, color: MUTED },
   projBlock: {
-    marginBottom: 11, paddingLeft: 10,
-    borderLeftWidth: 2.5, borderLeftColor: GOLD,
+    marginBottom: 11,
+    paddingLeft: 10,
+    borderLeftWidth: 2.5,
+    borderLeftColor: GOLD,
+    breakInside: "avoid",
   },
   projHeaderRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 2 },
   projTitle: { fontFamily: "Times-Bold", fontSize: 12, color: NAVY, flex: 1 },
@@ -327,6 +332,13 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
   const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const experience: any[] = tailored.experience?.length ? tailored.experience : (profile.work_experience ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const education: any[] = tailored.education?.length ? tailored.education : (profile.education_history ?? []);
+  const techSkills: string[] = tailored.tech_skills?.length ? tailored.tech_skills : (profile.master_data?.tech_skills ?? []);
+  const softSkills: string[] = tailored.soft_skills?.length ? tailored.soft_skills : (profile.master_data?.soft_skills ?? []);
+  const languages: string[] = tailored.languages?.length ? tailored.languages : (profile.languages ?? []);
 
   const contactItems = [
     profile.contact_email ? { kind: "email" as const, val: profile.contact_email } : null,
@@ -365,10 +377,10 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
           {/* LEFT SIDEBAR */}
           <View style={styles.sidebar}>
             {/* Technical Skills */}
-            {tailored.tech_skills?.length > 0 && (
+            {techSkills.length > 0 && (
               <View style={styles.sidebarSection}>
                 <Text style={styles.sidebarSectionTitle}>Technical Skills</Text>
-                {tailored.tech_skills.map((s, i) => (
+                {techSkills.map((s, i) => (
                   <View key={i} style={styles.skillRow}>
                     <View style={styles.skillDot} />
                     <Text style={styles.skillLabel}>{s}</Text>
@@ -378,10 +390,10 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
             )}
 
             {/* Soft Skills */}
-            {tailored.soft_skills?.length > 0 && (
+            {softSkills.length > 0 && (
               <View style={styles.sidebarSection}>
                 <Text style={styles.sidebarSectionTitle}>Core Competencies</Text>
-                {tailored.soft_skills.map((s, i) => (
+                {softSkills.map((s, i) => (
                   <View key={i} style={styles.skillRow}>
                     <View style={styles.skillDotNavy} />
                     <Text style={styles.skillLabel}>{s}</Text>
@@ -391,11 +403,11 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
             )}
 
             {/* Education */}
-            {tailored.education?.length > 0 && (
+            {education.length > 0 && (
               <View style={styles.sidebarSection}>
                 <Text style={styles.sidebarSectionTitle}>Education</Text>
-                {tailored.education.map((edu, i) => (
-                  <View key={i}>
+                {education.map((edu, i) => (
+                  <View key={i} wrap={false}>
                     <Text style={styles.eduDegree}>{edu.degree}</Text>
                     <Text style={styles.eduSchool}>{edu.university}</Text>
                     <Text style={styles.eduYear}>{edu.graduation_year}</Text>
@@ -405,10 +417,10 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
             )}
 
             {/* Languages */}
-            {tailored.languages?.length > 0 && (
+            {languages.length > 0 && (
               <View style={styles.sidebarSection}>
                 <Text style={styles.sidebarSectionTitle}>Languages</Text>
-                {tailored.languages.map((l, i) => (
+                {languages.map((l, i) => (
                   <View key={i} style={styles.skillRow}>
                     <View style={styles.skillDot} />
                     <Text style={styles.skillLabel}>{l}</Text>
@@ -422,7 +434,7 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
               <View style={styles.sidebarSection}>
                 <Text style={styles.sidebarSectionTitle}>Certifications</Text>
                 {certifications.map((c, i) => (
-                  <View key={i} style={styles.certBlock}>
+                  <View key={i} style={styles.certBlock} wrap={false}>
                     <Text style={styles.certName}>{c.name || ""}</Text>
                     <Text style={styles.certSub}>
                       {[c.issuer || c.organization, c.issue_date || c.year || c.date].filter(Boolean).join("  ·  ")}
@@ -444,11 +456,11 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
             )}
 
             {/* Experience */}
-            {tailored.experience?.length > 0 && (
-              <View style={styles.mainSection}>
+            {experience.length > 0 && (
+              <View style={styles.mainSection} minPresenceAhead={60}>
                 <Text style={styles.mainSectionTitle}>Professional Experience</Text>
-                {tailored.experience.map((exp, i) => (
-                  <View key={i} style={styles.expBlock}>
+                {experience.map((exp, i) => (
+                  <View key={i} style={styles.expBlock} wrap={false}>
                     <View style={styles.expHeaderRow}>
                       <Text style={styles.expRole}>{exp.role}</Text>
                       <Text style={styles.expDateBadge}>{exp.duration}</Text>
@@ -467,10 +479,10 @@ export function ExecutiveCV({ profile, tailored, jobTitle, companyName }: Execut
 
             {/* Projects */}
             {projects.length > 0 && (
-              <View style={styles.mainSection}>
+              <View style={styles.mainSection} minPresenceAhead={60}>
                 <Text style={styles.mainSectionTitle}>Notable Projects</Text>
                 {projects.map((p, i) => (
-                  <View key={i} style={styles.projBlock}>
+                  <View key={i} style={styles.projBlock} wrap={false}>
                     <View style={styles.projHeaderRow}>
                       <Text style={styles.projTitle}>{p.name || p.title || ""}</Text>
                       <Text style={styles.expDateBadge}>{p.dates || p.duration || ""}</Text>

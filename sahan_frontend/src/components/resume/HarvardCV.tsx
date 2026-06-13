@@ -250,6 +250,13 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
   const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const experience: any[] = tailored.experience?.length ? tailored.experience : (profile.work_experience ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const education: any[] = tailored.education?.length ? tailored.education : (profile.education_history ?? []);
+  const techSkills: string[] = tailored.tech_skills?.length ? tailored.tech_skills : (profile.master_data?.tech_skills ?? []);
+  const softSkills: string[] = tailored.soft_skills?.length ? tailored.soft_skills : (profile.master_data?.soft_skills ?? []);
+  const languages: string[] = tailored.languages?.length ? tailored.languages : (profile.languages ?? []);
 
   const contactItems = [
     profile.contact_email ? { kind: "email" as const, val: profile.contact_email } : null,
@@ -289,10 +296,10 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
         )}
 
         {/* Experience */}
-        {tailored.experience?.length > 0 && (
+        {experience.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Professional Experience</Text>
-            {tailored.experience.map((exp, i) => (
+            {experience.map((exp, i) => (
               <View key={i} style={styles.expBlock}>
                 <View style={styles.expHeader}>
                   <Text style={styles.expTitle}>{exp.role}</Text>
@@ -340,10 +347,10 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
         )}
 
         {/* Education */}
-        {tailored.education?.length > 0 && (
+        {education.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Education</Text>
-            {tailored.education.map((edu, i) => (
+            {education.map((edu, i) => (
               <View key={i} style={styles.eduRow}>
                 <View>
                   <Text style={styles.eduDegree}>{edu.degree}</Text>
@@ -356,31 +363,33 @@ export function HarvardCV({ profile, tailored, jobTitle, companyName }: HarvardC
         )}
 
         {/* Skills — wrap={false} prevents the 2-column grid from splitting across pages */}
+        {(techSkills.length > 0 || softSkills.length > 0 || languages.length > 0) && (
         <View style={styles.section} wrap={false}>
           <Text style={styles.sectionTitle}>Skills & Languages</Text>
           <View style={styles.skillsGrid}>
-            {tailored.tech_skills?.length > 0 && (
+            {techSkills.length > 0 && (
               <View style={styles.skillsCol}>
                 <Text style={styles.skillCategory}>Technical Skills</Text>
-                <Text style={styles.skillText}>{tailored.tech_skills.join(", ")}</Text>
+                <Text style={styles.skillText}>{techSkills.join(", ")}</Text>
               </View>
             )}
             <View style={styles.skillsCol}>
-              {tailored.soft_skills?.length > 0 && (
+              {softSkills.length > 0 && (
                 <>
                   <Text style={styles.skillCategory}>Soft Skills</Text>
-                  <Text style={styles.skillText}>{tailored.soft_skills.join(", ")}</Text>
+                  <Text style={styles.skillText}>{softSkills.join(", ")}</Text>
                 </>
               )}
-              {tailored.languages?.length > 0 && (
+              {languages.length > 0 && (
                 <>
                   <Text style={[styles.skillCategory, { marginTop: 4 }]}>Languages</Text>
-                  <Text style={styles.skillText}>{tailored.languages.join(", ")}</Text>
+                  <Text style={styles.skillText}>{languages.join(", ")}</Text>
                 </>
               )}
             </View>
           </View>
         </View>
+        )}
         {/* Certifications */}
         {certifications.length > 0 && (
           <View style={styles.section}>
@@ -451,6 +460,13 @@ export function HarvardPreview({
   const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const experience: any[] = tailored.experience?.length ? tailored.experience : (profile.work_experience ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const education: any[] = tailored.education?.length ? tailored.education : (profile.education_history ?? []);
+  const techSkills: string[] = tailored.tech_skills?.length ? tailored.tech_skills : (profile.master_data?.tech_skills ?? []);
+  const softSkills: string[] = tailored.soft_skills?.length ? tailored.soft_skills : (profile.master_data?.soft_skills ?? []);
+  const languages: string[] = tailored.languages?.length ? tailored.languages : (profile.languages ?? []);
 
   const contactItems: HContactItem[] = [
     profile.contact_email ? { kind: "email", val: profile.contact_email } : null,
@@ -480,10 +496,10 @@ export function HarvardPreview({
       )}
 
       {/* Experience */}
-      {tailored.experience?.length > 0 && (
+      {experience.length > 0 && (
         <div style={{ marginBottom: "8px" }}>
           <HSectionTitle title="Professional Experience" />
-          {tailored.experience.map((exp, i) => (
+          {experience.map((exp, i) => (
             <div key={i} style={{ marginBottom: "6px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1px" }}>
                 <span style={{ fontWeight: 700, fontSize: "10px", color: H.dark }}>{exp.role}</span>
@@ -531,10 +547,10 @@ export function HarvardPreview({
       )}
 
       {/* Education */}
-      {tailored.education?.length > 0 && (
+      {education.length > 0 && (
         <div style={{ marginBottom: "8px" }}>
           <HSectionTitle title="Education" />
-          {tailored.education.map((edu, i) => (
+          {education.map((edu, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
               <div>
                 <p style={{ fontWeight: 700, fontSize: "10px", color: H.dark }}>{edu.degree}</p>
@@ -547,31 +563,33 @@ export function HarvardPreview({
       )}
 
       {/* Skills & Languages */}
+      {(techSkills.length > 0 || softSkills.length > 0 || languages.length > 0) && (
       <div style={{ marginBottom: "8px" }}>
         <HSectionTitle title="Skills & Languages" />
         <div style={{ display: "flex", gap: "14px" }}>
-          {tailored.tech_skills?.length > 0 && (
+          {techSkills.length > 0 && (
             <div style={{ flex: 1 }}>
               <p style={{ fontWeight: 700, fontSize: "9px", color: H.dark, marginBottom: "2px" }}>Technical Skills</p>
-              <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{tailored.tech_skills.join(", ")}</p>
+              <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{techSkills.join(", ")}</p>
             </div>
           )}
           <div style={{ flex: 1 }}>
-            {tailored.soft_skills?.length > 0 && (
+            {softSkills.length > 0 && (
               <>
                 <p style={{ fontWeight: 700, fontSize: "9px", color: H.dark, marginBottom: "2px" }}>Soft Skills</p>
-                <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35, marginBottom: "4px" }}>{tailored.soft_skills.join(", ")}</p>
+                <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35, marginBottom: "4px" }}>{softSkills.join(", ")}</p>
               </>
             )}
-            {tailored.languages?.length > 0 && (
+            {languages.length > 0 && (
               <>
                 <p style={{ fontWeight: 700, fontSize: "9px", color: H.dark, marginBottom: "2px" }}>Languages</p>
-                <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{tailored.languages.join(", ")}</p>
+                <p style={{ fontSize: "9px", color: H.body, lineHeight: 1.35 }}>{languages.join(", ")}</p>
               </>
             )}
           </div>
         </div>
       </div>
+      )}
 
       {/* Certifications */}
       {certifications.length > 0 && (

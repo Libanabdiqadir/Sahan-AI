@@ -29,7 +29,7 @@ export function TemplatePickerModal({ isOpen, onClose, template, setTemplate }: 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
@@ -37,7 +37,7 @@ export function TemplatePickerModal({ isOpen, onClose, template, setTemplate }: 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 16 }}
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className="bg-white rounded-2xl p-5 w-full max-w-3xl shadow-2xl max-h-[85vh] flex flex-col"
+            className="bg-white rounded-2xl p-4 sm:p-5 w-full max-w-3xl shadow-2xl max-h-[85vh] flex flex-col"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-5">
@@ -55,7 +55,7 @@ export function TemplatePickerModal({ isOpen, onClose, template, setTemplate }: 
             </div>
 
             <div className="overflow-y-auto flex-1 -mr-1 pr-1">
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
                 {TEMPLATES.map(({ id, label, desc, badge }) => (
                   <motion.button
                     key={id}

@@ -2,6 +2,7 @@ import type {
   AdminUser,
   AnalyticsData,
   AuthTokens,
+  GenerationMode,
   LoginCredentials,
   PlanChoice,
   RegisterCredentials,
@@ -11,7 +12,7 @@ import type {
   TailoredData,
 } from "../types";
 
-const BASE_URL = `${import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"}`;
+const BASE_URL: string = import.meta.env.VITE_API_URL;
 
 // ─── Token Management ─────────────────────────────────────────────────────────
 // Access token lives in memory so it is never written to localStorage and cannot
@@ -166,11 +167,7 @@ export const authApi = {
 
   logout: () => tokenStorage.clear(),
 
-  me: async (): Promise<User> => {
-    const user = await apiFetch<User>("/auth/users/me/");
-    console.log("[authApi.me] raw response →", user);
-    return user;
-  },
+  me: async (): Promise<User> => apiFetch<User>("/auth/users/me/"),
 
   updateName: (id: number, payload: { first_name: string; last_name: string }): Promise<User> =>
     apiFetch<User>(`/users/${id}/`, {
@@ -229,22 +226,63 @@ export const profileApi = {
 };
 
 // ─── Resume API ───────────────────────────────────────────────────────────────
+
+/**
+ * Poll a resume record until the Celery worker finishes (status leaves 'processing').
+ * Throws a structured error object on failure or timeout so useTailorForm can
+ * surface it the same way as any other API error.
+ */
+async function pollResume(
+  id: number,
+  intervalMs = 2500,
+  timeoutMs  = 120_000,
+): Promise<ResumeHistory> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, intervalMs));
+    const resume = await apiFetch<ResumeHistory>(`/resumes/${id}/`);
+    if (resume.status === "failed") {
+      throw {
+        error: resume.error_message || "AI generation failed. Please try again.",
+        code:  "generation_failed",
+      };
+    }
+    if (resume.status === "completed") return resume;
+  }
+  throw { error: "Generation timed out. Please try again in a moment.", code: "timeout" };
+}
+
 export const resumeApi = {
   list: (): Promise<ResumeHistory[]> => apiFetch<ResumeHistory[]>("/resumes/"),
   get:  (id: number): Promise<ResumeHistory> => apiFetch<ResumeHistory>(`/resumes/${id}/`),
 
-  tailor: (payload: {
+  tailor: async (payload: {
     job_description: string;
     company_name?: string;
     job_title?: string;
-  }): Promise<ResumeHistory> =>
-    apiFetch<ResumeHistory>("/resumes/tailor/", {
+    generation_mode?: GenerationMode;
+  }): Promise<ResumeHistory> => {
+    // Each click gets a fresh idempotency key so rapid double-clicks return the
+    // same in-flight record instead of creating a duplicate + consuming quota.
+    const idempotency_key = crypto.randomUUID();
+    const result = await apiFetch<ResumeHistory>("/resumes/tailor/", {
       method: "POST",
-      body: JSON.stringify(payload),
-    }),
+      body: JSON.stringify({ ...payload, idempotency_key }),
+    });
+    // Sync path (status already 'completed'): return immediately.
+    // Async path (Celery worker, status='processing'): poll until done.
+    if (result.status !== "processing") return result;
+    return pollResume(result.id);
+  },
 
   delete: (id: number): Promise<void> =>
     apiFetch<void>(`/resumes/${id}/`, { method: "DELETE" }),
+};
+
+// ─── Subscription API ─────────────────────────────────────────────────────────
+export const subscriptionApi = {
+  getStatus: (): Promise<{ plan: string; limit: number; used: number; remaining: number; reset_date: string }> =>
+    apiFetch("/subscription/status/"),
 };
 
 // ─── PDF API ──────────────────────────────────────────────────────────────────

@@ -12,6 +12,7 @@ from .views import (
   google_auth_check,
   google_register,
   subscription_status,
+  stripe_webhook,
   track_visit,
   analytics_dashboard,
 )
@@ -37,6 +38,8 @@ urlpatterns = [
     path('auth/google/register/', google_register,   name='google_register'),
 
     path('subscription/status/', subscription_status, name='subscription_status'),
+
+    path('stripe/webhook/',      stripe_webhook,       name='stripe_webhook'),
 
     path('analytics/track/',     track_visit,          name='analytics_track'),
     path('analytics/',           analytics_dashboard,  name='analytics_dashboard'),

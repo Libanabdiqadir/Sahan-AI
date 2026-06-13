@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { FileText, Loader2, Download, RefreshCw, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { FileText, Mail, Loader2, Download, RefreshCw, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { resumeApi } from "../../services/api";
 import { HarvardCV } from "../resume/HarvardCV";
+import { CoverLetterDocument } from "../resume/CoverLetterDocument";
 import type { UserProfile, ResumeHistory } from "../../types";
 
 function StatusBadge({ status }: { status: ResumeHistory["status"] }) {
@@ -60,13 +61,21 @@ export function ResumeVaultTab({ profile }: Props) {
                     {new Date(r.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                   </p>
                 </div>
-                <div className="flex items-center gap-3 ml-4">
+                <div className="flex items-center gap-2 ml-4">
                   <StatusBadge status={r.status} />
                   {r.status === "completed" && profile && (
                     <>
+                      {/* CV download — cover_letter stripped so PDF contains only the resume */}
                       <PDFDownloadLink
-                        document={<HarvardCV profile={profile} tailored={r.tailored_data} jobTitle={r.job_title} companyName={r.company_name} />}
-                        fileName={`${r.job_title?.replace(/\s/g, "_")}_CV.pdf`}
+                        document={
+                          <HarvardCV
+                            profile={profile}
+                            tailored={{ ...r.tailored_data, cover_letter: "" }}
+                            jobTitle={r.job_title}
+                            companyName={r.company_name}
+                          />
+                        }
+                        fileName={`${r.job_title?.replace(/\s/g, "_") || "Resume"}_CV.pdf`}
                       >
                         {({ loading: pdfLoading }) => (
                           <button
@@ -77,12 +86,39 @@ export function ResumeVaultTab({ profile }: Props) {
                           </button>
                         )}
                       </PDFDownloadLink>
-                      <button
-                        onClick={e => e.stopPropagation()}
-                        className="font-sans text-[12px] font-semibold px-3 py-1.5 border border-stone-200 rounded-lg text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all flex items-center gap-1.5"
-                      >
-                        <Download size={11} /> Letter
-                      </button>
+
+                      {/* Cover letter download */}
+                      {r.tailored_data?.cover_letter ? (
+                        <PDFDownloadLink
+                          document={
+                            <CoverLetterDocument
+                              profile={profile}
+                              tailored={r.tailored_data}
+                              jobTitle={r.job_title}
+                              companyName={r.company_name}
+                            />
+                          }
+                          fileName={`${r.job_title?.replace(/\s/g, "_") || "Cover_Letter"}_Letter.pdf`}
+                        >
+                          {({ loading: pdfLoading }) => (
+                            <button
+                              onClick={e => e.stopPropagation()}
+                              className="font-sans text-[12px] font-semibold px-3 py-1.5 border border-stone-200 rounded-lg text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all flex items-center gap-1.5"
+                            >
+                              {pdfLoading ? <Loader2 size={11} className="animate-spin" /> : <Mail size={11} />} Letter
+                            </button>
+                          )}
+                        </PDFDownloadLink>
+                      ) : (
+                        <button
+                          disabled
+                          onClick={e => e.stopPropagation()}
+                          className="font-sans text-[12px] font-semibold px-3 py-1.5 border border-stone-100 rounded-lg text-slate-300 flex items-center gap-1.5 cursor-not-allowed"
+                          title="No cover letter generated for this entry"
+                        >
+                          <Mail size={11} /> Letter
+                        </button>
+                      )}
                     </>
                   )}
                   {r.status === "failed" && (

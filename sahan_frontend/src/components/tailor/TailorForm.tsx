@@ -1,7 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Loader2, AlertCircle, FileText, ChevronDown } from "lucide-react";
-import type { Template } from "../../types";
+import { Sparkles, Loader2, AlertCircle, FileText, ChevronDown, SlidersHorizontal, TriangleAlert } from "lucide-react";
+import type { Template, GenerationMode } from "../../types";
 import { TEMPLATES } from "./TemplatePickerModal";
+
+const MODE_LABELS: Record<GenerationMode, string> = {
+  both:              "Both Documents",
+  cv_only:           "Resume Only",
+  cover_letter_only: "Cover Letter Only",
+};
 
 interface Props {
   jobTitle: string;
@@ -13,8 +19,10 @@ interface Props {
   loading: boolean;
   error: string;
   template: Template;
+  selectedMode: GenerationMode;
   onOpenTemplateModal: () => void;
-  handleTailor: () => void;
+  onGenerate: () => void;
+  onOpenChoiceModal: () => void;
 }
 
 export function TailorForm({
@@ -22,16 +30,17 @@ export function TailorForm({
   companyName, setCompanyName,
   jobDescription, setJobDescription,
   loading, error,
-  template, onOpenTemplateModal,
-  handleTailor,
+  template, selectedMode, onOpenTemplateModal,
+  onGenerate, onOpenChoiceModal,
 }: Props) {
   const selectedLabel = TEMPLATES.find(t => t.id === template)?.label ?? "";
+  const modeLabel     = MODE_LABELS[selectedMode];
 
   return (
     <div className="bg-white border border-stone-200 rounded-2xl p-6 mb-5">
       <h2 className="text-[18px] font-bold text-slate-900 tracking-tight mb-1">AI Resume Tailoring</h2>
       <p className="font-sans text-[13px] text-slate-400 mb-5">
-        Enter the job details below. Gemini 2.5 Flash will craft a tailored resume and cover letter matched to this specific role.
+        Enter the job details below. Our AI engine will craft a tailored resume and cover letter matched to this specific role.
       </p>
 
       {/* Template picker trigger */}
@@ -87,17 +96,46 @@ export function TailorForm({
             <AlertCircle size={14} /> {error}
           </motion.div>
         )}
+        {selectedMode === "cover_letter_only" && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="mb-4 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl font-sans text-[13px] text-amber-800 flex items-start gap-2"
+          >
+            <TriangleAlert size={15} className="mt-0.5 shrink-0 text-amber-500" />
+            <span>
+              <strong>Cover Letter Only mode is active.</strong> Generating now will produce an empty resume.
+              {" "}<button onClick={onOpenChoiceModal} className="underline font-semibold hover:text-amber-900">Switch to Both Documents</button> to get a full resume and cover letter.
+            </span>
+          </motion.div>
+        )}
       </AnimatePresence>
 
-      <button
-        onClick={handleTailor}
-        disabled={loading}
-        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-60 text-white font-sans font-semibold text-[14px] px-6 py-3 rounded-xl flex items-center gap-2 transition-all"
-      >
-        {loading
-          ? <><Loader2 size={15} className="animate-spin" />Gemini AI is tailoring your resume...</>
-          : <><Sparkles size={15} />Generate with Gemini AI</>}
-      </button>
+      <div className="flex items-center gap-3">
+        {/* Primary: immediate generation with current mode */}
+        <button
+          onClick={onGenerate}
+          disabled={loading || !jobDescription.trim()}
+          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 text-white font-sans font-semibold text-[14px] px-6 py-3 rounded-xl flex items-center gap-2 transition-all"
+        >
+          {loading
+            ? <><Loader2 size={15} className="animate-spin" /> Generating…</>
+            : <><Sparkles size={15} /> Generate</>}
+        </button>
+
+        {/* Secondary: open format picker modal — shows current mode so user always knows what will generate */}
+        <button
+          onClick={onOpenChoiceModal}
+          disabled={loading}
+          className="flex flex-col items-start font-sans px-5 py-2.5 rounded-xl border-2 border-stone-200 text-slate-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50/40 disabled:opacity-50 transition-all"
+        >
+          <span className="flex items-center gap-1.5 font-semibold text-[13px]">
+            <SlidersHorizontal size={13} /> Choose Type
+          </span>
+          <span className="text-[11px] text-slate-400 mt-0.5">
+            Mode: <span className={`font-semibold ${selectedMode === "cover_letter_only" ? "text-amber-500" : "text-blue-600"}`}>{modeLabel}</span>
+          </span>
+        </button>
+      </div>
     </div>
   );
 }

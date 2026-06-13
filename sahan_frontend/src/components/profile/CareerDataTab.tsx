@@ -1,6 +1,7 @@
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Briefcase, FileText, Plus, Trash2, XCircle, CheckCircle2,
+  Briefcase, FileText, Plus, Trash2, XCircle, CheckCircle2, X, Eye,
 } from "lucide-react";
 import type {
   UserProfile, EducationEntry, ExperienceEntry, ProjectEntry, CertificationEntry,
@@ -8,9 +9,9 @@ import type {
 
 function SkillChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1.5 font-sans text-[12px] font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 group">
+    <span className="inline-flex items-center gap-1.5 font-sans text-[12px] font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
       {label}
-      <button onClick={onRemove} className="opacity-0 group-hover:opacity-100 text-blue-400 hover:text-red-400 transition-all">
+      <button onClick={onRemove} className="text-blue-400 hover:text-red-400 transition-all">
         <XCircle size={11} />
       </button>
     </span>
@@ -61,6 +62,10 @@ export interface CareerDataTabProps {
   handleDeleteCertification: (idx: number) => void;
 }
 
+type DetailItem =
+  | { type: "exp"; data: ExperienceEntry }
+  | { type: "project"; data: ProjectEntry };
+
 export function CareerDataTab(props: CareerDataTabProps) {
   const {
     draft, setDraft,
@@ -71,6 +76,13 @@ export function CareerDataTab(props: CareerDataTabProps) {
     showProjectForm, setShowProjectForm, newProject, setNewProject, handleAddProject, handleDeleteProject,
     showCertForm, setShowCertForm, newCert, setNewCert, handleAddCertification, handleDeleteCertification,
   } = props;
+
+  const [expRespInput,       setExpRespInput]       = useState("");
+  const [projHighlightInput, setProjHighlightInput] = useState("");
+  const [detailItem,         setDetailItem]         = useState<DetailItem | null>(null);
+
+  useEffect(() => { if (!showExpForm)     setExpRespInput(""); },       [showExpForm]);
+  useEffect(() => { if (!showProjectForm) setProjHighlightInput(""); }, [showProjectForm]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
@@ -85,26 +97,50 @@ export function CareerDataTab(props: CareerDataTabProps) {
         </div>
         {(draft.work_experience ?? []).length > 0 ? (
           (draft.work_experience ?? []).map((exp, i) => (
-            <div key={i} className="flex items-start justify-between p-4 border border-stone-100 rounded-xl mb-3 group">
+            <div
+              key={i}
+              onClick={() => setDetailItem({ type: "exp", data: exp })}
+              className="flex items-start justify-between p-4 border border-stone-100 rounded-xl mb-3 group cursor-pointer hover:border-blue-200 hover:bg-blue-50/20 transition-all"
+            >
               <div className="flex gap-3 items-start">
-                <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 mt-0.5"><Briefcase size={15} className="text-blue-600" /></div>
+                <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
+                  <Briefcase size={15} className="text-blue-600" />
+                </div>
                 <div>
                   <p className="font-semibold text-[14px] text-slate-900">{exp.role}</p>
                   <p className="font-sans text-[12px] text-slate-400 mt-0.5">{exp.company} · {exp.duration}</p>
+                  {exp.responsibilities.length > 0 && (
+                    <p className="font-sans text-[11px] text-slate-300 mt-1">
+                      {exp.responsibilities.length} responsibilit{exp.responsibilities.length === 1 ? "y" : "ies"}
+                    </p>
+                  )}
                 </div>
               </div>
-              <button onClick={() => handleDeleteExperience(i)} className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all mt-1"><Trash2 size={13} /></button>
+              <div className="flex items-center gap-1 mt-1 shrink-0">
+                <Eye size={12} className="text-blue-300 hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity" />
+                <button
+                  onClick={e => { e.stopPropagation(); handleDeleteExperience(i); }}
+                  className="p-1.5 text-slate-300 hover:text-red-400 transition-all rounded-lg hover:bg-red-50"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
             </div>
           ))
         ) : (
           <p className="font-sans text-[13px] text-slate-300 italic">No work experience added yet.</p>
         )}
+
         {showExpForm && (
-          <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white rounded-2xl border border-stone-200 p-6 w-full max-w-[480px] shadow-xl">
+          <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 sm:p-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-6 w-full max-w-[480px] shadow-xl max-h-[90vh] overflow-y-auto"
+            >
               <div className="flex items-center justify-between mb-5">
                 <h3 className="font-bold text-[16px] text-slate-900">Add Work Experience</h3>
-                <button onClick={() => setShowExpForm(false)} className="text-slate-400 hover:text-slate-600"><XCircle size={18} /></button>
+                <button onClick={() => setShowExpForm(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-stone-100 rounded-lg transition-colors"><XCircle size={18} /></button>
               </div>
               <div className="space-y-4">
                 <div>
@@ -120,13 +156,36 @@ export function CareerDataTab(props: CareerDataTabProps) {
                   <input className="form-input" value={newExp.duration} onChange={e => setNewExp(p => ({ ...p, duration: e.target.value }))} placeholder="e.g. Jan 2022 – Present" />
                 </div>
                 <div>
-                  <label className="label-xs text-slate-700 font-medium">Key Responsibilities (one per line)</label>
-                  <textarea
-                    className="form-input min-h-[100px] resize-none w-full"
-                    value={newExp.responsibilities.join("\n")}
-                    onChange={e => setNewExp(p => ({ ...p, responsibilities: e.target.value.split("\n").filter(Boolean) }))}
-                    placeholder={"Built reusable React components...\nReduced load time by 40%..."}
+                  <label className="label-xs block mb-2">Key Responsibilities</label>
+                  <input
+                    className="form-input w-full"
+                    value={expRespInput}
+                    onChange={e => setExpRespInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter" && expRespInput.trim()) {
+                        e.preventDefault();
+                        setNewExp(p => ({ ...p, responsibilities: [...p.responsibilities, expRespInput.trim()] }));
+                        setExpRespInput("");
+                      }
+                    }}
+                    placeholder="Type a responsibility and press Enter ↵"
                   />
+                  {newExp.responsibilities.length > 0 && (
+                    <ul className="mt-3 space-y-1.5">
+                      {newExp.responsibilities.map((r, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-[13px] text-slate-700 bg-stone-50 rounded-lg px-3 py-2 group/bullet">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-[5px] shrink-0" />
+                          <span className="flex-1 leading-snug">{r}</span>
+                          <button
+                            onClick={() => setNewExp(p => ({ ...p, responsibilities: p.responsibilities.filter((_, ri) => ri !== idx) }))}
+                            className="text-slate-300 hover:text-red-400 transition-colors shrink-0 opacity-0 group-hover/bullet:opacity-100"
+                          >
+                            <X size={11} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
@@ -156,18 +215,18 @@ export function CareerDataTab(props: CareerDataTabProps) {
                   <p className="font-sans text-[12px] text-slate-400 mt-0.5">{edu.university} · {edu.graduation_year}</p>
                 </div>
               </div>
-              <button onClick={() => handleDeleteEducation(i)} className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all mt-1"><Trash2 size={13} /></button>
+              <button onClick={() => handleDeleteEducation(i)} className="p-1.5 text-slate-300 hover:text-red-400 transition-all mt-0.5 rounded-lg hover:bg-red-50 shrink-0"><Trash2 size={13} /></button>
             </div>
           ))
         ) : (
           <p className="font-sans text-[13px] text-slate-300 italic">No education added yet.</p>
         )}
         {showEduForm && (
-          <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white rounded-2xl border border-stone-200 p-6 w-full max-w-[440px] shadow-xl">
+          <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 sm:p-6">
+            <motion.div initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-6 w-full max-w-[440px] shadow-xl">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="font-bold text-[16px] text-slate-900">Add Education</h3>
-                <button onClick={() => setShowEduForm(false)} className="text-slate-400 hover:text-slate-600"><XCircle size={18} /></button>
+                <button onClick={() => setShowEduForm(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-stone-100 rounded-lg transition-colors"><XCircle size={18} /></button>
               </div>
               <div className="space-y-4">
                 <div>
@@ -202,30 +261,54 @@ export function CareerDataTab(props: CareerDataTabProps) {
         </div>
         {(draft.projects ?? []).length > 0 ? (
           (draft.projects ?? []).map((proj, i) => (
-            <div key={i} className="flex items-start justify-between p-4 border border-stone-100 rounded-xl mb-3 group">
+            <div
+              key={i}
+              onClick={() => setDetailItem({ type: "project", data: proj })}
+              className="flex items-start justify-between p-4 border border-stone-100 rounded-xl mb-3 group cursor-pointer hover:border-emerald-200 hover:bg-emerald-50/20 transition-all"
+            >
               <div className="flex gap-3 items-start">
-                <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 mt-0.5"><FileText size={15} className="text-emerald-600" /></div>
+                <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 mt-0.5">
+                  <FileText size={15} className="text-emerald-600" />
+                </div>
                 <div>
                   <p className="font-semibold text-[14px] text-slate-900">{proj.title}</p>
                   <p className="font-sans text-[12px] text-slate-400 mt-0.5">{proj.role_title}{proj.dates ? ` · ${proj.dates}` : ""}</p>
                   {proj.link && <p className="font-sans text-[11px] text-blue-500 mt-0.5 truncate max-w-xs">{proj.link}</p>}
+                  {(proj.highlights ?? []).length > 0 && (
+                    <p className="font-sans text-[11px] text-slate-300 mt-1">
+                      {proj.highlights!.length} highlight{proj.highlights!.length === 1 ? "" : "s"}
+                    </p>
+                  )}
                 </div>
               </div>
-              <button onClick={() => handleDeleteProject(i)} className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all mt-1"><Trash2 size={13} /></button>
+              <div className="flex items-center gap-1 mt-1 shrink-0">
+                <Eye size={12} className="text-emerald-300 hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity" />
+                <button
+                  onClick={e => { e.stopPropagation(); handleDeleteProject(i); }}
+                  className="p-1.5 text-slate-300 hover:text-red-400 transition-all rounded-lg hover:bg-red-50"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
             </div>
           ))
         ) : (
           <p className="font-sans text-[13px] text-slate-300 italic">No projects added yet.</p>
         )}
+
         {showProjectForm && (
-          <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white rounded-2xl border border-stone-200 p-6 w-full max-w-[520px] shadow-xl">
+          <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 sm:p-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-6 w-full max-w-[520px] shadow-xl max-h-[90vh] overflow-y-auto"
+            >
               <div className="flex items-center justify-between mb-5">
                 <h3 className="font-bold text-[16px] text-slate-900">Add Project</h3>
-                <button onClick={() => setShowProjectForm(false)} className="text-slate-400 hover:text-slate-600"><XCircle size={18} /></button>
+                <button onClick={() => setShowProjectForm(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-stone-100 rounded-lg transition-colors"><XCircle size={18} /></button>
               </div>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="label-xs mr-3">Project Title *</label>
                     <input className="form-input" value={newProject.title} onChange={e => setNewProject(p => ({ ...p, title: e.target.value }))} placeholder="e.g. E-Commerce Platform" autoFocus />
@@ -239,7 +322,39 @@ export function CareerDataTab(props: CareerDataTabProps) {
                   <label className="label-xs mr-3">Description</label>
                   <textarea className="form-input min-h-[80px] resize-none w-full" value={newProject.description} onChange={e => setNewProject(p => ({ ...p, description: e.target.value }))} placeholder="Brief description of the project and your impact..." />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="label-xs block mb-2">Key Highlights</label>
+                  <input
+                    className="form-input w-full"
+                    value={projHighlightInput}
+                    onChange={e => setProjHighlightInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter" && projHighlightInput.trim()) {
+                        e.preventDefault();
+                        setNewProject(p => ({ ...p, highlights: [...(p.highlights ?? []), projHighlightInput.trim()] }));
+                        setProjHighlightInput("");
+                      }
+                    }}
+                    placeholder="Type a highlight and press Enter ↵"
+                  />
+                  {(newProject.highlights ?? []).length > 0 && (
+                    <ul className="mt-3 space-y-1.5">
+                      {(newProject.highlights ?? []).map((h, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-[13px] text-slate-700 bg-stone-50 rounded-lg px-3 py-2 group/bullet">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-[5px] shrink-0" />
+                          <span className="flex-1 leading-snug">{h}</span>
+                          <button
+                            onClick={() => setNewProject(p => ({ ...p, highlights: (p.highlights ?? []).filter((_, hi) => hi !== idx) }))}
+                            className="text-slate-300 hover:text-red-400 transition-colors shrink-0 opacity-0 group-hover/bullet:opacity-100"
+                          >
+                            <X size={11} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="label-xs mr-3">Link / URL</label>
                     <input className="form-input" value={newProject.link} onChange={e => setNewProject(p => ({ ...p, link: e.target.value }))} placeholder="github.com/you/project" />
@@ -280,9 +395,9 @@ export function CareerDataTab(props: CareerDataTabProps) {
         <h2 className="font-bold text-[15px] text-slate-900 mb-4">Soft Skills</h2>
         <div className="flex flex-wrap gap-2 mb-4">
           {(draft.master_data?.soft_skills ?? []).map((s, i) => (
-            <span key={i} className="inline-flex items-center gap-1.5 font-sans text-[12px] font-medium px-3 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 group">
+            <span key={i} className="inline-flex items-center gap-1.5 font-sans text-[12px] font-medium px-3 py-1 rounded-full bg-green-50 text-green-700 border border-green-200">
               {s}
-              <button onClick={() => removeSkill("soft_skills", i)} className="opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all"><XCircle size={11} /></button>
+              <button onClick={() => removeSkill("soft_skills", i)} className="hover:text-red-400 transition-all"><XCircle size={11} /></button>
             </span>
           ))}
         </div>
@@ -299,7 +414,7 @@ export function CareerDataTab(props: CareerDataTabProps) {
         <h2 className="font-bold text-[15px] text-slate-900 mb-4">Languages</h2>
         <div className="flex flex-wrap gap-2 mb-4">
           {(draft.languages ?? []).map((l, i) => (
-            <span key={i} className="inline-flex items-center gap-1.5 font-sans text-[12px] font-medium px-3 py-1 rounded-full bg-violet-50 text-violet-700 border border-violet-200 group">
+            <span key={i} className="inline-flex items-center gap-1.5 font-sans text-[12px] font-medium px-3 py-1 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
               {l}
               <button
                 onClick={() => {
@@ -307,7 +422,7 @@ export function CareerDataTab(props: CareerDataTabProps) {
                   updated.splice(i, 1);
                   setDraft(p => ({ ...p, languages: updated }));
                 }}
-                className="opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all"
+                className="hover:text-red-400 transition-all"
               >
                 <XCircle size={11} />
               </button>
@@ -344,21 +459,21 @@ export function CareerDataTab(props: CareerDataTabProps) {
                   {cert.credential_url && <p className="font-sans text-[11px] text-blue-500 mt-0.5 truncate max-w-xs">{cert.credential_url}</p>}
                 </div>
               </div>
-              <button onClick={() => handleDeleteCertification(i)} className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all mt-1"><Trash2 size={13} /></button>
+              <button onClick={() => handleDeleteCertification(i)} className="p-1.5 text-slate-300 hover:text-red-400 transition-all mt-0.5 rounded-lg hover:bg-red-50 shrink-0"><Trash2 size={13} /></button>
             </div>
           ))
         ) : (
           <p className="font-sans text-[13px] text-slate-300 italic">No certifications added yet.</p>
         )}
         {showCertForm && (
-          <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white rounded-2xl border border-stone-200 p-6 w-full max-w-[520px] shadow-xl">
+          <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 sm:p-6">
+            <motion.div initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-6 w-full max-w-[520px] shadow-xl">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="font-bold text-[16px] text-slate-900">Add Certification</h3>
-                <button onClick={() => setShowCertForm(false)} className="text-slate-400 hover:text-slate-600"><XCircle size={18} /></button>
+                <button onClick={() => setShowCertForm(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-stone-100 rounded-lg transition-colors"><XCircle size={18} /></button>
               </div>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="label-xs mr-3">Certification Name *</label>
                     <input className="form-input" value={newCert.name} onChange={e => setNewCert(p => ({ ...p, name: e.target.value }))} placeholder="e.g. AWS Solutions Architect" autoFocus />
@@ -368,7 +483,7 @@ export function CareerDataTab(props: CareerDataTabProps) {
                     <input className="form-input" value={newCert.issuer} onChange={e => setNewCert(p => ({ ...p, issuer: e.target.value }))} placeholder="e.g. Amazon Web Services" />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="label-xs mr-3">Issue Date</label>
                     <input className="form-input" value={newCert.issue_date} onChange={e => setNewCert(p => ({ ...p, issue_date: e.target.value }))} placeholder="e.g. March 2024" />
@@ -378,7 +493,7 @@ export function CareerDataTab(props: CareerDataTabProps) {
                     <input className="form-input" value={newCert.expiration_date} onChange={e => setNewCert(p => ({ ...p, expiration_date: e.target.value }))} placeholder="e.g. March 2027" />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="label-xs mr-3">Credential ID</label>
                     <input className="form-input" value={newCert.credential_id} onChange={e => setNewCert(p => ({ ...p, credential_id: e.target.value }))} placeholder="Optional credential ID" />
@@ -398,7 +513,118 @@ export function CareerDataTab(props: CareerDataTabProps) {
         )}
       </div>
 
+      {/* ── Detail Pop-up Modal ──────────────────────────────────────── */}
+      <AnimatePresence>
+        {detailItem && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm"
+            onClick={() => setDetailItem(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[80vh] overflow-y-auto"
+              onClick={e => e.stopPropagation()}
+            >
+              {detailItem.type === "exp" ? (
+                <>
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="flex gap-3 items-start">
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                        <Briefcase size={18} className="text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-[17px] text-slate-900 leading-tight">{detailItem.data.role}</h3>
+                        <p className="font-sans text-[13px] text-slate-400 mt-0.5">{detailItem.data.company}</p>
+                      </div>
+                    </div>
+                    <button onClick={() => setDetailItem(null)} className="text-slate-300 hover:text-slate-600 transition-colors ml-4 shrink-0 mt-0.5">
+                      <X size={18} />
+                    </button>
+                  </div>
+                  {detailItem.data.duration && (
+                    <div className="mb-5">
+                      <span className="font-sans text-[12px] font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-600">
+                        {detailItem.data.duration}
+                      </span>
+                    </div>
+                  )}
+                  {detailItem.data.responsibilities.length > 0 ? (
+                    <div>
+                      <p className="font-semibold text-[11px] text-slate-400 uppercase tracking-wider mb-3">Responsibilities</p>
+                      <ul className="space-y-2.5">
+                        {detailItem.data.responsibilities.map((r, i) => (
+                          <li key={i} className="flex items-start gap-2.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-[5px] shrink-0" />
+                            <span className="text-[13px] text-slate-700 leading-snug">{r}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <p className="font-sans text-[13px] text-slate-300 italic">No responsibilities recorded.</p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="flex gap-3 items-start">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                        <FileText size={18} className="text-emerald-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-[17px] text-slate-900 leading-tight">{detailItem.data.title}</h3>
+                        <p className="font-sans text-[13px] text-slate-400 mt-0.5">{detailItem.data.role_title}</p>
+                      </div>
+                    </div>
+                    <button onClick={() => setDetailItem(null)} className="text-slate-300 hover:text-slate-600 transition-colors ml-4 shrink-0 mt-0.5">
+                      <X size={18} />
+                    </button>
+                  </div>
+                  {detailItem.data.dates && (
+                    <div className="mb-5">
+                      <span className="font-sans text-[12px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600">
+                        {detailItem.data.dates}
+                      </span>
+                    </div>
+                  )}
+                  {detailItem.data.description && (
+                    <div className="mb-5">
+                      <p className="font-semibold text-[11px] text-slate-400 uppercase tracking-wider mb-2">Description</p>
+                      <p className="text-[13px] text-slate-700 leading-relaxed">{detailItem.data.description}</p>
+                    </div>
+                  )}
+                  {(detailItem.data.highlights ?? []).length > 0 && (
+                    <div className="mb-5">
+                      <p className="font-semibold text-[11px] text-slate-400 uppercase tracking-wider mb-3">Highlights</p>
+                      <ul className="space-y-2.5">
+                        {(detailItem.data.highlights ?? []).map((h, i) => (
+                          <li key={i} className="flex items-start gap-2.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-[5px] shrink-0" />
+                            <span className="text-[13px] text-slate-700 leading-snug">{h}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {detailItem.data.link && (
+                    <div>
+                      <p className="font-semibold text-[11px] text-slate-400 uppercase tracking-wider mb-2">Link</p>
+                      <p className="font-sans text-[13px] text-blue-500 break-all">{detailItem.data.link}</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </motion.div>
   );
 }
-

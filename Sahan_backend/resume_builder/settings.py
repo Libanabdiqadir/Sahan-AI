@@ -25,15 +25,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 
-ALLOWED_HOSTS = []
+# Read comma-separated hosts from env in production, e.g.:
+# ALLOWED_HOSTS=sahanai.com,www.sahanai.com,api.sahanai.com
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 
 # Application definition
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     # Rest Framework and Token Auth
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',  # P1: JWT blacklisting on logout/refresh
     'djoser',
 
     # dj-rest-auth base endpoints
@@ -70,15 +71,15 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',          
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -113,6 +114,11 @@ DATABASES = {
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
+        # Reuse database connections for up to 60 seconds instead of opening a
+        # new connection per request.  Critical under load — PostgreSQL's default
+        # max_connections (100) is exhausted instantly at any real traffic level
+        # without this.  Use PgBouncer in transaction mode for 10k+ concurrency.
+        'CONN_MAX_AGE': env.int('DB_CONN_MAX_AGE', default=60),
     }
 }
 
@@ -152,6 +158,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+# collectstatic destination — required in production (whitenoise / CDN).
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 AUTH_USER_MODEL = 'core.User'
 GEMINI_API_KEY = env('GEMINI_API_KEY')
 
@@ -159,11 +170,29 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    # Any view that forgets to declare permission_classes defaults to requiring
+    # an authenticated user rather than silently being open to the world.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    # Global throttling — protects every endpoint.  Auth-specific views apply
+    # a tighter 'auth' scope on top of this via throttle_classes = [AuthRateThrottle].
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '60/minute',   # unauthenticated callers (e.g. login page)
+        'user': '300/minute',  # authenticated callers across all endpoints
+        'auth': '10/minute',   # login, register, Google OAuth, resend-activation
+    },
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
+# In production set: CORS_ALLOWED_ORIGINS=https://sahanai.com,https://www.sahanai.com
+CORS_ALLOWED_ORIGINS = env.list(
+    'CORS_ALLOWED_ORIGINS',
+    default=["http://localhost:5173"],
+)
 
 DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
@@ -173,11 +202,13 @@ DJOSER = {
         'current_user': 'core.serializer.UserSerializer',
     },
     'EMAIL': {
-        'activation': 'core.email.ActivationEmail',
+        'activation':     'core.email.ActivationEmail',
+        'password_reset': 'core.email.PasswordResetEmail',  # P1: route via Resend
     },
     'LOGIN_FIELD': 'email',
     'SEND_ACTIVATION_EMAIL': True,
     'ACTIVATION_URL': 'verify-email/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'reset-password/{uid}/{token}',
     # EMAIL_FRONTEND_* is what djoser's BaseEmailMessage actually uses when
     # building the activation URL in the email body.  The plain 'DOMAIN' key
     # is only used for the URL path template above, NOT for the host portion.
@@ -199,6 +230,10 @@ EMAIL_PORT       = env.int('EMAIL_PORT',   default=587)
 EMAIL_USE_TLS    = env.bool('EMAIL_USE_TLS', default=True)
 EMAIL_HOST_USER  = env('EMAIL_HOST_USER',  default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+
+# ─── Resend ───────────────────────────────────────────────────────────────────
+RESEND_API_KEY    = env('RESEND_API_KEY',    default='')
+RESEND_FROM_EMAIL = env('RESEND_FROM_EMAIL', default='onboarding@resend.dev')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -237,7 +272,69 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME':  timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS':  True,
+    'BLACKLIST_AFTER_ROTATION': True,  # P1: invalidate old refresh tokens on rotation/logout
     'ALGORITHM': 'HS256',
     'AUTH_HEADER_TYPES': ('Bearer',),
     'UPDATE_LAST_LOGIN': True,
 }
+
+# ─── Celery ───────────────────────────────────────────────────────────────────
+# Start worker: celery -A resume_builder worker --loglevel=info --concurrency=4
+CELERY_BROKER_URL         = env('CELERY_BROKER_URL',     default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND     = env('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT     = ['json']
+CELERY_TASK_SERIALIZER    = 'json'
+CELERY_RESULT_SERIALIZER  = 'json'
+CELERY_TIMEZONE           = 'UTC'
+CELERY_TASK_TRACK_STARTED = True
+# AI tasks are slow — one at a time per worker prevents memory pressure
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+# Dev shortcut: when DEBUG=True, tasks run synchronously in-process so you
+# don't need a running Celery worker.  Set to False (or leave DEBUG=False) in
+# production where the real worker is running.
+CELERY_TASK_ALWAYS_EAGER    = DEBUG
+CELERY_TASK_EAGER_PROPAGATES = False  # never let task exceptions crash the view
+# P1: expire task results after 1 hour — prevents unbounded Redis memory growth.
+CELERY_RESULT_EXPIRES = 3600
+
+# ─── HTTPS / Security Headers ─────────────────────────────────────────────────
+# These are intentionally gated on not-DEBUG so local development is unaffected.
+# All settings must be confirmed active before go-live via:
+#   python manage.py check --deploy
+if not DEBUG:
+    SECURE_SSL_REDIRECT             = True
+    SECURE_PROXY_SSL_HEADER         = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS             = 31_536_000   # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS  = True
+    SECURE_HSTS_PRELOAD             = True
+    SESSION_COOKIE_SECURE           = True
+    CSRF_COOKIE_SECURE              = True
+    SECURE_BROWSER_XSS_FILTER       = True
+    SECURE_CONTENT_TYPE_NOSNIFF     = True
+    X_FRAME_OPTIONS                 = 'DENY'
+
+    # ─── P0: AWS S3 media storage (production only) ───────────────────────────
+    # In dev, Django's default FileSystemStorage is used (media/ on local disk).
+    # Set AWS_* env vars in the production environment before deploying.
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "bucket_name":  env("AWS_STORAGE_BUCKET_NAME"),
+                "region_name":  env("AWS_S3_REGION_NAME", default="us-east-1"),
+                "access_key":   env("AWS_ACCESS_KEY_ID"),
+                "secret_key":   env("AWS_SECRET_ACCESS_KEY"),
+                "file_overwrite": False,
+                "object_parameters": {"CacheControl": "max-age=86400"},
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+    MEDIA_URL = f"https://{env('AWS_STORAGE_BUCKET_NAME', default='')}.s3.amazonaws.com/"
+
+# ─── Stripe ───────────────────────────────────────────────────────────────────
+# STRIPE_WEBHOOK_SECRET is required for the /api/stripe/webhook/ endpoint.
+# Obtain it from the Stripe dashboard → Webhooks → your endpoint → Signing secret.
+STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET', default='')

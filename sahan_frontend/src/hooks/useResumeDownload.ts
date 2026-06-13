@@ -4,6 +4,7 @@ import { ExecutiveCV } from "../components/resume/ExecutiveCV";
 import { ModernProfessionalCV } from "../components/resume/ModernProfessionalCV";
 import { ModernMinimalistCV } from "../components/resume/ModernMinimalistCV";
 import { BoldChronologicalCV } from "../components/resume/BoldChronologicalCV";
+import { CoverLetterDocument } from "../components/resume/CoverLetterDocument";
 import type { Template, UserProfile, ResumeHistory } from "../types";
 
 export function useResumeDownload(
@@ -16,8 +17,14 @@ export function useResumeDownload(
   const [cvLoading, setCvLoading] = useState(false);
   const [clLoading, setClLoading] = useState(false);
 
-  const buildDoc = () => {
-    const props = { profile: profile!, tailored: tailored!, jobTitle, companyName };
+  // CV-only: pass cover_letter as empty so the PDF excludes that section
+  const buildCvDoc = () => {
+    const props = {
+      profile: profile!,
+      tailored: { ...tailored!, cover_letter: "" },
+      jobTitle,
+      companyName,
+    };
     switch (template) {
       case "executive":         return createElement(ExecutiveCV, props);
       case "modern":            return createElement(ModernProfessionalCV, props);
@@ -26,6 +33,15 @@ export function useResumeDownload(
       default:                  return createElement(HarvardCV, props);
     }
   };
+
+  const buildCoverLetterDoc = () =>
+    createElement(CoverLetterDocument, {
+      profile: profile!,
+      tailored: tailored!,
+      jobTitle,
+      companyName,
+      template,
+    });
 
   const triggerDownload = (blob: Blob, filename: string) => {
     const url  = URL.createObjectURL(blob);
@@ -44,7 +60,10 @@ export function useResumeDownload(
     setCvLoading(true);
     try {
       const { pdf } = await import("@react-pdf/renderer");
-      const blob = await pdf(buildDoc()).toBlob();
+      // Cast needed: our wrapper components satisfy react-pdf's runtime contract
+      // but TypeScript can't verify prop-type compatibility statically.
+      type PdfArg = Parameters<typeof pdf>[0];
+      const blob = await pdf(buildCvDoc() as unknown as PdfArg).toBlob();
       triggerDownload(blob, `${profile.full_name?.replace(/\s/g, "_")}_CV.pdf`);
     } catch (err) {
       alert("CV download failed: " + String(err));
@@ -58,7 +77,8 @@ export function useResumeDownload(
     setClLoading(true);
     try {
       const { pdf } = await import("@react-pdf/renderer");
-      const blob = await pdf(buildDoc()).toBlob();
+      type PdfArg = Parameters<typeof pdf>[0];
+      const blob = await pdf(buildCoverLetterDoc() as unknown as PdfArg).toBlob();
       triggerDownload(blob, `${profile.full_name?.replace(/\s/g, "_")}_Cover_Letter.pdf`);
     } catch (err) {
       alert("Cover letter download failed: " + String(err));

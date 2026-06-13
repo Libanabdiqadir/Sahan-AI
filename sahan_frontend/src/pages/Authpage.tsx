@@ -7,7 +7,7 @@ import { useAuth } from "../hooks/useAuth";
 import { authApi, parseApiError } from "../services/api";
 import { GoogleRegisterModal } from "../components/auth/GoogleRegisterModal";
 import type { AuthTokens } from "../types";
-import sahanLogo from "../assets/sahan_ai_logo.png";
+import sahanLogo from "../assets/sahan-logo.png";
 
 type Mode = "login" | "register" | "verify-pending";
 
@@ -90,13 +90,6 @@ export default function AuthPage() {
         await login({ email: fields.email, password: fields.password });
         navigate("/dashboard");
       } else {
-        console.log("[AuthPage] registration payload →", {
-          email: fields.email,
-          first_name: fields.first_name,
-          last_name: fields.last_name,
-          password: fields.password ? "***" : "(empty)",
-          re_password: fields.re_password ? "***" : "(empty)",
-        });
         await register(fields);
         // Registration succeeded — account is inactive until email is verified.
         setPendingEmail(fields.email);
@@ -264,7 +257,7 @@ export default function AuthPage() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="grid grid-cols-2 gap-3 overflow-hidden"
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-3"
                   >
                     <div>
                       <label className="label-xs mr-2">First name</label>

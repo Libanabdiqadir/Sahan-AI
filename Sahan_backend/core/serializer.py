@@ -5,8 +5,6 @@ from djoser.serializers import (
 )
 from .models import User, ResumeHistory, UserProfile, Document, UserSubscription
 
-# Well-known disposable / throwaway email providers.
-# Extend this list or swap in a package (e.g. disposable-email-domains) as needed.
 _DISPOSABLE_DOMAINS = frozenset({
     "mailinator.com", "guerrillamail.com", "guerrillamail.net", "guerrillamail.org",
     "guerrillamail.biz", "guerrillamail.de", "guerrillamail.info",
@@ -78,11 +76,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(BasePasswordRetypeSerializer):
-  # Extend BasePasswordRetypeSerializer (not the plain base) so that djoser's
-  # password-match validation and re_password field are included.
-  # re_password is intentionally omitted from Meta.fields — the parent adds it
-  # dynamically in __init__, and listing it here would cause DRF to search for
-  # a model field named re_password and raise ImproperlyConfigured.
+
   class Meta(BaseUserCreateSerializer.Meta):
     model = User
     fields = ['id', 'email', 'password', 'first_name', 'last_name']
@@ -130,9 +124,10 @@ class ResumeHistorySerializer(serializers.ModelSerializer):
   documents = DocumentSerializer(many=True, read_only=True)
   user_details = UserSerializer(source='user', read_only=True)
   class Meta:
-    model= ResumeHistory
+    model = ResumeHistory
     fields = [
-      'id', 'user', 'user_details', 'company_name', 'job_title', 
-      'tailored_data', 'cover_letter_text', 'job_description', 
-      'status', 'created_at', 'documents'
+      'id', 'user', 'user_details', 'company_name', 'job_title',
+      'tailored_data', 'cover_letter_text', 'job_description',
+      'status', 'error_message', 'created_at', 'documents',
     ]
+    read_only_fields = ['id', 'user', 'user_details', 'status', 'error_message', 'created_at', 'documents']

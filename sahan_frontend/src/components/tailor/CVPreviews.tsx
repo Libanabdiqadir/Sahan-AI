@@ -9,6 +9,13 @@ export function HarvardPreview({ profile, tailored }: { profile: UserProfile; ta
   const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const experience: any[] = tailored.experience?.length ? tailored.experience : (profile.work_experience ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const education: any[] = tailored.education?.length ? tailored.education : (profile.education_history ?? []);
+  const techSkills: string[] = tailored.tech_skills?.length ? tailored.tech_skills : (profile.master_data?.tech_skills ?? []);
+  const softSkills: string[] = tailored.soft_skills?.length ? tailored.soft_skills : (profile.master_data?.soft_skills ?? []);
+  const languages: string[] = tailored.languages?.length ? tailored.languages : (profile.languages ?? []);
   return (
     <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", padding: "25.4mm", fontFamily: "Arial, sans-serif", fontSize: "12px", lineHeight: "1.5", color: "#1a1a2e", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box" }}>
       <h1 style={{ fontSize: "20px", fontWeight: "700", textAlign: "center", textTransform: "uppercase", letterSpacing: "2.5px", marginBottom: "5px" }}>{profile.full_name}</h1>
@@ -20,10 +27,10 @@ export function HarvardPreview({ profile, tailored }: { profile: UserProfile; ta
           <p style={{ fontSize: "12px", fontStyle: "italic", color: "#374151", lineHeight: "1.7" }}>{tailored.summary}</p>
         </div>
       )}
-      {tailored.experience?.length > 0 && (
+      {experience.length > 0 && (
         <div style={{ marginBottom: "16px" }}>
           <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Professional Experience</p>
-          {tailored.experience.map((exp, i) => (
+          {experience.map((exp, i) => (
             <div key={i} style={{ marginBottom: "14px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={{ fontWeight: "700", fontSize: "13px" }}>{exp.role}</span>
@@ -53,10 +60,10 @@ export function HarvardPreview({ profile, tailored }: { profile: UserProfile; ta
           ))}
         </div>
       )}
-      {tailored.education?.length > 0 && (
+      {education.length > 0 && (
         <div style={{ marginBottom: "16px" }}>
           <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Education</p>
-          {tailored.education.map((edu, i) => (
+          {education.map((edu, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
               <div>
                 <p style={{ fontWeight: "700", fontSize: "13px" }}>{edu.degree}</p>
@@ -67,14 +74,16 @@ export function HarvardPreview({ profile, tailored }: { profile: UserProfile; ta
           ))}
         </div>
       )}
-      <div>
-        <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Skills &amp; Languages</p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "12px" }}>
-          {tailored.tech_skills?.length > 0 && <div><span style={{ fontWeight: "700" }}>Technical: </span><span style={{ color: "#374151" }}>{tailored.tech_skills.join(", ")}</span></div>}
-          {tailored.soft_skills?.length > 0 && <div><span style={{ fontWeight: "700" }}>Soft Skills: </span><span style={{ color: "#374151" }}>{tailored.soft_skills.join(", ")}</span></div>}
-          {tailored.languages?.length > 0 && <div><span style={{ fontWeight: "700" }}>Languages: </span><span style={{ color: "#374151" }}>{tailored.languages.join(", ")}</span></div>}
+      {(techSkills.length > 0 || softSkills.length > 0 || languages.length > 0) && (
+        <div>
+          <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Skills &amp; Languages</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "12px" }}>
+            {techSkills.length > 0 && <div><span style={{ fontWeight: "700" }}>Technical: </span><span style={{ color: "#374151" }}>{techSkills.join(", ")}</span></div>}
+            {softSkills.length > 0 && <div><span style={{ fontWeight: "700" }}>Soft Skills: </span><span style={{ color: "#374151" }}>{softSkills.join(", ")}</span></div>}
+            {languages.length > 0 && <div><span style={{ fontWeight: "700" }}>Languages: </span><span style={{ color: "#374151" }}>{languages.join(", ")}</span></div>}
+          </div>
         </div>
-      </div>
+      )}
       {certifications.length > 0 && (
         <div style={{ marginTop: "16px" }}>
           <p style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", borderBottom: "0.5px solid #e5e7eb", paddingBottom: "4px", marginBottom: "10px" }}>Certifications</p>
@@ -124,6 +133,13 @@ export function ExecutivePreview({ profile, tailored }: { profile: UserProfile; 
   const projects: any[] = tailored.projects?.length ? tailored.projects : (profile.projects ?? []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const certifications: any[] = tailored.certifications?.length ? tailored.certifications : (profile.certifications ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const experience: any[] = tailored.experience?.length ? tailored.experience : (profile.work_experience ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const education: any[] = tailored.education?.length ? tailored.education : (profile.education_history ?? []);
+  const techSkills: string[] = tailored.tech_skills?.length ? tailored.tech_skills : (profile.master_data?.tech_skills ?? []);
+  const softSkills: string[] = tailored.soft_skills?.length ? tailored.soft_skills : (profile.master_data?.soft_skills ?? []);
+  const languages: string[] = tailored.languages?.length ? tailored.languages : (profile.languages ?? []);
   const NAVY = "#1e2d4a"; const GOLD = "#b8972e"; const LIGHT = "#f4f6f9";
   return (
     <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", fontFamily: "Arial, sans-serif", fontSize: "11px", lineHeight: "1.6", color: "#2d3748", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box", overflow: "hidden" }}>
@@ -139,28 +155,28 @@ export function ExecutivePreview({ profile, tailored }: { profile: UserProfile; 
       </div>
       <div style={{ display: "flex", minHeight: "calc(297mm - 120px)" }}>
         <div style={{ width: "34%", background: LIGHT, padding: "28px 22px", borderRight: `3px solid ${NAVY}` }}>
-          {tailored.tech_skills?.length > 0 && (
+          {techSkills.length > 0 && (
             <div style={{ marginBottom: "24px" }}>
               <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Technical Skills</div>
-              {tailored.tech_skills.map((s, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: GOLD, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{s}</span></div>)}
+              {techSkills.map((s, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: GOLD, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{s}</span></div>)}
             </div>
           )}
-          {tailored.soft_skills?.length > 0 && (
+          {softSkills.length > 0 && (
             <div style={{ marginBottom: "24px" }}>
               <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Core Competencies</div>
-              {tailored.soft_skills.map((s, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: NAVY, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{s}</span></div>)}
+              {softSkills.map((s, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: NAVY, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{s}</span></div>)}
             </div>
           )}
-          {tailored.education?.length > 0 && (
+          {education.length > 0 && (
             <div style={{ marginBottom: "24px" }}>
               <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Education</div>
-              {tailored.education.map((edu, i) => <div key={i} style={{ marginBottom: "12px" }}><p style={{ fontWeight: "700", fontSize: "11px", color: NAVY }}>{edu.degree}</p><p style={{ fontSize: "10.5px", color: "#4a5568", fontStyle: "italic" }}>{edu.university}</p><p style={{ fontSize: "10.5px", color: "#718096" }}>{edu.graduation_year}</p></div>)}
+              {education.map((edu, i) => <div key={i} style={{ marginBottom: "12px" }}><p style={{ fontWeight: "700", fontSize: "11px", color: NAVY }}>{edu.degree}</p><p style={{ fontSize: "10.5px", color: "#4a5568", fontStyle: "italic" }}>{edu.university}</p><p style={{ fontSize: "10.5px", color: "#718096" }}>{edu.graduation_year}</p></div>)}
             </div>
           )}
-          {tailored.languages?.length > 0 && (
+          {languages.length > 0 && (
             <div style={{ marginBottom: "24px" }}>
               <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "12px" }}>Languages</div>
-              {tailored.languages.map((l, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: GOLD, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{l}</span></div>)}
+              {languages.map((l, i) => <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}><div style={{ width: "7px", height: "7px", borderRadius: "50%", background: GOLD, flexShrink: 0 }} /><span style={{ fontSize: "11px" }}>{l}</span></div>)}
             </div>
           )}
           {certifications.length > 0 && (
@@ -182,10 +198,10 @@ export function ExecutivePreview({ profile, tailored }: { profile: UserProfile; 
               <p style={{ fontSize: "12px", color: "#4a5568", lineHeight: "1.8", fontStyle: "italic" }}>{tailored.summary}</p>
             </div>
           )}
-          {tailored.experience?.length > 0 && (
+          {experience.length > 0 && (
             <div>
               <div style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "1.5px", color: NAVY, borderBottom: `2px solid ${GOLD}`, paddingBottom: "5px", marginBottom: "14px" }}>Professional Experience</div>
-              {tailored.experience.map((exp, i) => (
+              {experience.map((exp, i) => (
                 <div key={i} style={{ marginBottom: "18px", paddingLeft: "14px", borderLeft: `3px solid ${GOLD}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "3px" }}>
                     <p style={{ fontWeight: "700", fontSize: "13px", color: NAVY }}>{exp.role}</p>

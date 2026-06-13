@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import type { UserProfile } from "../../types";
 
 function SidebarSection({ title, children, onAdd }: { title: string; children: React.ReactNode; onAdd?: () => void }) {
@@ -39,12 +39,40 @@ interface Props {
   profile: UserProfile | null;
   onAddProject: () => void;
   onAddCert: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function ProfileSidebar({ profile, onAddProject, onAddCert }: Props) {
+export function ProfileSidebar({ profile, onAddProject, onAddCert, isOpen, onClose }: Props) {
   return (
-    <aside className="w-[320px] shrink-0 bg-white border-r border-stone-200 overflow-y-auto p-5">
-      <h2 className="font-bold text-[14px] text-slate-900 mb-1">Master Profile</h2>
+    <>
+      {/* Mobile overlay backdrop */}
+      {isOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-30 bg-black/30 backdrop-blur-sm"
+          onClick={onClose}
+        />
+      )}
+
+      <aside className={`
+        bg-white border-r border-stone-200 overflow-y-auto p-5 shrink-0
+        md:block md:w-[320px] md:relative md:z-auto md:translate-x-0
+        fixed inset-y-[60px] left-0 z-40 w-[min(320px,85vw)] transition-transform duration-300
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        md:translate-x-0 md:inset-auto md:h-auto
+      `}>
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="font-bold text-[14px] text-slate-900">Master Profile</h2>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="md:hidden p-1.5 rounded-lg text-slate-400 hover:bg-stone-100 transition-colors"
+            aria-label="Close profile panel"
+          >
+            <X size={16} />
+          </button>
+        )}
+      </div>
       <p className="font-sans text-[12px] text-slate-400 mb-5 leading-relaxed">Your career data is stored once and used for every tailored resume.</p>
 
       {profile ? (
@@ -106,5 +134,6 @@ export function ProfileSidebar({ profile, onAddProject, onAddCert }: Props) {
         </div>
       )}
     </aside>
+    </>
   );
 }

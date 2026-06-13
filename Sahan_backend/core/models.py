@@ -96,7 +96,7 @@ class ResumeHistory(models.Model):
   STATUS_CHOICES = [
     ('processing', 'Processing'),   # AI generation in flight
     ('completed', 'Completed'),     # successfully generated and saved
-    ('failed', 'Failed'),           # any failure — does NOT count against quota
+    ('failed', 'Failed'),           # any failure does NOT count against quota
   ]
 
   user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='resumes')
@@ -109,11 +109,9 @@ class ResumeHistory(models.Model):
 
   status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing')
 
-  # Audit fields
   error_message = models.TextField(blank=True)
   completed_at = models.DateTimeField(null=True, blank=True)
 
-  # Idempotency key supplied by the client to de-duplicate rapid clicks
   idempotency_key = models.CharField(max_length=64, blank=True, db_index=True)
 
   created_at = models.DateTimeField(auto_now_add=True)
@@ -122,9 +120,9 @@ class ResumeHistory(models.Model):
     ordering = ['-created_at']
     verbose_name_plural = 'Resume Histories'
     indexes = [
-      # Fast quota queries: filter by user + status + month
+
       models.Index(fields=['user', 'status', 'created_at'], name='resume_user_status_date_idx'),
-      # Fast idempotency look-up
+
       models.Index(fields=['user', 'idempotency_key'], name='resume_user_idem_idx'),
     ]
 
@@ -164,8 +162,10 @@ class UserSubscription(models.Model):
   stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
   stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True)
   plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default='free')
-  # True for paid plans with an active Stripe subscription; free plan is always considered active
+
   is_active = models.BooleanField(default=True)
+
+  billing_cycle_start = models.DateTimeField(null=True, blank=True)
 
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)

@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+from google.api_core.exceptions import ResourceExhausted
 from rest_framework.exceptions import PermissionDenied
 
 from .models import Document, ResumeHistory, UserProfile, UserSubscription
@@ -19,40 +20,51 @@ PLAN_LIMITS = {
     'elite': 9999,
 }
 
+BILLING_CYCLE_DAYS = 30
+
 # A PROCESSING record older than this is considered stale (server crash, timeout, etc.)
-# and is excluded from the in-flight count so it doesn't permanently block the user.
+# and is excluded from the in flight count so it doesn't permanently block the user.
 STALE_PROCESSING_MINUTES = 15
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
 
-# ─── Internal quota helper ────────────────────────────────────────────────────
+# ─── Internal quota helpers ───────────────────────────────────────────────────
 
-def _count_quota_used(user, now):
+def _compute_cycle_start(subscription, now):
     """
-    Returns the number of resumes that count against this month's quota:
-      - All 'completed' resumes created this calendar month
-      - 'processing' resumes created this month that are NOT stale
-        (stale = started more than STALE_PROCESSING_MINUTES ago, implying a
-        crashed server or client disconnect — they will eventually be cleaned up)
+    Returns the start datetime of the user's current 30-day billing cycle.
 
-    'failed' resumes are intentionally excluded: a failed attempt must never
-    consume quota.
+    Advances from the stored billing_cycle_start (or created_at for new rows)
+    by BILLING_CYCLE_DAYS-day ticks until the window contains `now`.
+    Pure computation — does NOT write to the database.
+    """
+    anchor = subscription.billing_cycle_start or subscription.created_at
+    cycle_start = anchor
+    while now >= cycle_start + timedelta(days=BILLING_CYCLE_DAYS):
+        cycle_start = cycle_start + timedelta(days=BILLING_CYCLE_DAYS)
+    return cycle_start
+
+
+def _count_quota_used(user, now, cycle_start, plan='free'):
+    """
+    Returns the number of generations that count against the user's quota.
+
+    Free plan  → counts ALL completed/processing records ever (lifetime, no reset).
+    Pro/Elite  → counts only records within the current 30-day billing cycle.
+
+    'failed' records are excluded — a failed attempt never consumes quota.
+    'processing' records older than STALE_PROCESSING_MINUTES are excluded so a
+    crashed worker never permanently blocks the user.
     """
     stale_cutoff = now - timedelta(minutes=STALE_PROCESSING_MINUTES)
-    return (
-        ResumeHistory.objects
-        .filter(
-            user=user,
-            created_at__year=now.year,
-            created_at__month=now.month,
-        )
-        .filter(
-            Q(status='completed') |
-            Q(status='processing', created_at__gte=stale_cutoff)
-        )
-        .count()
-    )
+    qs = ResumeHistory.objects.filter(user=user)
+    if plan != 'free':
+        qs = qs.filter(created_at__gte=cycle_start)
+    return qs.filter(
+        Q(status='completed') |
+        Q(status='processing', created_at__gte=stale_cutoff)
+    ).count()
 
 
 # ─── Public: atomic slot reservation ─────────────────────────────────────────
@@ -76,10 +88,6 @@ def reserve_generation_slot(user, job_title, company_name, job_description, idem
     call ResumeService.tailor_resume(resume) afterwards.  If that call fails,
     the record is marked 'failed', which releases the quota slot.
     """
-    # ── Idempotency guard: protect against rapid double-clicks ────────────────
-    # If the client sent the same idempotency_key within the last 10 minutes,
-    # return the already-in-progress or completed record without creating a
-    # duplicate or consuming quota again.
     if idempotency_key:
         recent_cutoff = timezone.now() - timedelta(minutes=10)
         existing = (
@@ -90,27 +98,34 @@ def reserve_generation_slot(user, job_title, company_name, job_description, idem
         if existing:
             return existing, False
 
-    # ── Lock the user's subscription row for the duration of this transaction ─
-    # Any other concurrent request for the same user will block here until
-    # this transaction commits, ensuring the quota check + slot creation are
-    # atomic together.
+
     try:
         subscription = UserSubscription.objects.select_for_update().get(user=user)
     except UserSubscription.DoesNotExist:
-        # Signal should always create this; fall back gracefully.
+
         subscription = UserSubscription.objects.create(user=user, plan='free')
         subscription = UserSubscription.objects.select_for_update().get(pk=subscription.pk)
 
     now = timezone.now()
-    plan = subscription.plan
+    plan = subscription.plan if subscription.is_active else 'free'
     limit = PLAN_LIMITS.get(plan, PLAN_LIMITS['free'])
-    used = _count_quota_used(user, now)
+
+    # Compute the current billing cycle window and persist it if it advanced.
+    # Runs inside the SELECT FOR UPDATE lock so it's race-safe.
+    cycle_start = _compute_cycle_start(subscription, now)
+    stored_anchor = subscription.billing_cycle_start or subscription.created_at
+    if cycle_start != stored_anchor:
+        subscription.billing_cycle_start = cycle_start
+        subscription.save(update_fields=['billing_cycle_start', 'updated_at'])
+
+    used = _count_quota_used(user, now, cycle_start, plan=plan)
 
     if used >= limit:
+        period_label = 'ever' if plan == 'free' else 'this billing period'
         raise PermissionDenied(detail={
             'error': (
-                f"You have used all {limit} resume{'s' if limit != 1 else ''} "
-                f"allowed on the {plan} plan this month."
+                f"You have used all {limit} generation{'s' if limit != 1 else ''} "
+                f"allowed on the {plan} plan {period_label}."
             ),
             'code':  'limit_reached',
             'plan':  plan,
@@ -118,9 +133,6 @@ def reserve_generation_slot(user, job_title, company_name, job_description, idem
             'used':  used,
         })
 
-    # ── Reserve the slot: create the PROCESSING record inside the transaction ─
-    # This record is now visible to any subsequent concurrent request's quota
-    # count (because it will be committed before the lock is released).
     resume = ResumeHistory.objects.create(
         user=user,
         job_title=job_title,
@@ -141,20 +153,27 @@ def get_subscription_status(user):
     """
     try:
         subscription = UserSubscription.objects.get(user=user)
-        plan = subscription.plan
+        plan = subscription.plan if subscription.is_active else 'free'
+        cycle_start = _compute_cycle_start(subscription, timezone.now())
     except UserSubscription.DoesNotExist:
         plan = 'free'
+        cycle_start = timezone.now()
 
     now = timezone.now()
     limit = PLAN_LIMITS.get(plan, PLAN_LIMITS['free'])
-    used = _count_quota_used(user, now)
+    used = _count_quota_used(user, now, cycle_start, plan=plan)
+
+    # Free plan quota is lifetime — it never resets, so reset_date is null.
+    reset_date = None if plan == 'free' else (
+        cycle_start + timedelta(days=BILLING_CYCLE_DAYS)
+    ).strftime('%Y-%m-%d')
 
     return {
         'plan':       plan,
         'limit':      limit,
         'used':       used,
         'remaining':  max(0, limit - used),
-        'reset_date': f"{now.year}-{now.month + 1:02d}-01" if now.month < 12 else f"{now.year + 1}-01-01",
+        'reset_date': reset_date,
     }
 
 
@@ -163,7 +182,7 @@ def get_subscription_status(user):
 class ResumeService:
 
     @staticmethod
-    def tailor_resume(resume: ResumeHistory) -> ResumeHistory:
+    def tailor_resume(resume: ResumeHistory, generation_mode: str = 'both') -> ResumeHistory:
         """
         Runs AI generation for an already-created PROCESSING resume record.
 
@@ -175,11 +194,22 @@ class ResumeService:
             A 'failed' record does NOT count against quota, so the user can retry.
           - Always returns the resume object (caller checks resume.status).
         """
-        model = genai.GenerativeModel(model_name='models/gemini-2.5-flash')
+        PRIMARY_MODEL  = 'models/gemini-2.5-flash'
+        FALLBACK_MODEL = 'models/gemini-2.0-flash'
 
         try:
             profile = UserProfile.objects.get(user=resume.user)
             master_data = profile.get_master_data()
+
+            if generation_mode == 'cv_only':
+                cover_letter_instruction = "'cover_letter': An empty string \"\"."
+                mode_note = "IMPORTANT: This request is for a CV only. Do NOT write a cover letter. Set 'cover_letter' to an empty string."
+            elif generation_mode == 'cover_letter_only':
+                cover_letter_instruction = "'cover_letter': A beautifully written, highly compelling, human-sounding cover letter (excluding any formal closures or signatures)."
+                mode_note = "IMPORTANT: Generate ONLY the cover letter. Do NOT populate any resume fields. Set 'summary' to an empty string, and set 'tech_skills', 'soft_skills', 'experience', 'projects', 'education', 'certifications', and 'languages' to empty arrays."
+            else:
+                cover_letter_instruction = "'cover_letter': A beautifully written, highly compelling, human-sounding cover letter (excluding any formal closures or signatures)."
+                mode_note = ""
 
             prompt = f"""
                 You are an elite, professional resume writer. Your goal is to write highly convincing, human-written resumes that completely avoid generic AI phrasing, buzzwords, or structural tells.
@@ -217,7 +247,7 @@ class ResumeService:
                 'duration': Date range.
                 'responsibilities': A list of 3-4 clean, high-impact achievement sentences (no leading dashes or bullet characters).
 
-                'projects': A list of objects representing personal or professional projects (draw from the Master Data projects if present):
+                'projects': CRITICAL — scan every project in the Master Data 'projects' array. Include ALL projects whose tech stack, domain, or purpose overlaps with the Job Description. Do NOT skip projects simply because experience entries already fill the resume. If the target role is technical (e.g. Full-Stack, Backend, Frontend, Data, DevOps) and any Master Data project uses relevant technologies or solves a related problem, it MUST appear here. Each object:
                 'name': The name of the project.
                 'role_title': Role on the project (e.g., "Lead Creator", "Solo Developer").
                 'description': A single polished, impact-driven action statement explaining what was built and its relevance (no leading dashes or bullet characters).
@@ -236,16 +266,37 @@ class ResumeService:
                 'credential_id': ID if present (omit key entirely if not present).
                 'languages': A list of languages spoken.
 
-                'cover_letter': A beautifully written, highly compelling, human-sounding cover letter (excluding any formal closures or signatures).
+                {cover_letter_instruction}
+                {mode_note}
             """
 
-            response = model.generate_content(
-                prompt,
-                generation_config={"response_mime_type": "application/json"},
-            )
+            gen_cfg = {"response_mime_type": "application/json"}
+            try:
+                response = genai.GenerativeModel(model_name=PRIMARY_MODEL).generate_content(
+                    prompt, generation_config=gen_cfg,
+                )
+            except ResourceExhausted:
+                # Primary model's free tier daily quota exhausted; try the fallback
+                # model which has a much higher free-tier limit (1 500 RPD vs 20 RPD).
+                response = genai.GenerativeModel(model_name=FALLBACK_MODEL).generate_content(
+                    prompt, generation_config=gen_cfg,
+                )
 
             cleaned_text = response.text.strip().removeprefix('```json').removesuffix('```')
             data = json.loads(cleaned_text)
+
+            # Enforce generation_mode: override whatever the AI produced
+            if generation_mode == 'cv_only':
+                data['cover_letter'] = ''
+            elif generation_mode == 'cover_letter_only':
+                data['summary'] = ''
+                data['tech_skills'] = []
+                data['soft_skills'] = []
+                data['experience'] = []
+                data['projects'] = []
+                data['education'] = []
+                data['certifications'] = []
+                data['languages'] = []
 
             resume.tailored_data = data
             resume.status = 'completed'
@@ -255,13 +306,20 @@ class ResumeService:
         except ObjectDoesNotExist:
             resume.status = 'failed'
             resume.error_message = (
-                'Profile not found. Please complete your profile in Settings before generating a resume.'
+                'Profile not found. Please complete your profile before generating a resume.'
+            )
+            resume.save(update_fields=['status', 'error_message'])
+
+        except ResourceExhausted:
+            resume.status = 'failed'
+            resume.error_message = (
+                'AI generation quota reached. Please try again tomorrow.'
             )
             resume.save(update_fields=['status', 'error_message'])
 
         except Exception as e:
             resume.status = 'failed'
-            resume.error_message = str(e)
+            resume.error_message = str(e)[:500]
             resume.save(update_fields=['status', 'error_message'])
 
         return resume

@@ -8,7 +8,7 @@ export function useQuickAddProfile(
 ) {
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [newProject, setNewProject] = useState<ProjectEntry>({
-    title: "", role_title: "", description: "", link: "", dates: "",
+    title: "", role_title: "", description: "", link: "", dates: "", highlights: [],
   });
   const [certModalOpen, setCertModalOpen] = useState(false);
   const [newCert, setNewCert] = useState<CertificationEntry>({

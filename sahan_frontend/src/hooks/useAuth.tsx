@@ -42,7 +42,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // apiFetch handles the 401 → refresh flow automatically, so we just call me().
     try {
       const user = await authApi.me();
-      console.log("[useAuth.fetchUser] storing in state →", { first_name: user.first_name, last_name: user.last_name });
       setState({ user, isLoading: false, isAuthenticated: true });
       // Fire-and-forget: record today's unique visit, ignore failures silently
       adminApi.trackVisit().catch(() => {});
@@ -60,7 +59,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (creds: RegisterCredentials): Promise<void> => {
-    console.log("[useAuth.register] creds passed to API →", { ...creds, password: "***", re_password: "***" });
     await authApi.register(creds);
     // Do NOT auto-login — the account is inactive until the user clicks the
     // verification link in their email. The caller shows the "check inbox" UI.
