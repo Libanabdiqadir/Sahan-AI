@@ -80,3 +80,5 @@ uritemplate==4.2.0
 urllib3==2.6.1
 virtualenv==21.2.0
 whitenoise>=6.9.0
+dj-rest-auth==6.0.0
+django-allauth==64.0.0
