@@ -29,8 +29,8 @@ export function ResumeVaultTab({ profile }: Props) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="bg-white border border-stone-200 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-5">
+      <div className="bg-white border border-stone-200 rounded-xl p-4 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
           <h2 className="font-bold text-[15px] text-slate-900">Generated Documents ({resumes.length})</h2>
           <p className="font-sans text-[12px] text-slate-400">Fetched from ResumeHistory model</p>
         </div>
@@ -52,16 +52,16 @@ export function ResumeVaultTab({ profile }: Props) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="flex items-center justify-between p-4 border border-stone-100 rounded-xl hover:border-blue-300 hover:bg-blue-50/20 transition-all cursor-pointer"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 border border-stone-100 rounded-xl hover:border-blue-300 hover:bg-blue-50/20 transition-all cursor-pointer"
               >
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-[14px] text-slate-900 truncate">{r.job_title || "Tailored Resume"}</p>
-                  <p className="font-sans text-[12px] text-slate-400 mt-0.5">
+                <div className="min-w-0">
+                  <p className="font-semibold text-[14px] text-slate-900 break-words leading-snug">{r.job_title || "Tailored Resume"}</p>
+                  <p className="font-sans text-[12px] text-slate-400 mt-0.5 break-words">
                     {r.company_name || <span className="italic">General Application</span>} ·{" "}
                     {new Date(r.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
                   <StatusBadge status={r.status} />
                   {r.status === "completed" && profile && (
                     <>

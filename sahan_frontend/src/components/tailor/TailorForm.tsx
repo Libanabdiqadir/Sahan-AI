@@ -37,7 +37,7 @@ export function TailorForm({
   const modeLabel     = MODE_LABELS[selectedMode];
 
   return (
-    <div className="bg-white border border-stone-200 rounded-2xl p-6 mb-5">
+    <div className="bg-white border border-stone-200 rounded-2xl p-4 sm:p-6 mb-5">
       <h2 className="text-[18px] font-bold text-slate-900 tracking-tight mb-1">AI Resume Tailoring</h2>
       <p className="font-sans text-[13px] text-slate-400 mb-5">
         Enter the job details below. Our AI engine will craft a tailored resume and cover letter matched to this specific role.
@@ -66,19 +66,19 @@ export function TailorForm({
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
-          <label className="label-xs mr-2">Job Title</label>
-          <input className="form-input" value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g. Senior Product Designer" />
+          <label className="label-xs mb-1 block">Job Title</label>
+          <input className="form-input w-full" value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g. Senior Product Designer" />
         </div>
         <div>
-          <label className="label-xs mr-2">Company Name</label>
-          <input className="form-input" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g. Stripe" />
+          <label className="label-xs mb-1 block">Company Name</label>
+          <input className="form-input w-full" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g. Stripe" />
         </div>
       </div>
 
       <div className="mb-5">
-        <label className="label-xs mr-2">Job Description</label>
+        <label className="label-xs mb-1 block">Job Description</label>
         <textarea
           className="form-input min-h-[140px] resize-y w-full"
           value={jobDescription}
@@ -110,12 +110,12 @@ export function TailorForm({
         )}
       </AnimatePresence>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {/* Primary: immediate generation with current mode */}
         <button
           onClick={onGenerate}
           disabled={loading || !jobDescription.trim()}
-          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 text-white font-sans font-semibold text-[14px] px-6 py-3 rounded-xl flex items-center gap-2 transition-all"
+          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 text-white font-sans font-semibold text-[14px] px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
         >
           {loading
             ? <><Loader2 size={15} className="animate-spin" /> Generating…</>
@@ -126,7 +126,7 @@ export function TailorForm({
         <button
           onClick={onOpenChoiceModal}
           disabled={loading}
-          className="flex flex-col items-start font-sans px-5 py-2.5 rounded-xl border-2 border-stone-200 text-slate-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50/40 disabled:opacity-50 transition-all"
+          className="w-full sm:w-auto flex flex-col items-center sm:items-start font-sans px-5 py-2.5 rounded-xl border-2 border-stone-200 text-slate-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50/40 disabled:opacity-50 transition-all"
         >
           <span className="flex items-center gap-1.5 font-semibold text-[13px]">
             <SlidersHorizontal size={13} /> Choose Type

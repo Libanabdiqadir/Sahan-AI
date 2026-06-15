@@ -20,8 +20,8 @@ function SidebarSection({ title, children, onAdd }: { title: string; children: R
 function MiniCard({ title, sub }: { title: string; sub: string }) {
   return (
     <div className="bg-stone-50 border border-stone-200 rounded-lg p-3 mb-2">
-      <p className="font-semibold text-[13px] text-slate-900">{title}</p>
-      <p className="font-sans text-[11px] text-slate-400 mt-0.5">{sub}</p>
+      <p className="font-semibold text-[13px] text-slate-900 break-words leading-snug">{title}</p>
+      <p className="font-sans text-[11px] text-slate-400 mt-0.5 break-words leading-snug">{sub}</p>
     </div>
   );
 }
@@ -55,9 +55,9 @@ export function ProfileSidebar({ profile, onAddProject, onAddCert, isOpen, onClo
       )}
 
       <aside className={`
-        bg-white border-r border-stone-200 overflow-y-auto p-5 shrink-0
-        md:block md:w-[320px] md:relative md:z-auto md:translate-x-0
-        fixed inset-y-[60px] left-0 z-40 w-[min(320px,85vw)] transition-transform duration-300
+        bg-white border-r border-stone-200 overflow-y-auto p-4 sm:p-5 shrink-0
+        md:block md:w-[300px] lg:w-[320px] md:relative md:z-auto md:translate-x-0
+        fixed inset-y-[60px] left-0 z-40 w-[min(300px,88vw)] transition-transform duration-300
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         md:translate-x-0 md:inset-auto md:h-auto
       `}>
