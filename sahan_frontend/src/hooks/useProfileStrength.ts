@@ -50,17 +50,17 @@ export function useProfileStrength(profile: UserProfile | null): ProfileStrength
     : "bg-amber-50 text-amber-700";
 
   const tips: ProfileTip[] = [
-    { label: "Add contact email",         done: !!profile?.contact_email, tab: "info",   pts: 5  },
-    { label: "Add phone number",          done: !!profile?.phone_number,  tab: "info",   pts: 5  },
-    { label: "Add your location",         done: !!profile?.location,      tab: "info",   pts: 5  },
-    { label: "Add LinkedIn profile",      done: !!profile?.linkedin_url,  tab: "info",   pts: 5  },
-    { label: "Add first work experience", done: expCount >= 1,            tab: "career", pts: 10 },
-    { label: "Add second experience",     done: expCount >= 2,            tab: "career", pts: 10 },
-    { label: "Add education record",      done: eduCount  >= 1,           tab: "career", pts: 15 },
-    { label: "Add a project",             done: projCount >= 1,           tab: "career", pts: 10 },
-    { label: "Add a certification",       done: certCount >= 1,           tab: "career", pts: 15 },
-    { label: "Add 4+ technical skills",   done: techCount >= 4,           tab: "career", pts: 10 },
-    { label: "Add 3+ soft skills",        done: softCount >= 3,           tab: "career", pts: 10 },
+    { label: "Add contact email",         done: !!profile?.contact_email, tab: "info"   as const, pts: 5  },
+    { label: "Add phone number",          done: !!profile?.phone_number,  tab: "info"   as const, pts: 5  },
+    { label: "Add your location",         done: !!profile?.location,      tab: "info"   as const, pts: 5  },
+    { label: "Add LinkedIn profile",      done: !!profile?.linkedin_url,  tab: "info"   as const, pts: 5  },
+    { label: "Add first work experience", done: expCount >= 1,            tab: "career" as const, pts: 10 },
+    { label: "Add second experience",     done: expCount >= 2,            tab: "career" as const, pts: 10 },
+    { label: "Add education record",      done: eduCount  >= 1,           tab: "career" as const, pts: 15 },
+    { label: "Add a project",             done: projCount >= 1,           tab: "career" as const, pts: 10 },
+    { label: "Add a certification",       done: certCount >= 1,           tab: "career" as const, pts: 15 },
+    { label: "Add 4+ technical skills",   done: techCount >= 4,           tab: "career" as const, pts: 10 },
+    { label: "Add 3+ soft skills",        done: softCount >= 3,           tab: "career" as const, pts: 10 },
   ].sort((a, b) => Number(a.done) - Number(b.done));
 
   const doneCount = tips.filter(t => t.done).length;

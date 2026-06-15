@@ -412,7 +412,7 @@ export function ModernProfessionalCV({
   const totalPages = pages.length;
 
   return (
-    <Document title={`${profile.full_name} — ${jobTitle}`} hyphenationCallback={(w) => [w]}>
+    <Document title={`${profile.full_name} — ${jobTitle}`} hyphenationCallback={(w: string) => [w]}>
 
       {/* ══════════════════════════════════════════════════════════
           PAGE 1 — two-column (sidebar + main)
@@ -732,7 +732,7 @@ export function ModernProfessionalPreview({
                   <span style={{ fontSize: "9.5px", color: LIGHT, background: CHIP_BG, padding: "2px 8px", borderRadius: "10px" }}>{exp.duration}</span>
                 </div>
                 <p style={{ fontStyle: "italic", fontSize: "10.5px", color: BLUE, marginBottom: "6px" }}>{exp.role}</p>
-                {exp.responsibilities?.map((r, j) => (
+                {exp.responsibilities?.map((r: string, j: number) => (
                   <div key={j} style={{ display: "flex", marginBottom: "3px" }}>
                     <span style={{ color: BLUE, marginRight: "6px", fontSize: "14px", lineHeight: "1.3" }}>•</span>
                     <span style={{ fontSize: "10px", color: MUTED, lineHeight: "1.5" }}>{r}</span>

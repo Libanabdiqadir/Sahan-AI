@@ -38,7 +38,7 @@ export function HarvardPreview({ profile, tailored }: { profile: UserProfile; ta
               </div>
               <p style={{ fontStyle: "italic", fontSize: "12px", color: "#374151", marginBottom: "6px", marginTop: "2px" }}>{exp.company}</p>
               <ul style={{ marginLeft: "16px" }}>
-                {exp.responsibilities?.map((r, j) => <li key={j} style={{ fontSize: "12px", lineHeight: "1.6", marginBottom: "4px" }}>{r}</li>)}
+                {exp.responsibilities?.map((r: string, j: number) => <li key={j} style={{ fontSize: "12px", lineHeight: "1.6", marginBottom: "4px" }}>{r}</li>)}
               </ul>
             </div>
           ))}
@@ -208,7 +208,7 @@ export function ExecutivePreview({ profile, tailored }: { profile: UserProfile; 
                     <span style={{ fontSize: "10px", color: "white", background: NAVY, padding: "3px 10px", borderRadius: "20px", marginLeft: "10px", flexShrink: 0, whiteSpace: "nowrap" }}>{exp.duration}</span>
                   </div>
                   <p style={{ fontSize: "11px", color: GOLD, fontWeight: "700", marginBottom: "8px" }}>{exp.company}</p>
-                  {exp.responsibilities?.map((r, j) => (
+                  {exp.responsibilities?.map((r: string, j: number) => (
                     <div key={j} style={{ display: "flex", marginBottom: "5px", paddingLeft: "4px" }}>
                       <span style={{ color: GOLD, marginRight: "6px", fontSize: "13px", lineHeight: "1.5" }}>›</span>
                       <span style={{ fontSize: "11px", lineHeight: "1.6", color: "#4a5568" }}>{r}</span>
@@ -249,7 +249,6 @@ export function ExecutivePreview({ profile, tailored }: { profile: UserProfile; 
 export function ExecutiveCoverLetterPreview({ profile, tailored, jobTitle, companyName }: { profile: UserProfile; tailored: Tailored; jobTitle: string; companyName: string }) {
   const NAVY = "#1e2d4a"; const GOLD = "#b8972e";
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-  const contact = [profile.contact_email, profile.phone_number, profile.location, profile.linkedin_url].filter(Boolean).join("  ·  ");
   return (
     <div style={{ background: "white", width: "210mm", minHeight: "297mm", margin: "0 auto", fontFamily: "Arial, sans-serif", fontSize: "12px", lineHeight: "1.7", color: "#2d3748", border: "1px solid #e8e6e0", borderRadius: "8px", boxSizing: "border-box", overflow: "hidden" }}>
       <div style={{ background: NAVY, padding: "32px 36px 24px" }}>
