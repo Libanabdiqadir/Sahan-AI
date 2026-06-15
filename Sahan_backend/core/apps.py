@@ -23,7 +23,6 @@ class CoreConfig(AppConfig):
             if not User.objects.filter(is_superuser=True).exists():
                 print("Creating initial superuser securely from environment variables...")
                 User.objects.create_superuser(
-                    username=admin_username,
                     email=admin_email,
                     password=admin_password
                 )
