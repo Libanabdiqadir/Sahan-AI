@@ -114,11 +114,11 @@ DATABASES = {
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
-        # Reuse database connections for up to 60 seconds instead of opening a
-        # new connection per request.  Critical under load — PostgreSQL's default
-        # max_connections (100) is exhausted instantly at any real traffic level
-        # without this.  Use PgBouncer in transaction mode for 10k+ concurrency.
+
         'CONN_MAX_AGE': env.int('DB_CONN_MAX_AGE', default=60),
+        'OPTIONS': {
+            'sslmode': 'require',
+        }
     }
 }
 
