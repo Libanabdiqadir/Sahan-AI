@@ -233,38 +233,39 @@ class ResumeService:
                 Cover Letter Closing Constraint: The cover letter MUST NOT contain closing salutations or signatures like "Sincerely", "Best regards", "Kind regards", or any name/placeholder at the end. Stop writing exactly at the final paragraph.
 
                 === OUTPUT JSON STRUCTURE ===
-                Output MUST be a valid, parseable JSON object with these EXACT keys:
+                Output MUST be a single valid JSON object. Every key listed below is a TOP-LEVEL key on the root object. Do NOT nest any of these inside another key.
 
-                'summary': A concise, professional summary tailored to the job (max 3 sentences).
+                "summary": A concise, professional summary tailored to the job (max 3 sentences).
 
-                'tech_skills': A list of relevant technical/hard skills matching the job.
+                "tech_skills": A list of strings — relevant technical/hard skills matching the job.
 
-                'soft_skills': A list of relevant interpersonal/soft skills.
+                "soft_skills": A list of strings — relevant interpersonal/soft skills.
 
-                'experience': A list of objects, each representing work history:
-                'role': Targeted job title.
-                'company': Company name.
-                'duration': Date range.
-                'responsibilities': A list of 3-4 clean, high-impact achievement sentences (no leading dashes or bullet characters).
+                "experience": A list of work-history objects. Each object has EXACTLY these sub-keys:
+                    "role": Targeted job title.
+                    "company": Company name.
+                    "duration": Date range.
+                    "responsibilities": A list of 3–4 clean, high-impact achievement sentences (no leading dashes or bullet characters).
 
-                'projects': CRITICAL — scan every project in the Master Data 'projects' array. Include ALL projects whose tech stack, domain, or purpose overlaps with the Job Description. Do NOT skip projects simply because experience entries already fill the resume. If the target role is technical (e.g. Full-Stack, Backend, Frontend, Data, DevOps) and any Master Data project uses relevant technologies or solves a related problem, it MUST appear here. Each object:
-                'name': The name of the project.
-                'role_title': Role on the project (e.g., "Lead Creator", "Solo Developer").
-                'description': A single polished, impact-driven action statement explaining what was built and its relevance (no leading dashes or bullet characters).
-                'link': The repository or live URL (omit if not present).
-                'dates': Month/Year or duration (omit if not present).
+                "projects": CRITICAL — scan every project in the Master Data 'projects' array. Include ALL projects whose tech stack, domain, or purpose overlaps with the Job Description. Do NOT skip projects simply because experience entries already fill the resume. Each object has EXACTLY these sub-keys:
+                    "name": The name of the project.
+                    "role_title": Role on the project (e.g., "Lead Creator", "Solo Developer").
+                    "description": A single polished, impact-driven action statement explaining what was built and its relevance (no leading dashes or bullet characters).
+                    "link": The repository or live URL (omit this key if not present).
+                    "dates": Month/Year or duration (omit this key if not present).
 
-                'education': A list of objects:
-                'degree': Degree/course of study.
-                'university': Institution name.
-                'graduation_year': Year of graduation.
+                "education": A list of education objects. Each object has EXACTLY these sub-keys:
+                    "degree": Degree/course of study.
+                    "university": Institution name.
+                    "graduation_year": Year of graduation.
 
-                'certifications': A list of objects (draw from the Master Data certifications if present):
-                'name': Title of the certificate.
-                'issuer': Issuing organization.
-                'issue_date': Date received.
-                'credential_id': ID if present (omit key entirely if not present).
-                'languages': A list of languages spoken.
+                "certifications": A list of certification objects (draw from Master Data certifications). Each object has EXACTLY these sub-keys:
+                    "name": Title of the certificate.
+                    "issuer": Issuing organization.
+                    "issue_date": Date received.
+                    "credential_id": Credential ID (omit this key entirely if not present).
+
+                "languages": A top-level list of language strings (e.g. ["English", "Somali"]). This is NOT a sub-key of certifications.
 
                 {cover_letter_instruction}
                 {mode_note}

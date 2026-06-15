@@ -265,10 +265,10 @@ function SectionHeader({ title }: { title: string }) {
 }
 
 // ─── Shared section renderer ──────────────────────────────────────────────────
-function PageSections({ pg, tailored }: { pg: ContentPage; tailored: TailoredData }) {
+function PageSections({ pg, tailored, isFirstPage }: { pg: ContentPage; tailored: TailoredData; isFirstPage?: boolean }) {
   return (
     <>
-      {pg.hasSummary && tailored.summary && (
+      {(isFirstPage || pg.hasSummary) && tailored.summary && (
         <View style={S.section}>
           <SectionHeader title="Professional Summary" />
           <Text style={S.summaryText}>{tailored.summary}</Text>
@@ -496,7 +496,7 @@ export function ModernProfessionalCV({
             <Text style={S.name}>{profile.full_name}</Text>
           </View>
           <View style={S.headerRule} />
-          <PageSections pg={pages[0]} tailored={{ ...tailored, projects }} />
+          <PageSections pg={pages[0]} tailored={{ ...tailored, projects }} isFirstPage />
         </View>
       </Page>
 

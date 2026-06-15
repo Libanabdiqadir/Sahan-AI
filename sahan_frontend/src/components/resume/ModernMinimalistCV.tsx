@@ -289,13 +289,13 @@ function SH({ title }: { title: string }) {
 
 // ─── Shared section renderer (used on both page 1 and continuation pages) ────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function PageSections({ pg, tailored }: { pg: ContentPage; tailored: TailoredData }) {
+function PageSections({ pg, tailored, isFirstPage }: { pg: ContentPage; tailored: TailoredData; isFirstPage?: boolean }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const projects: any[] = tailored.projects?.length ? tailored.projects : [];
 
   return (
     <>
-      {pg.hasSummary && tailored.summary && (
+      {(isFirstPage || pg.hasSummary) && tailored.summary && (
         <View style={S.section}>
           <SH title="Professional Summary" />
           <Text style={S.summaryText}>{tailored.summary}</Text>
@@ -518,7 +518,7 @@ export function ModernMinimalistCV({ profile, tailored, jobTitle, companyName }:
 
           {/* ── Main — page 1 content ── */}
           <View style={S.main}>
-            <PageSections pg={pages[0]} tailored={{ ...tailored, projects }} />
+            <PageSections pg={pages[0]} tailored={{ ...tailored, projects }} isFirstPage />
           </View>
         </View>
       </Page>
