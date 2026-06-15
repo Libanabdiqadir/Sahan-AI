@@ -22,15 +22,15 @@ export function StatsGrid({ resumes }: Props) {
   ];
 
   return (
-    <motion.div {...fade(0.08)} className="grid grid-cols-4 gap-4 mb-8">
+    <motion.div {...fade(0.08)} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
       {stats.map(({ label, value, change, accent }) => (
         <div
           key={label}
-          className={`bg-white rounded-xl p-5 border ${accent ? "border-t-[3px] border-t-blue-600 border-x-stone-200 border-b-stone-200" : "border-stone-200"}`}
+          className={`bg-white rounded-xl p-3 sm:p-5 border min-w-0 flex flex-col justify-between ${accent ? "border-t-[3px] border-t-blue-600 border-x-stone-200 border-b-stone-200" : "border-stone-200"}`}
         >
-          <p className="font-sans text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2">{label}</p>
-          <p className="text-[30px] font-bold text-slate-900 tracking-tighter leading-none">{value}</p>
-          <p className="font-sans text-[11px] text-slate-400 mt-2">{change}</p>
+          <p className="font-sans text-[10px] sm:text-[11px] font-semibold text-slate-400 uppercase tracking-[0.4px] sm:tracking-wide leading-tight mb-2">{label}</p>
+          <p className="text-[26px] sm:text-[30px] font-bold text-slate-900 tracking-tighter leading-none my-1">{value}</p>
+          <p className="font-sans text-[10px] sm:text-[11px] text-slate-400 leading-tight mt-1">{change}</p>
         </div>
       ))}
     </motion.div>

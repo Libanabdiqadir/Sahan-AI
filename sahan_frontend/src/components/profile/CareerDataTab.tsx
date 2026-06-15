@@ -375,23 +375,23 @@ export function CareerDataTab(props: CareerDataTabProps) {
       </div>
 
       {/* ── Technical Skills ─────────────────────────────────────────── */}
-      <div className="bg-white border border-stone-200 rounded-xl p-6">
+      <div className="bg-white border border-stone-200 rounded-xl p-4 sm:p-6">
         <h2 className="font-bold text-[15px] text-slate-900 mb-4">Technical Skills</h2>
         <div className="flex flex-wrap gap-2 mb-4">
           {(draft.master_data?.tech_skills ?? []).map((s, i) => (
             <SkillChip key={i} label={s} onRemove={() => removeSkill("tech_skills", i)} />
           ))}
         </div>
-        <div className="flex gap-2">
-          <input className="form-input flex-1" value={hardSkills} onChange={e => setHardSkills(e.target.value)} onKeyDown={e => e.key === "Enter" && handleAddSkill("skills")} placeholder="Type a skill and press Enter" />
-          <button onClick={() => handleAddSkill("skills")} className="font-sans text-[13px] font-semibold px-4 py-2 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 flex items-center gap-1.5 transition-colors">
-            <Plus size={13} /> Add Hard skills
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input className="form-input w-full sm:flex-1" value={hardSkills} onChange={e => setHardSkills(e.target.value)} onKeyDown={e => e.key === "Enter" && handleAddSkill("skills")} placeholder="Type a skill and press Enter" />
+          <button onClick={() => handleAddSkill("skills")} className="w-full sm:w-auto font-sans text-[13px] font-semibold px-4 py-2.5 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 flex items-center justify-center gap-1.5 transition-colors shrink-0">
+            <Plus size={13} /> Add Hard Skill
           </button>
         </div>
       </div>
 
       {/* ── Soft Skills ──────────────────────────────────────────────── */}
-      <div className="bg-white border border-stone-200 rounded-xl p-6">
+      <div className="bg-white border border-stone-200 rounded-xl p-4 sm:p-6">
         <h2 className="font-bold text-[15px] text-slate-900 mb-4">Soft Skills</h2>
         <div className="flex flex-wrap gap-2 mb-4">
           {(draft.master_data?.soft_skills ?? []).map((s, i) => (
@@ -401,16 +401,16 @@ export function CareerDataTab(props: CareerDataTabProps) {
             </span>
           ))}
         </div>
-        <div className="flex gap-2">
-          <input className="form-input flex-1" value={softSkills} onChange={e => setSoftSkills(e.target.value)} onKeyDown={e => e.key === "Enter" && handleAddSkill("soft_skills")} placeholder="Type a skill and press Enter" />
-          <button onClick={() => handleAddSkill("soft_skills")} className="font-sans text-[13px] font-semibold px-4 py-2 border border-green-200 text-green-600 rounded-lg hover:bg-green-50 flex items-center gap-1.5 transition-colors">
-            <Plus size={13} /> Add Soft skills
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input className="form-input w-full sm:flex-1" value={softSkills} onChange={e => setSoftSkills(e.target.value)} onKeyDown={e => e.key === "Enter" && handleAddSkill("soft_skills")} placeholder="Type a skill and press Enter" />
+          <button onClick={() => handleAddSkill("soft_skills")} className="w-full sm:w-auto font-sans text-[13px] font-semibold px-4 py-2.5 border border-green-200 text-green-600 rounded-lg hover:bg-green-50 flex items-center justify-center gap-1.5 transition-colors shrink-0">
+            <Plus size={13} /> Add Soft Skill
           </button>
         </div>
       </div>
 
       {/* ── Languages ───────────────────────────────────────────────── */}
-      <div className="bg-white border border-stone-200 rounded-xl p-6">
+      <div className="bg-white border border-stone-200 rounded-xl p-4 sm:p-6">
         <h2 className="font-bold text-[15px] text-slate-900 mb-4">Languages</h2>
         <div className="flex flex-wrap gap-2 mb-4">
           {(draft.languages ?? []).map((l, i) => (
@@ -430,10 +430,10 @@ export function CareerDataTab(props: CareerDataTabProps) {
           ))}
           {!(draft.languages ?? []).length && <p className="font-sans text-[13px] text-slate-300 italic">No languages added yet.</p>}
         </div>
-        <div className="flex gap-2">
-          <input className="form-input flex-1" value={languageInput} onChange={e => setLanguageInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") handleAddLanguage(); }} placeholder="Add languages you speak" />
-          <button onClick={handleAddLanguage} className="font-sans text-[13px] font-semibold px-4 py-2 border border-violet-200 text-violet-600 rounded-lg hover:bg-violet-50 flex items-center gap-1.5 transition-colors">
-            <Plus size={13} /> Add language
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input className="form-input w-full sm:flex-1" value={languageInput} onChange={e => setLanguageInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") handleAddLanguage(); }} placeholder="Add languages you speak" />
+          <button onClick={handleAddLanguage} className="w-full sm:w-auto font-sans text-[13px] font-semibold px-4 py-2.5 border border-violet-200 text-violet-600 rounded-lg hover:bg-violet-50 flex items-center justify-center gap-1.5 transition-colors shrink-0">
+            <Plus size={13} /> Add Language
           </button>
         </div>
       </div>
