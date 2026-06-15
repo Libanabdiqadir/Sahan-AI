@@ -32,7 +32,7 @@ DEBUG = env('DEBUG')
 
 
 # Read comma-separated hosts from env in production, e.g.:
-# ALLOWED_HOSTS=sahanai.com,www.sahanai.com,api.sahanai.com
+# ALLOWED_HOSTS=sahan-ai.onrender.com,sahancv.com,www.sahancv.com
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 
@@ -188,7 +188,7 @@ REST_FRAMEWORK = {
     },
 }
 
-# In production set: CORS_ALLOWED_ORIGINS=https://sahanai.com,https://www.sahanai.com
+# In production set: CORS_ALLOWED_ORIGINS=https://sahancv.com,https://www.sahancv.com
 CORS_ALLOWED_ORIGINS = env.list(
     'CORS_ALLOWED_ORIGINS',
     default=["http://localhost:5173"],
