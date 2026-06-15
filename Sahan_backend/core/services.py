@@ -1,14 +1,14 @@
 import json
-import uuid
+import re
 from datetime import timedelta
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types, errors as genai_errors
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
-from google.api_core.exceptions import ResourceExhausted
 from rest_framework.exceptions import PermissionDenied
 
 from .models import Document, ResumeHistory, UserProfile, UserSubscription
@@ -26,7 +26,7 @@ BILLING_CYCLE_DAYS = 30
 # and is excluded from the in flight count so it doesn't permanently block the user.
 STALE_PROCESSING_MINUTES = 15
 
-genai.configure(api_key=settings.GEMINI_API_KEY)
+client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
 # ─── Internal quota helpers ───────────────────────────────────────────────────
@@ -194,8 +194,11 @@ class ResumeService:
             A 'failed' record does NOT count against quota, so the user can retry.
           - Always returns the resume object (caller checks resume.status).
         """
-        PRIMARY_MODEL  = 'models/gemini-2.5-flash'
-        FALLBACK_MODEL = 'models/gemini-2.0-flash'
+        
+        PRIMARY_MODEL  = 'gemini-2.5-flash'
+        FALLBACK_MODEL = 'gemini-2.0-flash'
+
+        ai_config = types.GenerateContentConfig(response_mime_type='application/json')
 
         try:
             profile = UserProfile.objects.get(user=resume.user)
@@ -271,22 +274,47 @@ class ResumeService:
                 {mode_note}
             """
 
-            gen_cfg = {"response_mime_type": "application/json"}
             try:
-                response = genai.GenerativeModel(model_name=PRIMARY_MODEL).generate_content(
-                    prompt, generation_config=gen_cfg,
+                response = client.models.generate_content(
+                    model=PRIMARY_MODEL,
+                    contents=prompt,
+                    config=ai_config,
                 )
-            except ResourceExhausted:
-                # Primary model's free tier daily quota exhausted; try the fallback
-                # model which has a much higher free-tier limit (1 500 RPD vs 20 RPD).
-                response = genai.GenerativeModel(model_name=FALLBACK_MODEL).generate_content(
-                    prompt, generation_config=gen_cfg,
+            except genai_errors.ClientError as exc:
+                # Only fall back to the secondary model on rate-limit / quota
+                # errors (HTTP 429 / 503).  All other 4xx errors (bad auth,
+                # invalid payload, etc.) are real failures — re-raise them so
+                # the outer handler marks the job failed with a clear message.
+                if getattr(exc, 'code', 0) not in (429, 503):
+                    raise
+                response = client.models.generate_content(
+                    model=FALLBACK_MODEL,
+                    contents=prompt,
+                    config=ai_config,
                 )
 
-            cleaned_text = response.text.strip().removeprefix('```json').removesuffix('```')
-            data = json.loads(cleaned_text)
+            # Strip markdown code fences that some model versions emit even
+            # when response_mime_type='application/json' is set.
+            text = response.text.strip()
+            if text.startswith('```'):
+                text = re.sub(r'^```(?:json)?\s*', '', text)
+                text = re.sub(r'\s*```$', '', text)
+            data = json.loads(text)
 
-            # Enforce generation_mode: override whatever the AI produced
+            # Guarantee every key the frontend expects is present, so that a
+            # partially-populated AI response never causes a KeyError below or
+            # a missing-field render on the client.
+            data.setdefault('summary', '')
+            data.setdefault('tech_skills', [])
+            data.setdefault('soft_skills', [])
+            data.setdefault('experience', [])
+            data.setdefault('projects', [])
+            data.setdefault('education', [])
+            data.setdefault('certifications', [])
+            data.setdefault('languages', [])
+            data.setdefault('cover_letter', '')
+
+            # Enforce generation_mode: override whatever the AI produced.
             if generation_mode == 'cv_only':
                 data['cover_letter'] = ''
             elif generation_mode == 'cover_letter_only':
@@ -311,11 +339,13 @@ class ResumeService:
             )
             resume.save(update_fields=['status', 'error_message'])
 
-        except ResourceExhausted:
+        except genai_errors.ClientError as exc:
             resume.status = 'failed'
-            resume.error_message = (
-                'AI generation quota reached. Please try again tomorrow.'
-            )
+            code = getattr(exc, 'code', 0)
+            if code in (429, 503):
+                resume.error_message = 'AI generation quota reached. Please try again tomorrow.'
+            else:
+                resume.error_message = f'AI API error ({code}): {str(exc)[:430]}'
             resume.save(update_fields=['status', 'error_message'])
 
         except Exception as e:
