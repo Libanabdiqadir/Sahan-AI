@@ -117,7 +117,7 @@ DATABASES = {
 
         'CONN_MAX_AGE': env.int('DB_CONN_MAX_AGE', default=60),
         'OPTIONS': {
-            'sslmode': 'require',
+            'sslmode': 'require' if not DEBUG else 'disable',
         }
     }
 }
@@ -292,7 +292,7 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 # Dev shortcut: when DEBUG=True, tasks run synchronously in-process so you
 # don't need a running Celery worker.  Set to False (or leave DEBUG=False) in
 # production where the real worker is running.
-CELERY_TASK_ALWAYS_EAGER    = DEBUG
+CELERY_TASK_ALWAYS_EAGER    = env.bool('CELERY_TASK_ALWAYS_EAGER', default=DEBUG)
 CELERY_TASK_EAGER_PROPAGATES = False  # never let task exceptions crash the view
 # P1: expire task results after 1 hour — prevents unbounded Redis memory growth.
 CELERY_RESULT_EXPIRES = 3600
