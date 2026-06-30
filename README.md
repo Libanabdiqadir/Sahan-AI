@@ -1,3 +1,9 @@
+<img width="1440" height="811" alt="image" src="https://github.com/user-attachments/assets/cdad6000-950f-4079-a16a-f1d7d69635bb" />
+<img width="1440" height="812" alt="image" src="https://github.com/user-attachments/assets/4224ba53-57d0-4119-8ee6-ef3df9c7072e" />
+
+
+
+
 # Sahan AI is an Intelligent Full-Stack Resume & Cover Letter Tailor
 
 Sahan AI is a modern SaaS platform designed to automate and optimize the job application process. Instead of manually editing resumes for every different job posting, Sahan AI dynamically cross-references a user's stored professional profile with specific job descriptions to instantly generate targeted, high-impact resumes and cover letters using generative AI.
